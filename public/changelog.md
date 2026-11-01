@@ -1,6 +1,9 @@
 # ChangeLog de PVEMon
 Historial reconstruido desde la primera versión numerada. Lo más reciente, primero.
 
+## 1.5.3 · 01/11/2026
+- Nuevo en GitHub: formularios para abrir Issues (fallo y sugerencia) en castellano e inglés, que piden versión, logs y avisan de no pegar claves ni IPs. No cambia nada en la aplicación.
+
 ## 1.5.2 · 01/11/2026
 - Corregido: la API de solo lectura (`/api/v1/backups`) dejaba fuera copias que la pantalla Backups sí mostraba: las de elementos sin monitorizar y las tareas recién dadas de alta que aún no tenían estado. Ahora lista todas las copias que PVEMon conoce, con un campo nuevo `monitored`, y una tarea nueva sale como «none» hasta su primera evaluación.
 - El resumen (`/api/v1/summary`) y su «ok» siguen contando solo las copias monitorizadas, igual que las alertas.

@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security problem / Fallo de seguridad
+    url: https://github.com/Dagarin-es/PVEMon/security/advisories/new
+    about: "Do NOT open a public issue, report it privately here. / NO abras un Issue público: avísalo aquí en privado."

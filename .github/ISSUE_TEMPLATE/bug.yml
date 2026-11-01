@@ -1,0 +1,50 @@
+name: Bug / Fallo
+description: Something does not work as expected / Algo no funciona como debería
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **ES:** Puedes escribir en castellano o en inglés. **No pegues tokens, claves, contraseñas ni direcciones IP o nombres de tus servidores**: sustitúyelos por `xxxx`.
+        **EN:** You can write in Spanish or English. **Do not paste tokens, keys, passwords, IP addresses or your server names**: replace them with `xxxx`.
+  - type: input
+    id: version
+    attributes:
+      label: PVEMon version / Versión de PVEMon
+      description: Menu → ChangeLog, or the image tag / Menú → ChangeLog, o la etiqueta de la imagen
+      placeholder: "1.5.3"
+    validations:
+      required: true
+  - type: input
+    id: pve
+    attributes:
+      label: Proxmox VE version / Versión de Proxmox VE
+      placeholder: "9.0"
+  - type: dropdown
+    id: install
+    attributes:
+      label: How do you run it? / ¿Cómo lo ejecutas?
+      options:
+        - Docker Compose
+        - Arcane / Portainer / Dockge
+        - Docker run
+        - From source / Desde el código
+        - Other / Otro
+  - type: textarea
+    id: what
+    attributes:
+      label: What happens? / ¿Qué ocurre?
+      description: What you expected and what you got instead / Qué esperabas y qué ha pasado
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce / Pasos para reproducirlo
+      placeholder: "1. …\n2. …"
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: "`docker compose logs --tail 50` (remove sensitive data / quita datos sensibles)"
+      render: shell

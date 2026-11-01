@@ -1,6 +1,9 @@
 # PVEMon ChangeLog
 History rebuilt from the first numbered version. Most recent first.
 
+## 1.5.3 · 01/11/2026
+- New on GitHub: forms to open Issues (bug and suggestion) in Spanish and English, asking for version and logs and warning not to paste keys or IPs. Nothing changes in the application.
+
 ## 1.5.2 · 01/11/2026
 - Fixed: the read-only API (`/api/v1/backups`) left out backups that the Backups screen did show: those of unmonitored items and newly added tasks that did not have a status yet. It now lists every backup PVEMon knows, with a new `monitored` field, and a new task appears as “none” until its first evaluation.
 - The summary (`/api/v1/summary`) and its “ok” still count only monitored backups, like the alerts.

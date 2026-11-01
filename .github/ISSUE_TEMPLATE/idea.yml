@@ -1,0 +1,18 @@
+name: Suggestion / Sugerencia
+description: An idea to improve PVEMon / Una idea para mejorar PVEMon
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **ES / EN:** PVEMon is read-only toward Proxmox by design; suggestions that change servers will not be accepted. / PVEMon es de solo lectura con Proxmox por diseño; no se aceptarán sugerencias que modifiquen servidores.
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like? / ¿Qué te gustaría?
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why is it useful? / ¿Para qué te sirve?
