@@ -1,6 +1,15 @@
 # ChangeLog de PVEMon
 Historial reconstruido desde la primera versión numerada. Lo más reciente, primero.
 
+## 2.0.0-beta.3 · 01/11/2026
+- Las copias ahora se pueden pasar **en los dos sentidos**: exportar en PVEMon e importar en BCKMon, o exportar en BCKMon e importar en PVEMon (Ajustes › Sistema tiene las dos tarjetas en ambas aplicaciones). Mismo formato de archivo (`.bckmonx`); solo añade lo que falta.
+- Nuevo script `actualizar.sh` para actualizar en local las dos imágenes y los dos contenedores a partir de un zip en `/opt`.
+
+## 2.0.0-beta.2 · 01/11/2026
+- Nuevo: **Exportar a BCKMon** (PVEMon, Ajustes › Sistema). Crea un archivo cifrado (`.bckmonx`) solo con lo que necesita BCKMon: orígenes de copias, copias, correo IMAP, remitentes excluidos, formatos propios y comprobaciones de archivo (NFS), con su historial. No lleva servidores Proxmox, Docker, usuarios, kioscos ni alertas.
+- Nuevo: **Importar desde PVEMon** (BCKMon, Ajustes › Sistema). Solo añade lo que falta, no sustituye nada; el correo se configura únicamente si BCKMon aún no tiene uno. La contraseña del correo se vuelve a cifrar con la `SECRET_KEY` de BCKMon.
+- Corregido: BCKMon podía seguir mostrando el icono de PVEMon si el navegador lo tenía guardado en la misma dirección (los iconos se guardan 30 días). Ahora BCKMon pide sus iconos con una dirección propia.
+
 ## 2.0.0-beta.1 · 01/11/2026
 - **Versión beta.** La cabecera muestra «BETA» mientras la versión lleve «-beta». La estable sigue siendo la 1.5.7 (`dagarines/pvemon:1.5.7`); en Docker Hub `latest` no apunta a la beta. Guía para volver: `docs/VOLVER-A-1.5.7.md`.
 - **Nace BCKMon**, una segunda aplicación hecha con la misma base de código y centrada solo en las copias de seguridad: se llega con `EDITION=bckmon` (imagen `dagarines/bckmon`). Otro nombre, icono y colores (verdes), la pantalla de inicio es Backups, Ajustes reordenados (Copias, Alertas de copias, Notificaciones, Usuarios, Sistema), sin nodos, VM, LXC, Docker, discos ni actualizaciones, y la API de solo lectura solo ofrece copias y alertas. No se conecta a Proxmox, ni a Docker, ni explora la red.

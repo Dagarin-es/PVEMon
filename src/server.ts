@@ -145,7 +145,7 @@ app.get('/brand.js', async (_req, reply) => reply.header('Cache-Control', 'no-ca
 app.get('/manifest.webmanifest', async (_req, reply) => reply.header('Cache-Control', 'no-cache').type('application/manifest+json').send(manifest()));
 if (EDITION !== 'pvemon') {
   for (const f of ['icon.svg', 'icon-192.png', 'icon-512.png', 'favicon-32.png', 'favicon-48.png', 'apple-touch-icon.png', 'badge-96.png']) {
-    app.get('/' + f, async (_req, reply) => reply.sendFile(`editions/${EDITION}/${f}`));
+    app.get('/' + f, async (_req, reply) => reply.header('Cache-Control', 'public, max-age=3600').sendFile(`editions/${EDITION}/${f}`));
   }
 }
 await app.register(fastifyStatic, {

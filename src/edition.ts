@@ -21,14 +21,18 @@ export const brand = (s: string): string => EDITION === 'pvemon' || !s ? s : s
 /** Script que el navegador carga antes que nada: identifica la edición y la marca */
 export const brandScript = (): string =>
   `window.EDITION=${JSON.stringify(EDITION)};window.BRAND=${JSON.stringify(BRAND)};` +
-  `document.documentElement.setAttribute('data-ed',window.EDITION);document.title=window.BRAND.name;`;
+  `document.documentElement.setAttribute('data-ed',window.EDITION);document.title=window.BRAND.name;` +
+  // BCKMon: direcciones de icono propias (?e=bckmon) para no heredar los iconos que el navegador tenga guardados de PVEMon en la misma dirección
+  `window.ICQ=window.EDITION==='bckmon'?'?e=bckmon':'';` +
+  `document.querySelectorAll('link[rel=icon],link[rel=apple-touch-icon]').forEach(function(l){l.setAttribute('href',l.getAttribute('href').split('?')[0]+window.ICQ)});`;
 
+const ICQ = EDITION === 'bckmon' ? '?e=bckmon' : '';
 export const manifest = () => ({
   name: BRAND.name, short_name: BRAND.name, description: BRAND.desc, start_url: '/', display: 'standalone',
   background_color: BRAND.bg, theme_color: BRAND.bg,
   icons: [
-    { src: '/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
-    { src: '/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' },
-    { src: '/icon.svg', sizes: 'any', type: 'image/svg+xml' },
+    { src: '/icon-192.png' + ICQ, sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
+    { src: '/icon-512.png' + ICQ, sizes: '512x512', type: 'image/png', purpose: 'any maskable' },
+    { src: '/icon.svg' + ICQ, sizes: 'any', type: 'image/svg+xml' },
   ],
 });

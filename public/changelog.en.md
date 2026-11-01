@@ -1,6 +1,15 @@
 # PVEMon ChangeLog
 History rebuilt from the first numbered version. Most recent first.
 
+## 2.0.0-beta.3 · 01/11/2026
+- Backups can now be moved **in both directions**: export from PVEMon and import in BCKMon, or export from BCKMon and import in PVEMon (Settings › System has both cards in both applications). Same file format (`.bckmonx`); it only adds what is missing.
+- New `actualizar.sh` script to update both local images and containers from a zip in `/opt`.
+
+## 2.0.0-beta.2 · 01/11/2026
+- New: **Export to BCKMon** (PVEMon, Settings › System). Creates an encrypted file (`.bckmonx`) with only what BCKMon needs: backup sources, backups, IMAP mail, excluded senders, custom formats and file checks (NFS), with their history. It does not include Proxmox servers, Docker, users, kiosks or alerts.
+- New: **Import from PVEMon** (BCKMon, Settings › System). It only adds what is missing and replaces nothing; mail is configured only if BCKMon has none yet. The mail password is re-encrypted with BCKMon's own `SECRET_KEY`.
+- Fixed: BCKMon could keep showing the PVEMon icon if the browser had it cached at the same address (icons are cached for 30 days). BCKMon now requests its icons from its own address.
+
 ## 2.0.0-beta.1 · 01/11/2026
 - **Beta version.** The header shows “BETA” while the version carries “-beta”. The stable one is still 1.5.7 (`dagarines/pvemon:1.5.7`); on Docker Hub `latest` does not point to the beta. How to go back: `docs/VOLVER-A-1.5.7.md`.
 - **BCKMon is born**, a second application built from the same code and focused only on backups: you get it with `EDITION=bckmon` (image `dagarines/bckmon`). Different name, icon and colours (greens), Backups is the home screen, Settings reorganised (Backups, Backup alerts, Notifications, Users, System), no nodes, VMs, LXC, Docker, disks or updates, and the read-only API only offers backups and alerts. It does not connect to Proxmox or Docker, nor scan the network.

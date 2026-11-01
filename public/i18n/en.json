@@ -961,5 +961,20 @@
   "Copias": "Backups",
   "copias enlazadas": "backups linked",
   "Todavía no hay copias configuradas. Dalas de alta en Ajustes › Copias.": "There are no backups set up yet. Add them under Settings › Backups.",
-  "Versión beta: puede tener fallos": "Beta version: it may have bugs"
+  "Versión beta: puede tener fallos": "Beta version: it may have bugs",
+  "Contraseña para cifrar el archivo (mínimo 8 caracteres)": "Password to encrypt the file (at least 8 characters)",
+  "Preparando el archivo…": "Preparing the file…",
+  "No se pudo crear el archivo": "Could not create the file",
+  "Contraseña del archivo": "File password",
+  "Leyendo e importando…": "Reading and importing…",
+  "Importado: {0} orígenes nuevos, {1} copias nuevas, {2} correos, {3} comprobaciones de archivo, {4} remitentes excluidos nuevos.{5}": "Imported: {0} new sources, {1} new backups, {2} emails, {3} file checks, {4} new excluded senders.{5}",
+  " Se ha configurado también el correo (revísalo en Ajustes › Copias).": " Mail has also been set up (check it in Settings › Backups).",
+  "Importar": "Import",
+  "Archivo descargado: {0} orígenes, {1} copias, {2} correos. Impórtalo en {3} (Ajustes › Sistema).": "File downloaded: {0} sources, {1} backups, {2} emails. Import it in {3} (Settings › System).",
+  "Elige el archivo exportado desde {0} (.bckmonx)": "Choose the file exported from {0} (.bckmonx)",
+  "Pasar las copias a {0}": "Move the backups to {0}",
+  "Crea un archivo cifrado solo con la configuración de copias: orígenes, copias, correo, remitentes excluidos y comprobaciones de archivo. No lleva servidores Proxmox, Docker, usuarios, kioscos ni alertas. Se importa en {0}, en Ajustes › Sistema.": "Creates an encrypted file with only the backup settings: sources, backups, mail, excluded senders and file checks. It does not include Proxmox servers, Docker, users, kiosks or alerts. Import it in {0}, under Settings › System.",
+  "Descargar archivo para {0}": "Download file for {0}",
+  "Traer las copias desde {0}": "Bring the backups from {0}",
+  "Trae aquí la configuración de copias que exportaste desde {0}: orígenes, copias, comprobaciones de archivo, remitentes excluidos y el correo (si aquí todavía no hay uno configurado). No sustituye nada de lo que ya tengas: solo añade lo que falte. Los usuarios y los kioscos no se traen.": "Brings in here the backup settings you exported from {0}: sources, backups, file checks, excluded senders and the mail account (if none is set up here yet). It replaces nothing you already have: it only adds what is missing. Users and kiosks are not brought over."
 }

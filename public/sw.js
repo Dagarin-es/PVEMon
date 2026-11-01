@@ -1,4 +1,4 @@
-const C='pvemon-v98',A=['/','/brand.js','/manifest.webmanifest','/icon.svg','/badge-96.png','/app.css','/i18n.js'];
+const C='pvemon-v100',A=['/','/brand.js','/manifest.webmanifest','/icon.svg','/badge-96.png','/app.css','/i18n.js'];
 self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(C).then(c=>c.addAll(A)))});
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==C).map(x=>caches.delete(x)))).then(()=>self.clients.claim())));
 self.addEventListener('fetch',e=>{const u=new URL(e.request.url);if(e.request.method!=='GET'||u.pathname.startsWith('/api'))return;
