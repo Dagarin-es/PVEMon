@@ -1,0 +1,13 @@
+services:
+  pvemon:
+    image: dagarines/pvemon:latest   # imagen de Docker Hub (docker compose pull)
+    build: .                         # o construida desde este código (docker compose up -d --build)
+    container_name: pvemon
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATA_DIR: /data      # fijo: el .env no puede cambiarlo
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data:/data       # config.db + metrics.db (incluir en las copias de seguridad)

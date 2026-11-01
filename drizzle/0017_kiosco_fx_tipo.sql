@@ -1,0 +1,1 @@
+ALTER TABLE `kiosk_groups` ADD `fx_kind` text DEFAULT 'pixels' NOT NULL;

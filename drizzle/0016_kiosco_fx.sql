@@ -1,0 +1,1 @@
+ALTER TABLE `kiosk_groups` ADD `fx` real DEFAULT 2 NOT NULL;

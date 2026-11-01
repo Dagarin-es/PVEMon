@@ -1,0 +1,146 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1790875896668,
+      "tag": "0000_regular_iron_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1791047547435,
+      "tag": "0001_wakeful_phantom_reporter",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1791048260403,
+      "tag": "0002_expand_access",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1791050922899,
+      "tag": "0003_split_mem_rule",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1791051952114,
+      "tag": "0004_docker_endpoints_info",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1791053163013,
+      "tag": "0005_element_alias",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1791054429829,
+      "tag": "0006_server_source",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1791114844942,
+      "tag": "0007_backup_status",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1791116357023,
+      "tag": "0008_mail_backups",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1791117504483,
+      "tag": "0009_mail_sender",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1792326491663,
+      "tag": "0010_user_avatars",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "6",
+      "when": 1792429853069,
+      "tag": "0011_notif_telegram",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "6",
+      "when": 1792695804939,
+      "tag": "0012_mail_size",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "6",
+      "when": 1792829700214,
+      "tag": "0013_kioscos",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "6",
+      "when": 1792842349795,
+      "tag": "0014_kiosco_tema",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "6",
+      "when": 1792843141834,
+      "tag": "0015_kiosco_grupos",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "6",
+      "when": 1792844093737,
+      "tag": "0016_kiosco_fx",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "6",
+      "when": 1792844509125,
+      "tag": "0017_kiosco_fx_tipo",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "6",
+      "when": 1792863661842,
+      "tag": "0018_discos_y_posponer",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "6",
+      "when": 1792950000000,
+      "tag": "0019_idioma",
+      "breakpoints": true
+    }
+  ]
+}

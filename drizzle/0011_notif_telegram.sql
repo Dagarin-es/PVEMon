@@ -1,0 +1,1 @@
+ALTER TABLE `notification_prefs` ADD `telegram` integer DEFAULT false NOT NULL;

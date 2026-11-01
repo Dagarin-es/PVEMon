@@ -1,0 +1,1 @@
+ALTER TABLE `kiosks` ADD `theme` text DEFAULT 'auto' NOT NULL;

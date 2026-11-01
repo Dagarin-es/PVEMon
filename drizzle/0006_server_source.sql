@@ -1,0 +1,1 @@
+ALTER TABLE `servers` ADD `source` text DEFAULT 'manual' NOT NULL;
