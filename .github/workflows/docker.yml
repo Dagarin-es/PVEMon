@@ -1,7 +1,9 @@
-# Al publicar una versión (etiqueta vX.Y.Z o vX.Y.Z-beta.N) construye las imágenes para amd64 y arm64 y las sube a Docker Hub:
-#   dagarines/pvemon  (edición PVEMon)   y   dagarines/bckmon  (edición BCKMon, solo copias)
+# Al publicar una versión (etiqueta vX.Y.Z o vX.Y.Z-beta.N) construye la imagen para amd64 y arm64 y la sube a Docker Hub.
+# El mismo código vive en dos repositorios y cada uno publica SU imagen, según el nombre del repositorio:
+#   …/PVEMon  → dagarines/pvemon  (edición PVEMon)
+#   …/BCKMon  → dagarines/bckmon  (edición BCKMon, solo copias)
 # Las versiones beta (con «-» en la etiqueta) NO actualizan «latest» ni la etiqueta mayor.menor: solo llevan su versión exacta.
-# Necesita dos secretos en el repositorio: DOCKERHUB_USERNAME (dagarines) y DOCKERHUB_TOKEN (token de acceso de Docker Hub con permiso de escritura).
+# Necesita dos secretos en cada repositorio: DOCKERHUB_USERNAME (dagarines) y DOCKERHUB_TOKEN (token de acceso de Docker Hub con permiso de escritura).
 name: Imagen Docker
 on:
   push:
@@ -9,16 +11,25 @@ on:
   workflow_dispatch: {}
 
 jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.m.outputs.matrix }}
+    steps:
+      - id: m
+        run: |
+          repo="$(echo "${GITHUB_REPOSITORY}" | tr '[:upper:]' '[:lower:]')"
+          case "$repo" in
+            */bckmon) echo 'matrix={"include":[{"edition":"bckmon","image":"dagarines/bckmon","title":"BCKMon"}]}' >> "$GITHUB_OUTPUT" ;;
+            *)        echo 'matrix={"include":[{"edition":"pvemon","image":"dagarines/pvemon","title":"PVEMon"}]}' >> "$GITHUB_OUTPUT" ;;
+          esac
+
   docker:
+    needs: plan
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      matrix:
-        include:
-          - edition: pvemon
-            image: dagarines/pvemon
-          - edition: bckmon
-            image: dagarines/bckmon
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3
@@ -36,11 +47,12 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
           labels: |
-            org.opencontainers.image.title=${{ matrix.edition == 'bckmon' && 'BCKMon' || 'PVEMon' }}
+            org.opencontainers.image.title=${{ matrix.title }}
       - uses: docker/build-push-action@v6
         with:
           context: .
           platforms: linux/amd64,linux/arm64
+          pull: true
           push: true
           build-args: EDITION=${{ matrix.edition }}
           tags: ${{ steps.meta.outputs.tags }}

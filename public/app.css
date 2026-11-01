@@ -334,7 +334,7 @@ main>section.srv.sv{margin:0 0 18px}
 .nfsb{border:1px solid var(--bd);border-radius:8px;background:var(--well);padding:6px 10px;margin:8px 0;max-height:300px;overflow:auto}.nfsb:empty{display:none}
 .nfsc{padding:4px 0;word-break:break-all}.nfsc a{color:var(--ac);cursor:pointer;text-decoration:none}
 .nfsr{display:flex;gap:8px;align-items:center;padding:6px 4px;border-radius:6px;font-size:13.5px}.nfsr.go{cursor:pointer}.nfsr.go:hover,.nfsr.go:focus-visible{background:color-mix(in srgb,var(--ac) 9%,transparent);outline:none}.nfsr.dim{opacity:.55}.nfsr .grow{flex:1;min-width:0;overflow-wrap:anywhere}
-.k-mailbk{--kc:#f0a020}.k-filebk{--kc:#e0529c}
+.k-mailbk{--kc:#f0a020}.k-synbk{--kc:#3a8dde}.k-filebk{--kc:#e0529c}
 
 .lgo{display:block;width:88px;height:88px;margin:2px 0 8px;border-radius:20px;filter:drop-shadow(0 0 18px color-mix(in srgb,var(--ac) 45%,transparent))}
 @media(max-width:420px){.lgo{width:72px;height:72px}}

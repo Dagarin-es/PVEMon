@@ -68,6 +68,7 @@ export const mailRoutes: FastifyPluginAsync = async (app) => {
             id: e.id, name: e.alias ?? e.name, state: b?.state ?? 'none', lastOkAt: b?.lastOkAt ?? null, lastAttemptAt: b?.lastAttemptAt ?? null,
             message: b?.message ?? null, maxHours: b?.maxHoursOverride ?? s.backupMaxHours, ownLimit: b?.maxHoursOverride != null,
             lastOkSize: b?.lastOkSize ?? null,
+            format: (e.info as { format?: string } | null)?.format ?? null,
             fileCheck: fc.has(e.id) ? { protocol: 'nfs', host: fc.get(e.id)!.host, exportPath: fc.get(e.id)!.exportPath, file: fc.get(e.id)!.file, minBytes: Math.max(1, fc.get(e.id)!.minBytes ?? 1024), kind: fc.get(e.id)!.kind ?? 'file', lastFile: lastFiles.get(e.id) ?? null } : null,
           };
         }),

@@ -1,6 +1,12 @@
 # PVEMon ChangeLog
 History rebuilt from the first numbered version. Most recent first.
 
+## 2.0.0-beta.10 · 01/11/2026
+- “BCKMon” is now written in capitals throughout the BCKMon edition (it used to show “bckmon” in the heartbeat card and its help).
+- Backups using the built-in Synology Hyper Backup format have their own icon (a blue NAS) in the backup lists and in settings.
+- Docker image based on Debian 13 (`node:22-trixie-slim`) instead of Debian 12: fewer known vulnerabilities in the Docker Scout report. The application's own code and dependencies were already clean.
+- Own repository for BCKMon: the GitHub Actions workflow builds only the image of the repository it runs in (PVEMon → `dagarines/pvemon`, BCKMon → `dagarines/bckmon`). Includes a BCKMon README and docker-compose.
+
 ## 2.0.0-beta.9 · 01/11/2026
 - The rules of the built-in Synology Hyper Backup format (Backup_local, external NAS…) can now be seen under “Other backup programs”, with a **Create editable copy** button that generates an equivalent custom format with every field editable. Custom formats are applied before the built-in one.
 - Custom formats have a new field: “Ignore if the subject contains…” (for notices that are not a backup, such as integrity checks).

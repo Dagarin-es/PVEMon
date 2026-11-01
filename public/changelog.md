@@ -1,6 +1,12 @@
 # ChangeLog de PVEMon
 Historial reconstruido desde la primera versión numerada. Lo más reciente, primero.
 
+## 2.0.0-beta.10 · 01/11/2026
+- «BCKMon» se escribe con mayúsculas en todos los textos de la edición BCKMon (antes salía «bckmon» en la tarjeta del latido y su ayuda).
+- Las copias del formato integrado de Synology Hyper Backup tienen su propio icono (un NAS azul) en las listas de copias y en los ajustes.
+- Imagen Docker basada en Debian 13 (`node:22-trixie-slim`) en lugar de Debian 12: menos vulnerabilidades conocidas en el informe de Docker Scout. El código y las dependencias de la aplicación ya salían limpios.
+- Repositorio propio para BCKMon: el flujo de GitHub Actions construye solo la imagen del repositorio en el que se ejecuta (PVEMon → `dagarines/pvemon`, BCKMon → `dagarines/bckmon`). Incluye README y docker-compose de BCKMon.
+
 ## 2.0.0-beta.9 · 01/11/2026
 - Las reglas del formato integrado de Synology Hyper Backup (Backup_local, NAS externo…) ya se pueden ver en «Otros programas de copia» y hay un botón **Crear copia editable** que genera un formato propio equivalente, con todos sus campos modificables. Los formatos propios se aplican antes que el integrado.
 - Los formatos propios tienen un campo nuevo: «Ignorar si el asunto contiene…» (para avisos que no son una copia, como comprobaciones de integridad).

@@ -16,7 +16,7 @@ export const BRAND: Brand = BRANDS[EDITION];
 export const brand = (s: string): string => EDITION === 'pvemon' || !s ? s : s
   .replace(/PVEMON/g, BRAND.name.toUpperCase())
   .replace(/PVEMon/g, BRAND.name)
-  .replace(/(^|[^.\w])pvemon(?![-@\w])/g, '$1' + BRAND.name.toLowerCase());
+  .replace(/(^|[^.\w])pvemon(?![-@\w])/g, '$1' + BRAND.name);
 
 /** Script que el navegador carga antes que nada: identifica la edición y la marca */
 export const brandScript = (): string =>

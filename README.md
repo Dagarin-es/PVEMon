@@ -90,7 +90,7 @@ curl localhost:3000/api/health
 
 **2.0** is published first as a **beta** (`dagarines/pvemon:2.0.0-beta.N`; on Docker Hub `latest` still points to the stable one). The stable version is **1.5.7** and you can go back to it at any time: [`docs/VOLVER-A-1.5.7.md`](docs/VOLVER-A-1.5.7.md) (in Spanish). The database does not change between them.
 
-New in 2.0: **BCKMon**, a second application built from the same code and focused only on **backups** (IMAP mail, NFS file checks, alerts, notifications, kiosks and users). It does not connect to Proxmox or Docker, nor scan the network. Install it like PVEMon with the `dagarines/bckmon` image (or with `EDITION=bckmon`).
+New in 2.0: **BCKMon**, a second application built from the same code and focused only on **backups** (IMAP mail, NFS file checks, alerts, notifications, kiosks and users). It does not connect to Proxmox or Docker, nor scan the network. Install it like PVEMon with the `dagarines/bckmon` image (or with `EDITION=bckmon`). BCKMon has its own repository for Issues and releases: [github.com/Dagarin-es/BCKMon](https://github.com/Dagarin-es/BCKMon).
 
 ### Approximate resources
 
