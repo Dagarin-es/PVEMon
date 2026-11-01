@@ -36,7 +36,7 @@ Image: [`dagarines/pvemon`](https://hub.docker.com/r/dagarines/pvemon) (amd64 an
 ```yaml
 services:
   pvemon:
-    image: dagarines/pvemon:latest   # or a fixed version, e.g. dagarines/pvemon:1.5.1
+    image: dagarines/pvemon:latest   # or a fixed version, e.g. dagarines/pvemon:1.5.2
     container_name: pvemon
     restart: unless-stopped
     env_file: .env
@@ -185,7 +185,7 @@ Meant for Home Assistant, the future Android app and scripts. One key per progra
 | `/api/v1/summary` | Counters and names of what is failing: nodes, machines, backups (total and per source), disks, updates and alerts |
 | `/api/v1/nodes` | Per node: status, CPU, memory, disk, temperature, uptime, pending updates, disk summary |
 | `/api/v1/guests` | Per VM/LXC: status, IP, guest agent status, CPU, memory, disk, uptime, network |
-| `/api/v1/backups` (`?compact=1` for short lists) | Each backup (Proxmox and email sources): status, age, size, message; and backup storage usage |
+| `/api/v1/backups` (`?compact=1` for short lists) | Each backup PVEMon knows (Proxmox and email sources, monitored or not: see the `monitored` field): status, age, size, message; and backup storage usage. The summary only counts monitored ones |
 | `/api/v1/disks` | Each disk: health, wear, temperature, hours and power cycles, sectors; and ZFS pools |
 | `/api/v1/alerts` | Open alerts (snoozed ones are not listed) |
 

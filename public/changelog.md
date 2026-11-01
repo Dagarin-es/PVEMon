@@ -1,6 +1,11 @@
 # ChangeLog de PVEMon
 Historial reconstruido desde la primera versión numerada. Lo más reciente, primero.
 
+## 1.5.2 · 01/11/2026
+- Corregido: la API de solo lectura (`/api/v1/backups`) dejaba fuera copias que la pantalla Backups sí mostraba: las de elementos sin monitorizar y las tareas recién dadas de alta que aún no tenían estado. Ahora lista todas las copias que PVEMon conoce, con un campo nuevo `monitored`, y una tarea nueva sale como «none» hasta su primera evaluación.
+- El resumen (`/api/v1/summary`) y su «ok» siguen contando solo las copias monitorizadas, igual que las alertas.
+- Home Assistant: si el sensor cuenta las copias con `backups | length`, usa `backups | selectattr('monitored') | list | length` para contar solo las vigiladas.
+
 ## 1.5.1 · 01/11/2026
 - Corregido: en el kiosko (vista y editor), cualquier ficha de un nodo, VM, LXC, contenedor o copia mostraba «T is not a function» en lugar de la ficha. Era un fallo de la 1.5.0 (el parámetro de una función ocultaba la función de traducción).
 - Corregido: la pantalla «Mis avisos» de cada usuario tenía el mismo problema de nombres y no se podía abrir.

@@ -1,6 +1,11 @@
 # PVEMon ChangeLog
 History rebuilt from the first numbered version. Most recent first.
 
+## 1.5.2 · 01/11/2026
+- Fixed: the read-only API (`/api/v1/backups`) left out backups that the Backups screen did show: those of unmonitored items and newly added tasks that did not have a status yet. It now lists every backup PVEMon knows, with a new `monitored` field, and a new task appears as “none” until its first evaluation.
+- The summary (`/api/v1/summary`) and its “ok” still count only monitored backups, like the alerts.
+- Home Assistant: if your sensor counts backups with `backups | length`, use `backups | selectattr('monitored') | list | length` to count only the watched ones.
+
 ## 1.5.1 · 01/11/2026
 - Fixed: in the kiosk (view and editor), any tile of a node, VM, LXC, container or backup showed “T is not a function” instead of the tile. It was a 1.5.0 bug (a function parameter hid the translation function).
 - Fixed: each user’s “My notifications” screen had the same naming problem and could not be opened.

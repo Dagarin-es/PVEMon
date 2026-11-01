@@ -81,20 +81,24 @@ function snapshot(app: { metrics: { latest: (id: string, keys: string[]) => Reco
 
   /* copias de seguridad: VMs/LXC de Proxmox + tareas de los orígenes por correo (NAS, Fastmail…) */
   const now = nowSec();
-  const backups = live.filter((e) => ['vm', 'lxc', 'backup'].includes(e.kind)).flatMap((e) => {
+  // Misma regla que la pantalla Backups: cualquier copia que PVEMon conozca (no desaparecida), la vigile o no.
+  // `monitored` indica si cuenta en el resumen y en las alertas. Una tarea de correo o de archivo recién dada de alta,
+  // aún sin estado, sale como «none» en vez de quedar fuera hasta la primera evaluación.
+  const backups = all.filter((e) => !e.missing && ['vm', 'lxc', 'backup'].includes(e.kind)).flatMap((e) => {
     const b = bk.get(e.id);
     const s = srv.get(e.serverId);
-    if (!b || !s) return [];
+    if (!s || (!b && e.kind !== 'backup')) return [];
     const isMail = s.kind === 'mail';
-    const maxHours = b.maxHoursOverride ?? s.backupMaxHours;
-    const problem = b.state === 'error' || b.state === 'stale';
+    const state = b?.state ?? 'none';
+    const maxHours = b?.maxHoursOverride ?? s.backupMaxHours;
+    const problem = state === 'error' || state === 'stale';
     return [{
       id: e.id, group: s.name, type: isMail ? 'mail' : 'proxmox', node: isMail ? null : (nodeOf(e) ? name(nodeOf(e)!) : null),
-      vmid: isMail ? null : Number(e.externalId), name: name(e), state: b.state,
-      ok: b.state === 'ok' ? true : problem ? false : null, problem,
-      lastOkAt: iso(b.lastOkAt), ageHours: b.lastOkAt ? Math.round((now - b.lastOkAt) / 360) / 10 : null, maxHours,
-      lastOkSizeBytes: b.lastOkSize ?? null, lastOkStorage: b.lastOkStorage ?? null, lastAttemptAt: iso(b.lastAttemptAt), lastAttemptOk: b.lastAttemptOk ?? null,
-      message: b.message ?? null, checkedAt: iso(b.checkedAt),
+      vmid: isMail ? null : Number(e.externalId), name: name(e), monitored: e.monitored, state,
+      ok: state === 'ok' ? true : problem ? false : null, problem,
+      lastOkAt: iso(b?.lastOkAt ?? null), ageHours: b?.lastOkAt ? Math.round((now - b.lastOkAt) / 360) / 10 : null, maxHours,
+      lastOkSizeBytes: b?.lastOkSize ?? null, lastOkStorage: b?.lastOkStorage ?? null, lastAttemptAt: iso(b?.lastAttemptAt ?? null), lastAttemptOk: b?.lastAttemptOk ?? null,
+      message: b?.message ?? null, checkedAt: iso(b?.checkedAt ?? null),
     }];
   }).sort((a, b) => a.group.localeCompare(b.group) || a.name.localeCompare(b.name));
 
@@ -150,10 +154,11 @@ export const apiV1Routes: FastifyPluginAsync = async (app) => {
     /** Todo lo que suele necesitar un sensor: contadores y nombres de lo que falla. */
     v1.get('/summary', limit, async () => {
       const s = snapshot(app);
+      const bks = s.backups.filter((b) => b.monitored); // el resumen y las alertas solo cuentan lo que se vigila
       const names = <T extends { name: string }>(l: T[]) => l.map((x) => x.name);
-      const bkBy = (f: (b: (typeof s.backups)[number]) => boolean) => s.backups.filter(f);
+      const bkBy = (f: (b: (typeof s.backups)[number]) => boolean) => bks.filter(f);
       const groups: Record<string, { total: number; ok: number; problems: number; failed: string[] }> = {};
-      for (const b of s.backups) {
+      for (const b of bks) {
         const g = (groups[b.group] ??= { total: 0, ok: 0, problems: 0, failed: [] });
         g.total++; if (b.ok) g.ok++; if (b.problem) { g.problems++; g.failed.push(b.name); }
       }
@@ -161,13 +166,13 @@ export const apiV1Routes: FastifyPluginAsync = async (app) => {
       const upd = s.nodes.map((n) => n.updates?.pending ?? 0);
       return {
         at: new Date().toISOString(), version: VERSION,
-        ok: !s.alerts.length && !s.nodes.some((n) => !n.online) && !s.backups.some((b) => b.problem),
+        ok: !s.alerts.length && !s.nodes.some((n) => !n.online) && !bks.some((b) => b.problem),
         nodes: { total: s.nodes.length, online: s.nodes.filter((n) => n.online).length, offline: s.nodes.filter((n) => !n.online).length, offlineNames: names(s.nodes.filter((n) => !n.online)) },
         guests: { total: s.guests.length, running: s.guests.filter((g) => g.running).length, stopped: s.guests.filter((g) => !g.running).length, stoppedNames: names(s.guests.filter((g) => !g.running)) },
         backups: {
-          total: s.backups.length, ok: bkBy((b) => b.ok === true).length, problems: bkBy((b) => b.problem).length,
+          total: bks.length, ok: bkBy((b) => b.ok === true).length, problems: bkBy((b) => b.problem).length,
           error: bkBy((b) => b.state === 'error').length, stale: bkBy((b) => b.state === 'stale').length, none: bkBy((b) => b.state === 'none').length,
-          failedNames: bkBy((b) => b.problem).map((b) => `${b.group}: ${b.name}`), oldestOkAgeHours: Math.max(0, ...s.backups.map((b) => b.ageHours ?? 0)), groups,
+          failedNames: bkBy((b) => b.problem).map((b) => `${b.group}: ${b.name}`), oldestOkAgeHours: Math.max(0, ...bks.map((b) => b.ageHours ?? 0)), groups,
         },
         backupStorageMaxPercent: storages[0]?.pct ?? null,
         disks: {
@@ -185,7 +190,7 @@ export const apiV1Routes: FastifyPluginAsync = async (app) => {
     /** ?compact=1 deja solo lo necesario para pintar una lista (cabe de sobra en el límite de 16 KB de los atributos de Home Assistant) */
     v1.get<{ Querystring: { compact?: string } }>('/backups', limit, async (req) => {
       const s = snapshot(app);
-      const backups = req.query.compact ? s.backups.map((b) => ({ group: b.group, name: b.name, node: b.node, vmid: b.vmid, state: b.state, ok: b.ok, problem: b.problem, lastOkAt: b.lastOkAt, ageHours: b.ageHours, sizeBytes: b.lastOkSizeBytes, message: b.message })) : s.backups;
+      const backups = req.query.compact ? s.backups.map((b) => ({ group: b.group, name: b.name, node: b.node, vmid: b.vmid, monitored: b.monitored, state: b.state, ok: b.ok, problem: b.problem, lastOkAt: b.lastOkAt, ageHours: b.ageHours, sizeBytes: b.lastOkSizeBytes, message: b.message })) : s.backups;
       return { at: new Date().toISOString(), backups, storages: [...storageUsage.values()].flat().sort((a, b) => b.pct - a.pct) };
     });
     v1.get('/disks', limit, async () => { const s = snapshot(app); return { at: new Date().toISOString(), disks: s.disks, pools: s.pools }; });

@@ -35,7 +35,7 @@ Imagen: [`dagarines/pvemon`](https://hub.docker.com/r/dagarines/pvemon) (amd64 y
 ```yaml
 services:
   pvemon:
-    image: dagarines/pvemon:latest   # o una versión fija, p. ej. dagarines/pvemon:1.5.1
+    image: dagarines/pvemon:latest   # o una versión fija, p. ej. dagarines/pvemon:1.5.2
     container_name: pvemon
     restart: unless-stopped
     env_file: .env
@@ -193,7 +193,7 @@ Pensada para Home Assistant, la futura app de Android y scripts. Se crea una cla
 | `/api/v1/summary` | Contadores y nombres de lo que falla: nodos, máquinas, copias (total y por origen), discos, actualizaciones y alertas |
 | `/api/v1/nodes` | Por nodo: estado, CPU, memoria, disco, temperatura, uptime, actualizaciones pendientes, resumen de discos |
 | `/api/v1/guests` | Por VM/LXC: estado, IP, estado del agente invitado, CPU, memoria, disco, uptime, red |
-| `/api/v1/backups` (`?compact=1` para listas cortas) | Cada copia (Proxmox y orígenes por correo): estado, antigüedad, tamaño, mensaje; y uso de los almacenes de copias |
+| `/api/v1/backups` (`?compact=1` para listas cortas) | Cada copia que PVEMon conoce (Proxmox y orígenes por correo, monitorizada o no: campo `monitored`): estado, antigüedad, tamaño, mensaje; y uso de los almacenes de copias. El resumen solo cuenta las monitorizadas |
 | `/api/v1/disks` | Cada disco: salud, desgaste, temperatura, horas y ciclos de encendido, sectores; y pools ZFS |
 | `/api/v1/alerts` | Alertas abiertas (las pospuestas no salen) |
 
