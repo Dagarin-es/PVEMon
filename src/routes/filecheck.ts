@@ -8,7 +8,7 @@ import { browseNfs, listExports, NfsError } from '../filecheck/nfs.js';
 import { addCheck, editCheck, cleanExport, cleanFile, cleanHost, listChecks, probe, removeCheck, runChecks, setMinBytes } from '../filecheck/monitor.js';
 import { mailSources } from '../mail/monitor.js';
 
-const { elements } = schema;
+const { elements, servers, backupStatus } = schema;
 
 const target = z.object({
   protocol: z.literal('nfs'),
@@ -109,6 +109,25 @@ export const filecheckRoutes: FastifyPluginAsync = async (app) => {
     audit(req.user!.id, 'filecheck.minsize', req.params.id, { minBytes: b.data.minBytes });
     await runChecks(app.metrics, req.params.id);
     return view();
+  });
+
+  /** Crea una copia de una comprobación (mismo origen, servidor, ruta y límites) con otro nombre, para ajustarla después */
+  app.post<{ Params: { id: string } }>('/filecheck/:id/duplicate', async (req, reply) => {
+    const c = listChecks().find((x) => x.elementId === req.params.id);
+    const el = db.select().from(elements).where(eq(elements.id, req.params.id)).get();
+    const srv = el ? db.select().from(servers).where(eq(servers.id, el.serverId)).get() : undefined;
+    if (!c || !el || !srv) return reply.code(404).send({ error: 'Comprobación no encontrada' });
+    const st = db.select().from(backupStatus).where(eq(backupStatus.elementId, el.id)).get();
+    const hours = st?.maxHoursOverride ?? srv.backupMaxHours;
+    const taken = new Set(db.select({ n: elements.externalId }).from(elements).where(eq(elements.serverId, srv.id)).all().map((e) => e.n.toLowerCase()));
+    const base = el.name.replace(/ \(copia( \d+)?\)$/, '');
+    let name = `${base} (copia)`;
+    for (let n = 2; taken.has(name.toLowerCase()); n++) name = `${base} (copia ${n})`;
+    const r = addCheck({ name, source: srv.name, host: c.host, exportPath: c.exportPath, file: c.file, kind: c.kind, minBytes: c.minBytes, days: Math.floor(hours / 24), hours: hours % 24 });
+    if (r.error || !r.elementId) return reply.code(409).send({ error: r.error ?? 'No se pudo duplicar' });
+    audit(req.user!.id, 'filecheck.duplicate', name);
+    void runChecks(app.metrics, r.elementId).catch(() => undefined);
+    return { ...view(), newId: r.elementId };
   });
 
   app.delete<{ Params: { id: string } }>('/filecheck/:id', async (req, reply) => {

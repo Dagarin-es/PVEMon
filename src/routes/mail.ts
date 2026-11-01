@@ -7,7 +7,7 @@ import { db, schema } from '../db/index.js';
 import { lastFiles, listChecks, runChecks } from '../filecheck/monitor.js';
 import { getFetcher, resolveFolder } from '../mail/imap.js';
 import {
-  applyCache, createMailSource, evaluateAll, deleteAccount, getAccountsView, getExcluded, getFormats, getLastPoll, ignoreTask, imapConn, isPolling,
+  applyCache, createMailSource, evaluateAll, deleteAccount, duplicateAccount, getAccountsView, getExcluded, getFormats, getLastPoll, ignoreTask, imapConn, isPolling,
   mailSources, pendingSources, pollMail, readAccounts, resetMailCache, saveAccount, setExcluded, setFormats, unrecognized,
 } from '../mail/monitor.js';
 
@@ -42,6 +42,7 @@ const formatBody = z.array(z.object({
   sourceRegex: z.string().trim().max(300).optional(),
   defaultSource: z.string().trim().max(80).optional(),
   defaultTask: z.string().trim().max(80).optional(),
+  ignore: z.array(z.string().trim().min(1).max(200)).max(20).optional(),
 }).refine((f) => f.subjectContains || f.fromContains || f.bodyContains, { message: 'Cada formato necesita al menos una condición (asunto, remitente o texto)' })
   .refine((f) => f.ok.length + f.fail.length > 0, { message: 'Indica qué textos significan «bien» o «mal»' })
   .refine((f) => [f.taskRegex, f.sourceRegex].every((r) => { if (!r) return true; try { new RegExp(r); return true; } catch { return false; } }), { message: 'Una expresión regular no es válida' })
@@ -100,6 +101,12 @@ export const mailRoutes: FastifyPluginAsync = async (app) => {
     resetMailCache();
     audit(req.user!.id, 'mail.account.edit', b.data.host, { user: b.data.user, inFolder: b.data.inFolder, doneFolder: b.data.doneFolder, excludedFolder: b.data.excludedFolder, moveDone: b.data.moveDone, enabled: b.data.enabled });
     return view();
+  });
+  app.post<{ Params: { id: string } }>('/mail/accounts/:id/duplicate', async (req, reply) => {
+    const newId = duplicateAccount(req.params.id);
+    if (!newId) return reply.code(404).send({ error: 'Cuenta no encontrada' });
+    audit(req.user!.id, 'mail.account.duplicate', req.params.id);
+    return { ...view(), newId };
   });
   app.delete<{ Params: { id: string } }>('/mail/accounts/:id', async (req, reply) => {
     if (!deleteAccount(req.params.id)) return reply.code(404).send({ error: 'Cuenta no encontrada' });

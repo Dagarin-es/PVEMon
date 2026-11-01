@@ -1,6 +1,22 @@
 # ChangeLog de PVEMon
 Historial reconstruido desde la primera versión numerada. Lo más reciente, primero.
 
+## 2.0.0-beta.9 · 01/11/2026
+- Las reglas del formato integrado de Synology Hyper Backup (Backup_local, NAS externo…) ya se pueden ver en «Otros programas de copia» y hay un botón **Crear copia editable** que genera un formato propio equivalente, con todos sus campos modificables. Los formatos propios se aplican antes que el integrado.
+- Los formatos propios tienen un campo nuevo: «Ignorar si el asunto contiene…» (para avisos que no son una copia, como comprobaciones de integridad).
+
+## 2.0.0-beta.8 · 01/11/2026
+- Nuevo: botón **Duplicar** en los formatos de correo propios («Otros programas de copia»). Crea una copia con otro nombre y abre el formulario con todos sus campos (asunto, remitente, texto, palabras de bien/mal, origen y tarea) para cambiar lo que haga falta. Útil con formatos parecidos o si cambia el formato de un correo.
+
+## 2.0.0-beta.7 · 01/11/2026
+- Al editar una copia que llega por correo ahora aparecen todos sus campos: origen, nombre y el plazo (días y horas) tras el cual avisa si no llega una copia correcta, con botón «Usar el límite del origen».
+- Al editar una comprobación de archivo se ve el origen y hay botón **Probar** para comprobar la conexión antes de guardar.
+- Botón **Cancelar** también en el formulario de añadir comprobación de archivo.
+
+## 2.0.0-beta.6 · 01/11/2026
+- Corregido: no se podían editar las cuentas de correo (error de orden en el código de la beta 4) ni las copias que llegan por correo (fallo antiguo: el formulario de edición se rompía). Ya se editan en PVEMon y en BCKMon.
+- Nuevo: botón **Duplicar** en las cuentas de correo (la copia queda desactivada, con la misma contraseña) y en las comprobaciones de archivo (misma ruta y límites, con otro nombre). Al duplicar se abre el formulario para ajustar lo que haga falta. Las copias que llegan por correo no se duplican: se crean solas con cada correo, y una copia sin correos propios se quedaría siempre «sin datos».
+
 ## 2.0.0-beta.5 · 01/11/2026
 - Corregido: la etiqueta BETA de la cabecera ya no ocupa ancho. Ahora es un pequeño superíndice pegado al nombre, así que en el móvil el menú y el avatar ya no se descuadran (PVEMon y BCKMon).
 

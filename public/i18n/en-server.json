@@ -288,5 +288,6 @@
   "La contraseña del archivo debe tener al menos 8 caracteres": "The file password must have at least 8 characters",
   "Falta el archivo o la contraseña": "The file or the password is missing",
   "Este archivo no es una exportación de copias (se crea en la otra aplicación: Ajustes › Sistema)": "This file is not a backups export (create it in the other application: Settings › System)",
-  "Cuenta no encontrada": "Account not found"
+  "Cuenta no encontrada": "Account not found",
+  "No se pudo duplicar": "Could not duplicate"
 }

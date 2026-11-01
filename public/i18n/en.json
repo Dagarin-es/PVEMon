@@ -748,7 +748,6 @@
   "Añadir formato": "Add format",
   "Guardar cambios": "Save changes",
   "Otros programas de copia (formatos propios)": "Other backup programs (custom formats)",
-  "Los avisos de Synology Hyper Backup ya los entiendo. Para otro programa, dime qué correos son y qué palabras indican bien o mal. Se pueden editar todos los campos.": "I already understand Synology Hyper Backup notifications. For another program, tell me which emails they are and which words mean success or failure. All fields can be edited.",
   "bien: {0} · mal: {1}": "good: {0} · bad: {1}",
   "Formato quitado": "Format removed",
   "Añadir un formato nuevo": "Add a new format",
@@ -1000,5 +999,19 @@
   "Cómo se ven las copias": "How backups are shown",
   "Copias que llegan por correo": "Backups arriving by email",
   "Comprobaciones de archivo": "File checks",
-  "Todavía no hay orígenes de copias.": "There are no backup sources yet."
+  "Todavía no hay orígenes de copias.": "There are no backup sources yet.",
+  "Cuenta duplicada (desactivada): cámbiale lo que haga falta y guarda": "Account duplicated (disabled): change whatever you need and save",
+  "Comprobación duplicada: cámbiale lo que haga falta y guarda": "Check duplicated: change whatever you need and save",
+  "El nombre es solo el que se muestra. El original (el de los correos) no cambia, para que los correos nuevos sigan llegando a esta tarea.": "The name is only what is shown. The original (the one in the emails) does not change, so new emails keep reaching this task.",
+  "Avisar si no llega una copia correcta en más de": "Warn if no successful backup arrives within",
+  "Límite del origen restaurado": "Source limit restored",
+  "Usar el límite del origen": "Use the source limit",
+  "Los avisos de Synology Hyper Backup ya los entiendo. Para otro programa, dime qué correos son y qué palabras indican bien o mal. Se pueden editar y duplicar (útil si tienes varios parecidos o cambia el formato de un correo).": "I already understand Synology Hyper Backup notifications. For another program, tell me which emails they are and which words mean success or failure. They can be edited and duplicated (handy if you have several similar ones or an email's format changes).",
+  "Formato duplicado: cambia lo que haga falta y guarda": "Format duplicated: change whatever you need and save",
+  "Ignorar si el asunto contiene (separado por comas)": "Ignore if the subject contains (comma-separated)",
+  "Synology Hyper Backup (integrado)": "Synology Hyper Backup (built-in)",
+  "Es el formato de los avisos de Hyper Backup (Backup_local, NAS externo…). Origen: el nombre entre corchetes del asunto. Tarea: «Nombre de la tarea». Bien: «se ha completado / se ha realizado» (completed / performed). Mal: «ha fallado», «parcialmente» (failed / partially). Se ignoran los avisos de integridad, rotación, versiones y restauración. Es fijo: para cambiar algo, crea una copia editable.": "This is the format of Hyper Backup notices (Backup_local, external NAS…). Source: the name in square brackets in the subject. Task: “Task name”. Good: “completed / performed”. Bad: “failed”, “partially”. Integrity, rotation, version and restore notices are ignored. It is fixed: to change anything, create an editable copy.",
+  "Synology Hyper Backup (copia)": "Synology Hyper Backup (copy)",
+  "Crear copia editable": "Create editable copy",
+  "Copia de Synology creada: cámbiale lo que haga falta y guarda. Ojo: los formatos propios se aplican antes que el integrado.": "Synology copy created: change whatever you need and save. Note: custom formats are applied before the built-in one."
 }

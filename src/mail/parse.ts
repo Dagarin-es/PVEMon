@@ -24,6 +24,8 @@ export interface CustomFormat {
   sourceRegex?: string;
   defaultSource?: string;
   defaultTask?: string;
+  /** Si el asunto contiene alguno de estos textos, el correo se ignora (avisos que no son una copia) */
+  ignore?: string[];
 }
 
 export type ParseResult = { kind: 'parsed'; parsed: Parsed } | { kind: 'ignored' } | { kind: 'unknown' };
@@ -113,6 +115,7 @@ function parseCustom(m: RawMail, fm: CustomFormat): ParseResult {
   const all = `${m.subject}\n${m.text}`.toLowerCase();
   if (!fm.subjectContains && !fm.fromContains && !fm.bodyContains) return { kind: 'unknown' };
   if (!has(m.subject, fm.subjectContains) || !has(m.from, fm.fromContains) || !has(m.text, fm.bodyContains)) return { kind: 'unknown' };
+  if (fm.ignore?.some((t) => t && m.subject.toLowerCase().includes(t.toLowerCase()))) return { kind: 'ignored' };
   const full = `${m.subject}\n${m.text}`;
   const isFail = fm.fail.some((t) => t && all.includes(t.toLowerCase()));
   const isOk = fm.ok.some((t) => t && all.includes(t.toLowerCase()));

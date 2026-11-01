@@ -83,6 +83,19 @@ export function saveAccount(i: AccountInput, id?: string): string {
   return acc.id;
 }
 
+/** Copia una cuenta (con su contraseña) con otro nombre y DESACTIVADA, para ajustarla después. Devuelve el id de la nueva. */
+export function duplicateAccount(id: string): string | null {
+  const all = readAccounts();
+  const src = all.find((x) => x.id === id);
+  if (!src) return null;
+  const base = src.name.replace(/ \(copia( \d+)?\)$/, '');
+  let name = `${base} (copia)`;
+  for (let n = 2; all.some((x) => x.name === name); n++) name = `${base} (copia ${n})`;
+  const copy: MailAccount = { ...src, id: crypto.randomUUID(), name, enabled: false };
+  writeAccounts([...all, copy]);
+  return copy.id;
+}
+
 export function deleteAccount(id: string): boolean {
   const all = readAccounts();
   if (!all.some((a) => a.id === id)) return false;

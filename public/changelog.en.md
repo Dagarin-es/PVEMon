@@ -1,6 +1,22 @@
 # PVEMon ChangeLog
 History rebuilt from the first numbered version. Most recent first.
 
+## 2.0.0-beta.9 · 01/11/2026
+- The rules of the built-in Synology Hyper Backup format (Backup_local, external NAS…) can now be seen under “Other backup programs”, with a **Create editable copy** button that generates an equivalent custom format with every field editable. Custom formats are applied before the built-in one.
+- Custom formats have a new field: “Ignore if the subject contains…” (for notices that are not a backup, such as integrity checks).
+
+## 2.0.0-beta.8 · 01/11/2026
+- New: **Duplicate** button for custom email formats (“Other backup programs”). It creates a copy with another name and opens the form with all its fields (subject, sender, text, good/bad words, source and task) so you can change what you need. Handy for similar formats or when an email's format changes.
+
+## 2.0.0-beta.7 · 01/11/2026
+- Editing a backup that arrives by email now shows all its fields: source, name and the deadline (days and hours) after which it warns if no successful backup arrives, with a “Use the source limit” button.
+- Editing a file check shows its source and has a **Test** button to check the connection before saving.
+- **Cancel** button also on the add-file-check form.
+
+## 2.0.0-beta.6 · 01/11/2026
+- Fixed: mail accounts (a code-ordering error in beta 4) and backups arriving by email (an old bug: the edit form broke) could not be edited. They can be edited again in PVEMon and BCKMon.
+- New: **Duplicate** button for mail accounts (the copy is disabled and keeps the same password) and for file checks (same path and limits, different name). The edit form opens so you can adjust what you need. Backups arriving by email cannot be duplicated: they are created on their own with each email, and a copy with no emails of its own would always stay “no data”.
+
 ## 2.0.0-beta.5 · 01/11/2026
 - Fixed: the BETA tag in the header no longer takes up width. It is now a small superscript attached to the name, so on mobile the menu and avatar no longer get misaligned (PVEMon and BCKMon).
 
