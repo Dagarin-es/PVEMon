@@ -39,29 +39,64 @@ const readImap = (): ImapStored => {
   return { ...DEFAULT_IMAP, ...raw, inFolder: raw.inFolder ?? legacy[0] ?? DEFAULT_IMAP.inFolder, doneFolder: raw.doneFolder ?? legacy[1] ?? DEFAULT_IMAP.doneFolder };
 };
 
-export function getImapView() {
-  const c = readImap();
-  return { host: c.host, port: c.port, secure: c.secure, user: c.user, hasPassword: !!c.passwordEnc, inFolder: c.inFolder, doneFolder: c.doneFolder, excludedFolder: c.excludedFolder, moveDone: c.moveDone, lookbackDays: c.lookbackDays, enabled: c.enabled };
+/** Una cuenta de correo (un buzón IMAP) de la que se leen avisos de copias. */
+export interface MailAccount extends ImapStored { id: string; name: string }
+
+/** Lista de cuentas. La primera vez migra la cuenta única de versiones anteriores (se deja intacta «mail.imap» por si se vuelve atrás). */
+export function readAccounts(): MailAccount[] {
+  const list = getSetting<MailAccount[]>('mail.accounts');
+  if (Array.isArray(list)) return list.map((a) => ({ ...DEFAULT_IMAP, ...a }));
+  const old = readImap();
+  if (!old.host && !old.user) return [];
+  const acc: MailAccount = { ...old, id: crypto.randomUUID(), name: old.user || old.host };
+  setSetting('mail.accounts', [acc]);
+  return [acc];
+}
+const writeAccounts = (l: MailAccount[]): void => setSetting('mail.accounts', l);
+
+export function getAccountsView() {
+  return readAccounts().map((c) => ({
+    id: c.id, name: c.name, host: c.host, port: c.port, secure: c.secure, user: c.user, hasPassword: !!c.passwordEnc,
+    inFolder: c.inFolder, doneFolder: c.doneFolder, excludedFolder: c.excludedFolder, moveDone: c.moveDone, lookbackDays: c.lookbackDays, enabled: c.enabled,
+    poll: lastPolls.get(c.id) ?? null,
+  }));
 }
 
 export interface ImapInput {
   host: string; port: number; secure: boolean; user: string; password?: string;
   inFolder: string; doneFolder: string; excludedFolder?: string; moveDone: boolean; lookbackDays: number; enabled: boolean;
 }
-export function setImap(i: ImapInput): void {
-  const prev = readImap();
-  setSetting('mail.imap', {
+export interface AccountInput extends ImapInput { name?: string }
+
+/** Crea (sin id) o modifica (con id) una cuenta. Si la contraseña viene vacía en una modificación, se conserva la anterior. */
+export function saveAccount(i: AccountInput, id?: string): string {
+  const all = readAccounts();
+  const prev = id ? all.find((a) => a.id === id) : undefined;
+  if (id && !prev) throw new Error('Cuenta no encontrada');
+  const acc: MailAccount = {
+    id: prev?.id ?? crypto.randomUUID(), name: (i.name?.trim() || i.user || i.host).slice(0, 80),
     host: i.host, port: i.port, secure: i.secure, user: i.user,
-    passwordEnc: i.password ? encrypt(i.password) : prev.passwordEnc,
+    passwordEnc: i.password ? encrypt(i.password) : prev?.passwordEnc ?? '',
     inFolder: i.inFolder, doneFolder: i.doneFolder, excludedFolder: i.excludedFolder ?? '', moveDone: i.moveDone, lookbackDays: i.lookbackDays, enabled: i.enabled,
-  } satisfies ImapStored);
+  };
+  writeAccounts(prev ? all.map((a) => (a.id === prev.id ? acc : a)) : [...all, acc]);
+  return acc.id;
 }
 
-export function imapConn(over?: Partial<ImapInput>): ImapConfig | null {
-  const c = readImap();
-  const password = over?.password || (c.passwordEnc ? decrypt(c.passwordEnc) : '');
+export function deleteAccount(id: string): boolean {
+  const all = readAccounts();
+  if (!all.some((a) => a.id === id)) return false;
+  writeAccounts(all.filter((a) => a.id !== id));
+  lastPolls.delete(id);
+  return true;
+}
+
+/** Datos de conexión de una cuenta (con la contraseña descifrada) o de los valores sueltos del formulario; null si falta algo. */
+export function imapConn(accountId?: string, over?: Partial<ImapInput>): ImapConfig | null {
+  const c = accountId ? readAccounts().find((a) => a.id === accountId) : undefined;
+  const password = over?.password || (c?.passwordEnc ? decrypt(c.passwordEnc) : '');
   const cfg = {
-    host: over?.host ?? c.host, port: over?.port ?? c.port, secure: over?.secure ?? c.secure, user: over?.user ?? c.user, password,
+    host: over?.host ?? c?.host ?? '', port: over?.port ?? c?.port ?? 993, secure: over?.secure ?? c?.secure ?? true, user: over?.user ?? c?.user ?? '', password,
   };
   return cfg.host && cfg.user && cfg.password ? cfg : null;
 }
@@ -129,6 +164,7 @@ const cache = new Map<string, Entry>();
 
 export interface PollInfo { at: number; ok: boolean; error: string | null; seen: number; fetched: number; missingFolders: string[]; moved?: number; moveError?: string | null; notMoved?: number; movedExcluded?: number; notMovedList?: { subject: string; why: 'unknown' | 'excluded' | 'type' | 'source' | 'unseen'; source?: string }[] }
 let lastPoll: PollInfo | null = null;
+const lastPolls = new Map<string, PollInfo>(); // última consulta de cada cuenta
 let polling = false;
 export const isPolling = () => polling;
 export const getLastPoll = () => lastPoll;
@@ -234,15 +270,22 @@ export function evaluateAll(store: MetricsStore): { tasks: number; problems: num
 
 /* ───────────── consulta del buzón ───────────── */
 
-export async function pollMail(store: MetricsStore): Promise<PollInfo> {
+function joinPolls(at: number, list: { name: string; info: PollInfo }[]): PollInfo {
+  const bad = list.filter((x) => !x.info.ok);
+  const sum = (f: (i: PollInfo) => number | undefined) => list.reduce((n, x) => n + (f(x.info) ?? 0), 0);
+  return {
+    at, ok: bad.length === 0, error: bad.length ? bad.map((x) => (list.length > 1 ? `${x.name}: ` : '') + (x.info.error ?? '')).join(' · ') : null,
+    seen: sum((i) => i.seen), fetched: sum((i) => i.fetched), missingFolders: [...new Set(list.flatMap((x) => x.info.missingFolders))],
+    moved: sum((i) => i.moved), movedExcluded: sum((i) => i.movedExcluded), moveError: list.map((x) => x.info.moveError).find(Boolean) ?? null,
+    notMoved: sum((i) => i.notMoved), notMovedList: list.flatMap((x) => x.info.notMovedList ?? []).slice(0, 3),
+  };
+}
+
+/** Consulta una cuenta: descarga los correos nuevos, los interpreta y (si está activado) mueve los ya incorporados. */
+async function pollAccount(stored: MailAccount, store: MetricsStore): Promise<PollInfo> {
   const at = nowSec();
-  const stored = readImap();
-  const conn = imapConn();
-  if (!conn) {
-    return (lastPoll = { at, ok: false, error: 'Falta configurar el servidor de correo (IMAP)', seen: 0, fetched: 0, missingFolders: [] });
-  }
-  if (polling) return lastPoll ?? { at, ok: true, error: null, seen: 0, fetched: 0, missingFolders: [] };
-  polling = true;
+  const conn = imapConn(stored.id);
+  if (!conn) return { at, ok: false, error: 'Falta configurar el servidor de correo (IMAP)', seen: 0, fetched: 0, missingFolders: [] };
   try {
     const formats = getFormats();
     const folders = [...new Set([stored.inFolder, stored.doneFolder].filter(Boolean))];
@@ -288,9 +331,29 @@ export async function pollMail(store: MetricsStore): Promise<PollInfo> {
         if (uids.length) moved = await fetcher.finish(conn, stored.inFolder, stored.doneFolder, uids);
       } catch (e) { moveError = (e as Error).message || String(e); }
     }
-    lastPoll = { at, ok: true, error: null, seen: r.seen, fetched: r.mails.length, missingFolders: r.missingFolders, moved, movedExcluded, moveError, notMoved, notMovedList };
+    return { at, ok: true, error: null, seen: r.seen, fetched: r.mails.length, missingFolders: r.missingFolders, moved, movedExcluded, moveError, notMoved, notMovedList };
   } catch (e) {
-    lastPoll = { at, ok: false, error: (e as Error).message || String(e), seen: 0, fetched: 0, missingFolders: [] };
+    return { at, ok: false, error: (e as Error).message || String(e), seen: 0, fetched: 0, missingFolders: [] };
+  }
+}
+
+/** Consulta todas las cuentas activadas (o solo la indicada, aunque esté desactivada: «Comprobar ahora»). */
+export async function pollMail(store: MetricsStore, onlyId?: string): Promise<PollInfo> {
+  const at = nowSec();
+  const accs = readAccounts().filter((a) => (onlyId ? a.id === onlyId : a.enabled));
+  if (!accs.length) {
+    return (lastPoll = { at, ok: false, error: 'Falta configurar el servidor de correo (IMAP)', seen: 0, fetched: 0, missingFolders: [] });
+  }
+  if (polling) return lastPoll ?? { at, ok: true, error: null, seen: 0, fetched: 0, missingFolders: [] };
+  polling = true;
+  try {
+    const done: { name: string; info: PollInfo }[] = [];
+    for (const a of accs) {
+      const info = await pollAccount(a, store);
+      lastPolls.set(a.id, info);
+      done.push({ name: a.name, info });
+    }
+    lastPoll = joinPolls(at, done);
   } finally { polling = false; }
   return lastPoll;
 }
@@ -301,7 +364,7 @@ export function resetMailCache(): void { cache.clear(); }
 export function startMailMonitor(log: FastifyBaseLogger, store: MetricsStore): () => void {
   const run = async () => {
     try {
-      if (readImap().enabled) {
+      if (readAccounts().some((a) => a.enabled)) {
         const r = await pollMail(store);
         if (!r.ok) log.warn({ err: r.error }, 'consulta del correo de copias falló');
       } else { applyCache(); evaluateAll(store); }

@@ -7,13 +7,14 @@ import { db, schema } from '../db/index.js';
 import { lastFiles, listChecks, runChecks } from '../filecheck/monitor.js';
 import { getFetcher, resolveFolder } from '../mail/imap.js';
 import {
-  applyCache, createMailSource, evaluateAll, getExcluded, getFormats, getImapView, getLastPoll, ignoreTask, imapConn, isPolling,
-  mailSources, pendingSources, pollMail, resetMailCache, setExcluded, setFormats, setImap, unrecognized,
+  applyCache, createMailSource, evaluateAll, deleteAccount, getAccountsView, getExcluded, getFormats, getLastPoll, ignoreTask, imapConn, isPolling,
+  mailSources, pendingSources, pollMail, readAccounts, resetMailCache, saveAccount, setExcluded, setFormats, unrecognized,
 } from '../mail/monitor.js';
 
 const { servers, elements, backupStatus } = schema;
 
 const imapBody = z.object({
+  name: z.string().trim().max(80).optional(),
   host: z.string().trim().max(200),
   port: z.number().int().min(1).max(65535),
   secure: z.boolean(),
@@ -55,7 +56,7 @@ export const mailRoutes: FastifyPluginAsync = async (app) => {
     const bk = new Map(db.select().from(backupStatus).all().map((b) => [b.elementId, b]));
     const fc = new Map(listChecks().map((c) => [c.elementId, c]));
     return {
-      imap: getImapView(),
+      accounts: getAccountsView(),
       formats: getFormats(),
       excludedSenders: getExcluded(),
       sources: srv.map((s) => ({
@@ -79,28 +80,43 @@ export const mailRoutes: FastifyPluginAsync = async (app) => {
 
   app.get('/mail', async () => view());
 
-  app.put('/mail/imap', async (req, reply) => {
+  /* ───── cuentas de correo (varias) ───── */
+  const needOk = (b: z.infer<typeof imapBody>, id?: string) => !b.enabled || (b.host && b.user && (b.password || (id && readAccounts().find((a) => a.id === id)?.passwordEnc)));
+  app.post('/mail/accounts', async (req, reply) => {
     const b = imapBody.safeParse(req.body);
     if (!b.success) return reply.code(400).send({ error: 'Datos no válidos' });
-    if (b.data.enabled && !(b.data.host && b.data.user && (b.data.password || getImapView().hasPassword))) {
-      return reply.code(400).send({ error: 'Para activarlo hacen falta servidor, usuario y contraseña' });
-    }
-    setImap(b.data);
+    if (!needOk(b.data)) return reply.code(400).send({ error: 'Para activarlo hacen falta servidor, usuario y contraseña' });
+    saveAccount(b.data);
     resetMailCache();
-    audit(req.user!.id, 'mail.imap', b.data.host, { user: b.data.user, inFolder: b.data.inFolder, doneFolder: b.data.doneFolder, excludedFolder: b.data.excludedFolder, moveDone: b.data.moveDone, enabled: b.data.enabled });
+    audit(req.user!.id, 'mail.account.add', b.data.host, { user: b.data.user });
+    return view();
+  });
+  app.put<{ Params: { id: string } }>('/mail/accounts/:id', async (req, reply) => {
+    const b = imapBody.safeParse(req.body);
+    if (!b.success) return reply.code(400).send({ error: 'Datos no válidos' });
+    if (!readAccounts().some((a) => a.id === req.params.id)) return reply.code(404).send({ error: 'Cuenta no encontrada' });
+    if (!needOk(b.data, req.params.id)) return reply.code(400).send({ error: 'Para activarlo hacen falta servidor, usuario y contraseña' });
+    saveAccount(b.data, req.params.id);
+    resetMailCache();
+    audit(req.user!.id, 'mail.account.edit', b.data.host, { user: b.data.user, inFolder: b.data.inFolder, doneFolder: b.data.doneFolder, excludedFolder: b.data.excludedFolder, moveDone: b.data.moveDone, enabled: b.data.enabled });
+    return view();
+  });
+  app.delete<{ Params: { id: string } }>('/mail/accounts/:id', async (req, reply) => {
+    if (!deleteAccount(req.params.id)) return reply.code(404).send({ error: 'Cuenta no encontrada' });
+    audit(req.user!.id, 'mail.account.delete', req.params.id);
     return view();
   });
 
-  /** Prueba la conexión (con los datos del formulario) y comprueba que existen las carpetas */
-  app.post('/mail/imap/test', async (req, reply) => {
-    const b = imapBody.partial().safeParse(req.body);
+  /** Prueba la conexión (con los datos del formulario; si es una cuenta ya guardada, con su contraseña) y comprueba que existen las carpetas */
+  app.post('/mail/accounts/test', async (req, reply) => {
+    const b = imapBody.partial().extend({ id: z.string().max(80).optional() }).safeParse(req.body);
     if (!b.success) return reply.code(400).send({ error: 'Datos no válidos' });
-    const conn = imapConn(b.data);
+    const conn = imapConn(b.data.id, b.data);
     if (!conn) return reply.code(400).send({ error: 'Faltan servidor, usuario o contraseña' });
     try {
       const folders = await getFetcher().listFolders(conn);
-      const v = getImapView();
-      const want = [b.data.inFolder ?? v.inFolder, b.data.doneFolder ?? v.doneFolder, b.data.excludedFolder ?? v.excludedFolder].filter(Boolean);
+      const v = readAccounts().find((a) => a.id === b.data.id);
+      const want = [b.data.inFolder ?? v?.inFolder, b.data.doneFolder ?? v?.doneFolder, b.data.excludedFolder ?? v?.excludedFolder].filter((x): x is string => !!x);
       const missing = want.filter((w) => !resolveFolder(w, folders.map((path) => ({ path }))));
       return { ok: true, folders, missing, canCreate: true };
     } catch (e) {
@@ -108,8 +124,9 @@ export const mailRoutes: FastifyPluginAsync = async (app) => {
     }
   });
 
-  app.post('/mail/check', async (_req, reply) => {
-    const r = await pollMail(app.metrics);
+  app.post('/mail/check', async (req, reply) => {
+    const b = z.object({ id: z.string().max(80).optional() }).safeParse(req.body ?? {});
+    const r = await pollMail(app.metrics, b.success ? b.data.id : undefined);
     if (!r.ok) return reply.code(502).send({ error: r.error ?? 'Falló la consulta del correo' });
     return view();
   });
@@ -181,7 +198,7 @@ export const mailRoutes: FastifyPluginAsync = async (app) => {
     if (!b.success) return reply.code(400).send({ error: 'Datos no válidos' });
     setExcluded(b.data.senders);
     audit(req.user!.id, 'mail.excluded', undefined, { n: b.data.senders.length });
-    if (getImapView().enabled) void pollMail(app.metrics).catch(() => undefined); else evaluateAll(app.metrics);
+    if (readAccounts().some((a) => a.enabled)) void pollMail(app.metrics).catch(() => undefined); else evaluateAll(app.metrics);
     return view();
   });
 
@@ -192,7 +209,7 @@ export const mailRoutes: FastifyPluginAsync = async (app) => {
     resetMailCache(); // se vuelven a interpretar todos los correos con los formatos nuevos
     audit(req.user!.id, 'mail.formats', undefined, { n: b.data.length });
     // Releer todo el buzón puede tardar (y el proxy cortaría la petición): se hace en segundo plano y la pantalla se refresca sola
-    if (getImapView().enabled) void pollMail(app.metrics).catch(() => undefined);
+    if (readAccounts().some((a) => a.enabled)) void pollMail(app.metrics).catch(() => undefined);
     return view();
   });
 

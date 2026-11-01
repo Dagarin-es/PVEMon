@@ -498,7 +498,8 @@ label.f.ck{flex-direction:row;align-items:center;gap:10px}label.f.ck input{width
 .ft .seg.lang button.on{background:var(--grad);color:var(--on-ac);border-color:transparent}
 
 /* Distintivo «BETA» de la cabecera (se muestra mientras la versión lleve «-beta») */
-.brand .wm2 .beta{font:700 9.5px/1 var(--sans);font-style:normal;letter-spacing:.09em;color:var(--ac);border:1px solid var(--ac);border-radius:4px;padding:2px 5px;margin-left:7px;vertical-align:.95em;-webkit-text-fill-color:currentColor}
+.brand .wm2{position:relative;align-self:flex-start}
+.brand .wm2 .beta{position:absolute;top:-9px;right:0;font:700 8px/1 var(--sans);font-style:normal;letter-spacing:.1em;color:var(--ac);padding:0;margin:0;border:0;-webkit-text-fill-color:currentColor;pointer-events:none}
 
 /* ───── Edición BCKMon: identidad verde (lima y esmeralda). Rojo y verde menta de «correcto» no cambian de significado. ───── */
 :root[data-ed=bckmon]{
@@ -518,3 +519,5 @@ label.f.ck{flex-direction:row;align-items:center;gap:10px}label.f.ck input{width
   --btn:linear-gradient(135deg,#4d8f12,#15803d);--btn-tx:#fff;--btn-bd:transparent;--btn-glow:none;
 }
 :root[data-ed=bckmon] .tabs button.on{box-shadow:0 0 0 1px var(--ac) inset,0 0 14px color-mix(in srgb,var(--ac) 35%,transparent)}
+
+.lver{font-weight:700;letter-spacing:.04em;color:var(--ac)}

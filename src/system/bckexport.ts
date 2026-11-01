@@ -8,6 +8,7 @@
 import { createCipheriv, createDecipheriv, randomBytes } from 'node:crypto';
 import { and, eq } from 'drizzle-orm';
 import { gunzipSync, gzipSync } from 'node:zlib';
+import { readAccounts, saveAccount } from '../mail/monitor.js';
 import { getSetting, setSetting } from '../alerts/notify.js';
 import { decrypt, encrypt } from '../crypto.js';
 import { db, schema } from '../db/index.js';
@@ -20,7 +21,10 @@ const norm = (s: string) => s.trim().toLowerCase();
 type Row = Record<string, unknown>;
 interface Payload {
   v: 1; kind: 'bckmon-export'; app: string; at: number;
-  imap: Row | null; imapPassword: string; excludedSenders: string[]; formats: unknown[]; ignored: string[]; filechecks: Row[];
+  /** cuentas de correo, con la contraseña en claro (el archivo va cifrado) */
+  accounts?: (Row & { password: string })[];
+  /** formato de las betas 2 y 3: una sola cuenta */
+  imap?: Row | null; imapPassword?: string; excludedSenders: string[]; formats: unknown[]; ignored: string[]; filechecks: Row[];
   servers: Row[]; elements: Row[]; backupStatus: Row[]; mailEvents: Row[];
 }
 
@@ -29,15 +33,16 @@ export function exportCopias(pass: string, version: string): { file: Buffer; cou
   const ids = new Set(srv.map((s) => s.id));
   const els = db.select().from(elements).all().filter((e) => ids.has(e.serverId) && (e.kind === 'server' || e.kind === 'backup'));
   const elIds = new Set(els.map((e) => e.id));
-  const imap = getSetting<Row & { passwordEnc?: string }>('mail.imap');
-  let imapPassword = '';
-  try { if (imap?.passwordEnc) imapPassword = decrypt(imap.passwordEnc); } catch { /* clave antigua: sin contraseña */ }
-  const { passwordEnc: _p, ...imapClean } = (imap ?? {}) as Row & { passwordEnc?: string };
+  const accounts = readAccounts().map(({ passwordEnc, ...c }) => {
+    let password = '';
+    try { if (passwordEnc) password = decrypt(passwordEnc); } catch { /* clave antigua: sin contraseña */ }
+    return { ...c, password } as Row & { password: string };
+  });
   const bs = db.select().from(backupStatus).all().filter((b) => elIds.has(b.elementId));
   const me = db.select().from(mailEvents).all().filter((m) => elIds.has(m.elementId));
   const payload: Payload = {
     v: 1, kind: 'bckmon-export', app: version, at: Math.floor(Date.now() / 1000),
-    imap: imap ? imapClean : null, imapPassword,
+    accounts,
     excludedSenders: getSetting<string[]>('mail.excludedSenders') ?? [], formats: getSetting<unknown[]>('mail.formats') ?? [], ignored: getSetting<string[]>('mail.ignored') ?? [],
     filechecks: (getSetting<Row[]>('filechecks') ?? []).filter((c) => elIds.has(String(c.elementId))),
     servers: srv.map((s) => ({ id: s.id, name: s.name, backupMaxHours: s.backupMaxHours })),
@@ -50,7 +55,7 @@ export function exportCopias(pass: string, version: string): { file: Buffer; cou
   return { file: Buffer.concat([MAGIC, salt, iv, c.getAuthTag(), ct]), counts: { origenes: srv.length, copias: els.filter((e) => e.kind === 'backup').length, correos: me.length } };
 }
 
-export interface ImportResult { origenes: number; copias: number; correos: number; correoConfigurado: boolean; comprobaciones: number; excluidos: number }
+export interface ImportResult { origenes: number; copias: number; correos: number; cuentas: number; comprobaciones: number; excluidos: number }
 
 export function importCopias(file: Buffer, pass: string): ImportResult {
   if (file.length < MAGIC.length + 44 || !file.subarray(0, MAGIC.length).equals(MAGIC)) throw new BackupError('Este archivo no es una exportación de copias (se crea en la otra aplicación: Ajustes › Sistema)');
@@ -64,7 +69,7 @@ export function importCopias(file: Buffer, pass: string): ImportResult {
   } catch { throw new BackupError('Contraseña incorrecta o archivo dañado'); }
   if (p.kind !== 'bckmon-export' || !Array.isArray(p.servers) || !Array.isArray(p.elements)) throw new BackupError('El archivo no tiene el formato esperado');
 
-  const res: ImportResult = { origenes: 0, copias: 0, correos: 0, correoConfigurado: false, comprobaciones: 0, excluidos: 0 };
+  const res: ImportResult = { origenes: 0, copias: 0, correos: 0, cuentas: 0, comprobaciones: 0, excluidos: 0 };
   const sMap = new Map<string, string>(), eMap = new Map<string, string>();
   db.transaction((tx) => {
     // orígenes: si ya existe uno con el mismo nombre se reutiliza
@@ -113,10 +118,19 @@ export function importCopias(file: Buffer, pass: string): ImportResult {
   });
 
   // ajustes
-  const curImap = getSetting<{ host?: string }>('mail.imap');
-  if (p.imap && !curImap?.host) {
-    setSetting('mail.imap', { ...p.imap, passwordEnc: p.imapPassword ? encrypt(p.imapPassword) : '' });
-    res.correoConfigurado = true;
+  // Cuentas de correo: se añaden las que no existan (mismo servidor y usuario) y quedan DESACTIVADAS, para que dos aplicaciones
+  // no lean y muevan a la vez los mismos correos; se activan a mano cuando toque.
+  const have = new Set(readAccounts().map((a) => `${String(a.host).toLowerCase()}|${String(a.user).toLowerCase()}`));
+  const inc: Row[] = p.accounts ?? (p.imap && (p.imap as { host?: string }).host ? [{ ...p.imap, name: (p.imap as { user?: string }).user, password: p.imapPassword ?? '' }] : []);
+  for (const c of inc as (Row & { password?: string })[]) {
+    const key = `${String(c.host).toLowerCase()}|${String(c.user).toLowerCase()}`;
+    if (!c.host || have.has(key)) continue;
+    saveAccount({
+      name: String(c.name ?? c.user ?? c.host), host: String(c.host), port: Number(c.port) || 993, secure: c.secure !== false, user: String(c.user ?? ''),
+      password: c.password || undefined, inFolder: String(c.inFolder ?? 'Alertas'), doneFolder: String(c.doneFolder ?? 'Alertas/Procesados'),
+      excludedFolder: String(c.excludedFolder ?? ''), moveDone: !!c.moveDone, lookbackDays: Number(c.lookbackDays) || 60, enabled: false,
+    });
+    have.add(key); res.cuentas++;
   }
   const ex = getSetting<string[]>('mail.excludedSenders') ?? [];
   const exNew = [...new Set([...ex, ...(p.excludedSenders ?? [])])];

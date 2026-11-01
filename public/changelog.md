@@ -1,6 +1,15 @@
 # ChangeLog de PVEMon
 Historial reconstruido desde la primera versión numerada. Lo más reciente, primero.
 
+## 2.0.0-beta.5 · 01/11/2026
+- Corregido: la etiqueta BETA de la cabecera ya no ocupa ancho. Ahora es un pequeño superíndice pegado al nombre, así que en el móvil el menú y el avatar ya no se descuadran (PVEMon y BCKMon).
+
+## 2.0.0-beta.4 · 01/11/2026
+- Nuevo: **varias cuentas de correo**. En Ajustes › Copias puedes añadir, editar, probar y quitar cuentas; cada una tiene sus carpetas (entrada, procesados, excluidos), su marcado como leído y su interruptor. La cuenta que ya tenías se convierte sola en la primera (la configuración antigua queda intacta, por si vuelves a la 1.5.7). Los remitentes excluidos y los formatos propios valen para todas.
+- Nuevo: Ajustes › Copias se reorganiza en tres vistas: **Por correo** (cuentas, copias que llegan por correo, remitentes excluidos, correos que no se entienden y formatos propios), **Por archivo** (comprobaciones NFS y las copias que se comprueban así) y **Por origen** (cada NAS o equipo con todas sus copias).
+- Nuevo: la pantalla de acceso muestra la versión (y BETA).
+- Pasar las copias entre aplicaciones: las cuentas de correo se exportan con la contraseña (el archivo va cifrado) y al importar quedan **desactivadas**, para que PVEMon y BCKMon no lean y muevan a la vez los mismos correos. Los archivos de la beta 2 y 3 siguen valiendo.
+
 ## 2.0.0-beta.3 · 01/11/2026
 - Las copias ahora se pueden pasar **en los dos sentidos**: exportar en PVEMon e importar en BCKMon, o exportar en BCKMon e importar en PVEMon (Ajustes › Sistema tiene las dos tarjetas en ambas aplicaciones). Mismo formato de archivo (`.bckmonx`); solo añade lo que falta.
 - Nuevo script `actualizar.sh` para actualizar en local las dos imágenes y los dos contenedores a partir de un zip en `/opt`.

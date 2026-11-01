@@ -1,6 +1,15 @@
 # PVEMon ChangeLog
 History rebuilt from the first numbered version. Most recent first.
 
+## 2.0.0-beta.5 · 01/11/2026
+- Fixed: the BETA tag in the header no longer takes up width. It is now a small superscript attached to the name, so on mobile the menu and avatar no longer get misaligned (PVEMon and BCKMon).
+
+## 2.0.0-beta.4 · 01/11/2026
+- New: **several mail accounts**. In Settings › Backups you can add, edit, test and remove accounts; each one has its own folders (inbox, processed, excluded), its own mark-as-read option and its own switch. The account you already had becomes the first one automatically (the old setting is left untouched, in case you go back to 1.5.7). Excluded senders and custom formats apply to all of them.
+- New: Settings › Backups is reorganised into three views: **By email** (accounts, backups arriving by email, excluded senders, emails that are not understood and custom formats), **By file** (NFS checks and the backups checked that way) and **By source** (each NAS or computer with all its backups).
+- New: the sign-in screen shows the version (and BETA).
+- Moving backups between applications: mail accounts are exported with their password (the file is encrypted) and, when imported, are left **disabled**, so PVEMon and BCKMon do not read and move the same emails at once. Files from beta 2 and 3 are still valid.
+
 ## 2.0.0-beta.3 · 01/11/2026
 - Backups can now be moved **in both directions**: export from PVEMon and import in BCKMon, or export from BCKMon and import in PVEMon (Settings › System has both cards in both applications). Same file format (`.bckmonx`); it only adds what is missing.
 - New `actualizar.sh` script to update both local images and containers from a zip in `/opt`.
