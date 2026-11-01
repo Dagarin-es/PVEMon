@@ -2,6 +2,7 @@ import compress from '@fastify/compress';
 import cookie from '@fastify/cookie';
 import rateLimit from '@fastify/rate-limit';
 import fastifyStatic from '@fastify/static';
+import { EDITION, brandScript, manifest } from './edition.js';
 import Fastify from 'fastify';
 import { resolve } from 'node:path';
 import { purgeExpiredSessions } from './auth/sessions.js';
@@ -124,21 +125,29 @@ await app.register(healthRoutes, { prefix: '/api' });
 await app.register(authRoutes, { prefix: '/api' });
 await app.register(userRoutes, { prefix: '/api' });
 await app.register(avatarRoutes, { prefix: '/api' });
-await app.register(serverRoutes, { prefix: '/api' });
-await app.register(serverUpdateRoutes, { prefix: '/api' });
+if (EDITION === 'pvemon') await app.register(serverRoutes, { prefix: '/api' });
+if (EDITION === 'pvemon') await app.register(serverUpdateRoutes, { prefix: '/api' });
 await app.register(systemRoutes, { prefix: '/api' });
 await app.register(elementRoutes, { prefix: '/api' });
 await app.register(metricRoutes, { prefix: '/api' });
 await app.register(notificationRoutes, { prefix: '/api' });
 await app.register(alertRoutes, { prefix: '/api' });
 await app.register(deliveryRoutes, { prefix: '/api' });
-await app.register(dockerRoutes, { prefix: '/api' });
+if (EDITION === 'pvemon') await app.register(dockerRoutes, { prefix: '/api' });
 await app.register(mailRoutes, { prefix: '/api' });
 await app.register(filecheckRoutes, { prefix: '/api' });
 await app.register(overviewRoutes, { prefix: '/api' });
 await app.register(kioskRoutes, { prefix: '/api' });
-await app.register(diskRoutes, { prefix: '/api' });
+if (EDITION === 'pvemon') await app.register(diskRoutes, { prefix: '/api' });
 await app.register(apiV1Routes, { prefix: '/api' });
+// Marca de la edición: script, manifiesto e iconos propios (PVEMon por defecto; BCKMon con EDITION=bckmon)
+app.get('/brand.js', async (_req, reply) => reply.header('Cache-Control', 'no-cache').type('application/javascript; charset=utf-8').send(brandScript()));
+app.get('/manifest.webmanifest', async (_req, reply) => reply.header('Cache-Control', 'no-cache').type('application/manifest+json').send(manifest()));
+if (EDITION !== 'pvemon') {
+  for (const f of ['icon.svg', 'icon-192.png', 'icon-512.png', 'favicon-32.png', 'favicon-48.png', 'apple-touch-icon.png', 'badge-96.png']) {
+    app.get('/' + f, async (_req, reply) => reply.sendFile(`editions/${EDITION}/${f}`));
+  }
+}
 await app.register(fastifyStatic, {
   root: resolve('public'), // la PWA
   cacheControl: false,
@@ -147,17 +156,19 @@ await app.register(fastifyStatic, {
     res.header('Cache-Control', /\/fonts\/|\.(png|svg)$/.test(path) ? 'public, max-age=2592000' : 'no-cache');
   },
 });
-const stopScheduler = startScheduler(app.log);
+const noop = () => undefined;
+const PVE = EDITION === 'pvemon'; // BCKMon no habla con Proxmox, ni con Docker, ni explora la red
+const stopScheduler = PVE ? startScheduler(app.log) : noop;
 const stopAlerts = startAlerts(app.log);
-const stopCollector = startCollector(app.log, metrics);
-const stopDocker = startDockerCollector(app.log, metrics);
-const stopLan = startLanScan(app.log);
-const stopBackups = startBackupMonitor(app.log, metrics);
+const stopCollector = PVE ? startCollector(app.log, metrics) : noop;
+const stopDocker = PVE ? startDockerCollector(app.log, metrics) : noop;
+const stopLan = PVE ? startLanScan(app.log) : noop;
+const stopBackups = PVE ? startBackupMonitor(app.log, metrics) : noop;
 const stopMail = startMailMonitor(app.log, metrics);
 const stopFiles = startFileChecks(app.log, metrics);
 const stopHeartbeat = startHeartbeat(app.log);
 const stopDigest = startDigest(app.log);
-const stopUpdates = startUpdateWatcher(app.log);
+const stopUpdates = PVE ? startUpdateWatcher(app.log) : noop;
 
 // Mantenimiento: agregación de métricas y sesiones caducadas, cada 5 min
 const timer = setInterval(() => {

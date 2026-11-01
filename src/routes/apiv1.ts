@@ -5,6 +5,7 @@
  *  - Una clave ve todo lo monitorizado (como un administrador) pero NO sirve para el resto de la API (la de la web usa cookie).
  *  - Fechas en ISO 8601 (UTC); tiempos en horas o segundos, siempre indicado en el nombre del campo.
  */
+import { EDITION } from '../edition.js';
 import { eq } from 'drizzle-orm';
 import type { FastifyPluginAsync, FastifyReply, FastifyRequest } from 'fastify';
 import { z } from 'zod';
@@ -164,7 +165,7 @@ export const apiV1Routes: FastifyPluginAsync = async (app) => {
       }
       const storages = [...storageUsage.values()].flat().sort((a, b) => b.pct - a.pct);
       const upd = s.nodes.map((n) => n.updates?.pending ?? 0);
-      return {
+      const out: Record<string, unknown> = {
         at: new Date().toISOString(), version: VERSION,
         ok: !s.alerts.length && !s.nodes.some((n) => !n.online) && !bks.some((b) => b.problem),
         nodes: { total: s.nodes.length, online: s.nodes.filter((n) => n.online).length, offline: s.nodes.filter((n) => !n.online).length, offlineNames: names(s.nodes.filter((n) => !n.online)) },
@@ -183,17 +184,22 @@ export const apiV1Routes: FastifyPluginAsync = async (app) => {
         updates: { pending: upd.reduce((a, b) => a + b, 0), nodesWithUpdates: s.nodes.filter((n) => (n.updates?.pending ?? 0) > 0).map((n) => n.name) },
         alerts: { firing: s.alerts.length, critical: s.alerts.filter((a) => a.severity === 'critical').length, texts: s.alerts.slice(0, 10).map((a) => `${a.element}: ${a.text}`) },
       };
+      // BCKMon: solo copias y alertas
+      if (EDITION === 'bckmon') for (const k of ['nodes', 'guests', 'disks', 'updates', 'backupStorageMaxPercent']) delete out[k];
+      return out;
     });
 
-    v1.get('/nodes', limit, async () => ({ at: new Date().toISOString(), nodes: snapshot(app).nodes }));
-    v1.get('/guests', limit, async () => ({ at: new Date().toISOString(), guests: snapshot(app).guests }));
+    if (EDITION === 'pvemon') {
+      v1.get('/nodes', limit, async () => ({ at: new Date().toISOString(), nodes: snapshot(app).nodes }));
+      v1.get('/guests', limit, async () => ({ at: new Date().toISOString(), guests: snapshot(app).guests }));
+    }
     /** ?compact=1 deja solo lo necesario para pintar una lista (cabe de sobra en el límite de 16 KB de los atributos de Home Assistant) */
     v1.get<{ Querystring: { compact?: string } }>('/backups', limit, async (req) => {
       const s = snapshot(app);
       const backups = req.query.compact ? s.backups.map((b) => ({ group: b.group, name: b.name, node: b.node, vmid: b.vmid, monitored: b.monitored, state: b.state, ok: b.ok, problem: b.problem, lastOkAt: b.lastOkAt, ageHours: b.ageHours, sizeBytes: b.lastOkSizeBytes, message: b.message })) : s.backups;
       return { at: new Date().toISOString(), backups, storages: [...storageUsage.values()].flat().sort((a, b) => b.pct - a.pct) };
     });
-    v1.get('/disks', limit, async () => { const s = snapshot(app); return { at: new Date().toISOString(), disks: s.disks, pools: s.pools }; });
+    if (EDITION === 'pvemon') v1.get('/disks', limit, async () => { const s = snapshot(app); return { at: new Date().toISOString(), disks: s.disks, pools: s.pools }; });
     v1.get('/alerts', limit, async () => ({ at: new Date().toISOString(), alerts: snapshot(app).alerts }));
   }, { prefix: '/v1' });
 };

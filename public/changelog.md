@@ -1,6 +1,12 @@
 # ChangeLog de PVEMon
 Historial reconstruido desde la primera versión numerada. Lo más reciente, primero.
 
+## 2.0.0-beta.1 · 01/11/2026
+- **Versión beta.** La cabecera muestra «BETA» mientras la versión lleve «-beta». La estable sigue siendo la 1.5.7 (`dagarines/pvemon:1.5.7`); en Docker Hub `latest` no apunta a la beta. Guía para volver: `docs/VOLVER-A-1.5.7.md`.
+- **Nace BCKMon**, una segunda aplicación hecha con la misma base de código y centrada solo en las copias de seguridad: se llega con `EDITION=bckmon` (imagen `dagarines/bckmon`). Otro nombre, icono y colores (verdes), la pantalla de inicio es Backups, Ajustes reordenados (Copias, Alertas de copias, Notificaciones, Usuarios, Sistema), sin nodos, VM, LXC, Docker, discos ni actualizaciones, y la API de solo lectura solo ofrece copias y alertas. No se conecta a Proxmox, ni a Docker, ni explora la red.
+- PVEMon sigue exactamente igual (salvo el distintivo «BETA»). No hay cambios en la base de datos: `data/` vale también para la 1.5.7.
+- Interno: nueva variable `EDITION` (`pvemon` por defecto) y archivos `/brand.js`, `/manifest.webmanifest` e iconos propios de cada edición.
+
 ## 1.5.7 · 01/11/2026
 - Nuevo: tercera carpeta en «Correo donde llegan los avisos de copias»: «Carpeta a la que se mueven los excluidos». Los correos de remitentes excluidos se mueven ahí **sin marcarlos como leídos**, para que puedas revisarlos y decidir si ya no hace falta excluirlos. Déjala vacía para no moverlos. Funciona aunque «Marcar como leído y mover» esté desactivado. La carpeta se crea si no existe.
 - Los correos excluidos ya no salen en el aviso «sin mover» cuando esta carpeta está configurada.

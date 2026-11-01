@@ -496,3 +496,25 @@ label.f.ck{flex-direction:row;align-items:center;gap:10px}label.f.ck input{width
 .ft .seg.lang{display:inline-flex;gap:4px}
 .ft .seg.lang button{border:1px solid var(--bd2);background:transparent;color:var(--mu);border-radius:6px;padding:3px 9px;font-size:11.5px;cursor:pointer}
 .ft .seg.lang button.on{background:var(--grad);color:var(--on-ac);border-color:transparent}
+
+/* Distintivo «BETA» de la cabecera (se muestra mientras la versión lleve «-beta») */
+.brand .wm2 .beta{font:700 9.5px/1 var(--sans);font-style:normal;letter-spacing:.09em;color:var(--ac);border:1px solid var(--ac);border-radius:4px;padding:2px 5px;margin-left:7px;vertical-align:.95em;-webkit-text-fill-color:currentColor}
+
+/* ───── Edición BCKMon: identidad verde (lima y esmeralda). Rojo y verde menta de «correcto» no cambian de significado. ───── */
+:root[data-ed=bckmon]{
+  --bg:#060a05;--card:#0e1609;--well:#0a1006;--tx:#eefbe0;--mu:#9fb38b;--bd:#25341b;--bd2:#3a4f29;
+  --ac:#a3e635;--ac2:#4ade80;--on-ac:#0c1402;--free:#1c2a14;--sys:#6f8a58;--oth:#86a06c;
+  --grid:rgba(160,230,80,.05);
+  --mesh:radial-gradient(900px 520px at 8% -8%,rgba(74,222,128,.12),transparent 62%),radial-gradient(820px 520px at 100% 100%,rgba(163,230,53,.10),transparent 62%);
+  --grad:linear-gradient(135deg,#d4f26a,#5fd36a);
+  --btn:linear-gradient(135deg,#3b6a16,#2a6a35);--btn-tx:#f1ffe0;--btn-bd:rgba(163,230,53,.42);--btn-glow:0 0 14px -4px rgba(140,220,70,.5);
+}
+:root[data-ed=bckmon][data-theme=light]{
+  --bg:#eef3e6;--card:#ffffff;--well:#f4f8ee;--tx:#12200a;--mu:#566a45;--bd:#d6e1c6;--bd2:#b3c59a;
+  --ac:#3f7d0f;--ac2:#15803d;--on-ac:#fff;--free:#e0e9d2;--sys:#8da476;--oth:#8ea77a;
+  --grid:rgba(60,120,20,.06);
+  --mesh:radial-gradient(900px 520px at 0 -10%,rgba(63,125,15,.09),transparent 62%),radial-gradient(820px 520px at 100% 100%,rgba(21,128,61,.09),transparent 62%);
+  --grad:linear-gradient(135deg,#4d8f12,#15803d);
+  --btn:linear-gradient(135deg,#4d8f12,#15803d);--btn-tx:#fff;--btn-bd:transparent;--btn-glow:none;
+}
+:root[data-ed=bckmon] .tabs button.on{box-shadow:0 0 0 1px var(--ac) inset,0 0 14px color-mix(in srgb,var(--ac) 35%,transparent)}

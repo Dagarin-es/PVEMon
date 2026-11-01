@@ -1,6 +1,12 @@
 # PVEMon ChangeLog
 History rebuilt from the first numbered version. Most recent first.
 
+## 2.0.0-beta.1 · 01/11/2026
+- **Beta version.** The header shows “BETA” while the version carries “-beta”. The stable one is still 1.5.7 (`dagarines/pvemon:1.5.7`); on Docker Hub `latest` does not point to the beta. How to go back: `docs/VOLVER-A-1.5.7.md`.
+- **BCKMon is born**, a second application built from the same code and focused only on backups: you get it with `EDITION=bckmon` (image `dagarines/bckmon`). Different name, icon and colours (greens), Backups is the home screen, Settings reorganised (Backups, Backup alerts, Notifications, Users, System), no nodes, VMs, LXC, Docker, disks or updates, and the read-only API only offers backups and alerts. It does not connect to Proxmox or Docker, nor scan the network.
+- PVEMon stays exactly the same (apart from the “BETA” badge). The database does not change: `data/` also works with 1.5.7.
+- Internal: new `EDITION` variable (`pvemon` by default) and `/brand.js`, `/manifest.webmanifest` and icons for each edition.
+
 ## 1.5.7 · 01/11/2026
 - New: a third folder in “Mailbox where the backup notifications arrive”: “Folder excluded emails are moved to”. Emails from excluded senders are moved there **without being marked as read**, so you can review them and decide whether they still need to be excluded. Leave it empty not to move them. It works even if “Mark as read and move” is off. The folder is created if it does not exist.
 - Excluded emails no longer appear in the “not moved” notice when this folder is set.

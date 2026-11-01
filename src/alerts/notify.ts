@@ -6,6 +6,7 @@
 import { and, eq, inArray, isNotNull } from 'drizzle-orm';
 import nodemailer from 'nodemailer';
 import { request } from 'undici';
+import { BRAND } from '../edition.js';
 import webpush from 'web-push';
 import { allowedElementIds } from '../auth/access.js';
 import { decrypt, encrypt } from '../crypto.js';
@@ -133,7 +134,7 @@ export const getHook = (k: HookKind) => getSetting<HookConfig>(k);
 
 async function post(url: string, body: unknown, headers: Record<string, string> = {}): Promise<void> {
   const res = await request(url, {
-    method: 'POST', headers: { 'content-type': 'application/json', 'user-agent': 'pvemon', ...headers }, body: JSON.stringify(body),
+    method: 'POST', headers: { 'content-type': 'application/json', 'user-agent': BRAND.name.toLowerCase(), ...headers }, body: JSON.stringify(body),
     headersTimeout: 10_000, bodyTimeout: 10_000,
   });
   const text = await res.body.text().catch(() => '');
@@ -142,7 +143,7 @@ async function post(url: string, body: unknown, headers: Record<string, string> 
 
 /** Cuerpo JSON genérico: un lote de avisos */
 export const webhookBody = (notes0: AlertNote[], lang: Lang = 'es') => ({
-  source: 'pvemon', sentAt: new Date().toISOString(),
+  source: BRAND.name.toLowerCase(), sentAt: new Date().toISOString(),
   alerts: notes0.map((n0) => trNote(n0, lang)).map((n) => ({ event: n.state, severity: n.severity, title: n.title, text: n.text, path: n.path, elementId: n.elementId, alertId: n.eventId })),
 });
 
@@ -154,7 +155,7 @@ export const teamsBody = (notes0: AlertNote[], lang: Lang = 'es') => { const not
     content: {
       $schema: 'http://adaptivecards.io/schemas/adaptive-card.json', type: 'AdaptiveCard', version: '1.4',
       body: [
-        { type: 'TextBlock', text: 'PVEMon', weight: 'Bolder', size: 'Medium' },
+        { type: 'TextBlock', text: BRAND.name, weight: 'Bolder', size: 'Medium' },
         ...notes.slice(0, 10).flatMap((n) => [
           { type: 'TextBlock', text: n.title, weight: 'Bolder', wrap: true, color: n.state === 'resolved' ? 'Good' : n.severity === 'critical' ? 'Attention' : 'Warning', separator: true },
           { type: 'TextBlock', text: n.text + (n.path ? `\n${n.path}` : ''), wrap: true, isSubtle: true, spacing: 'None' },

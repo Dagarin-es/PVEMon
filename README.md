@@ -84,6 +84,13 @@ curl localhost:3000/api/health
 | `DATA_DIR` | `/data` (compose) | Folder of `config.db` and `metrics.db` |
 | `TZ` | `Europe/Madrid` | Time zone of the weekly summary |
 | `TELEGRAM_API`, `PVEMON_LAN_PORT` | api.telegram.org, `8006` | Advanced/testing |
+| `EDITION` | `pvemon` | `bckmon` turns on the BCKMon edition (backups only; see below). The `dagarines/bckmon` image already has it set |
+
+### Version 2.0 beta and BCKMon
+
+**2.0** is published first as a **beta** (`dagarines/pvemon:2.0.0-beta.N`; on Docker Hub `latest` still points to the stable one). The stable version is **1.5.7** and you can go back to it at any time: [`docs/VOLVER-A-1.5.7.md`](docs/VOLVER-A-1.5.7.md) (in Spanish). The database does not change between them.
+
+New in 2.0: **BCKMon**, a second application built from the same code and focused only on **backups** (IMAP mail, NFS file checks, alerts, notifications, kiosks and users). It does not connect to Proxmox or Docker, nor scan the network. Install it like PVEMon with the `dagarines/bckmon` image (or with `EDITION=bckmon`).
 
 ### Approximate resources
 

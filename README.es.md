@@ -83,6 +83,13 @@ curl localhost:3000/api/health
 | `DATA_DIR` | `/data` (compose) | Carpeta de `config.db` y `metrics.db` |
 | `TZ` | `Europe/Madrid` | Zona horaria del resumen semanal |
 | `TELEGRAM_API`, `PVEMON_LAN_PORT` | api.telegram.org, `8006` | Avanzado/pruebas |
+| `EDITION` | `pvemon` | `bckmon` activa la edición BCKMon (solo copias; ver más abajo). La imagen `dagarines/bckmon` ya la lleva puesta |
+
+### Versión 2.0 beta y BCKMon
+
+La **2.0** se publica primero como **beta** (`dagarines/pvemon:2.0.0-beta.N`; en Docker Hub `latest` sigue apuntando a la estable). La estable es la **1.5.7** y se puede volver a ella en cualquier momento: [`docs/VOLVER-A-1.5.7.md`](docs/VOLVER-A-1.5.7.md). La base de datos no cambia entre ambas.
+
+Novedad de la 2.0: **BCKMon**, una segunda aplicación con la misma base de código y centrada solo en las **copias de seguridad** (correo IMAP, comprobación de archivos por NFS, alertas, avisos, kioscos y usuarios). No se conecta a Proxmox, ni a Docker, ni explora la red. Se instala igual que PVEMon con la imagen `dagarines/bckmon` (o con `EDITION=bckmon`).
 
 ### Recursos orientativos
 

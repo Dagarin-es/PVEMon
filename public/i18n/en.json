@@ -955,5 +955,11 @@
   "el origen «{0}» no está dado de alta": "the source “{0}” has not been added",
   "no se ha podido leer": "could not be read",
   "Carpeta a la que se mueven los excluidos, sin marcarlos como leídos (ej. Alertas/Excluidos; vacío = no moverlos)": "Folder excluded emails are moved to, without marking them as read (e.g. Alerts/Excluded; empty = do not move them)",
-  " · excluidos movidos: {0}": " · excluded moved: {0}"
+  " · excluidos movidos: {0}": " · excluded moved: {0}",
+  "monitor de copias de seguridad": "backup monitor",
+  "Monitor de copias de seguridad": "Backup monitor",
+  "Copias": "Backups",
+  "copias enlazadas": "backups linked",
+  "Todavía no hay copias configuradas. Dalas de alta en Ajustes › Copias.": "There are no backups set up yet. Add them under Settings › Backups.",
+  "Versión beta: puede tener fallos": "Beta version: it may have bugs"
 }
