@@ -36,7 +36,7 @@ Image: [`dagarines/pvemon`](https://hub.docker.com/r/dagarines/pvemon) (amd64 an
 ```yaml
 services:
   pvemon:
-    image: dagarines/pvemon:latest   # or a fixed version, e.g. dagarines/pvemon:1.5.3
+    image: dagarines/pvemon:latest   # or a fixed version, e.g. dagarines/pvemon:1.5.7
     container_name: pvemon
     restart: unless-stopped
     env_file: .env

@@ -1,6 +1,21 @@
 # ChangeLog de PVEMon
 Historial reconstruido desde la primera versión numerada. Lo más reciente, primero.
 
+## 1.5.7 · 01/11/2026
+- Nuevo: tercera carpeta en «Correo donde llegan los avisos de copias»: «Carpeta a la que se mueven los excluidos». Los correos de remitentes excluidos se mueven ahí **sin marcarlos como leídos**, para que puedas revisarlos y decidir si ya no hace falta excluirlos. Déjala vacía para no moverlos. Funciona aunque «Marcar como leído y mover» esté desactivado. La carpeta se crea si no existe.
+- Los correos excluidos ya no salen en el aviso «sin mover» cuando esta carpeta está configurada.
+
+## 1.5.6 · 01/11/2026
+- Mejorado: la línea de estado del buzón ahora dice qué correos de la carpeta de entrada no se han movido y por qué (formato no reconocido, tipo de correo que PVEMon ignora, remitente excluido, o el origen «X» no está dado de alta).
+
+## 1.5.5 · 01/11/2026
+- Corregido: con «Marcar como leído y mover», los correos de una tarea a la que se había dado «Dejar de monitorizar» se quedaban siempre en la carpeta de entrada. Ahora se mueven igualmente (el origen está dado de alta y el correo se reconoce).
+- Nuevo: tras cada consulta, la línea de estado del buzón indica cuántos correos de la carpeta de entrada no se han movido y por qué («sin mover: N (su origen no está dado de alta o no se reconoce el correo)»). Para que se muevan, da de alta su origen en «Orígenes de copias».
+
+## 1.5.4 · 01/11/2026
+- Corregido: con «Marcar como leído y mover» activado, los correos que PVEMon ya había leído en una consulta anterior (por ejemplo, porque activaste la opción después, o un intento anterior falló) no se marcaban ni se movían nunca a la carpeta de procesados; solo se movían los recién llegados. Ahora se procesan también esos.
+- Mejorado: todos los campos de los Ajustes (correo, notificaciones, usuarios, copias, API, kioskos…) llevan ahora un título visible encima, que no desaparece al rellenarlos. El ejemplo sigue dentro del campo.
+
 ## 1.5.3 · 01/11/2026
 - Nuevo en GitHub: formularios para abrir Issues (fallo y sugerencia) en castellano e inglés, que piden versión, logs y avisan de no pegar claves ni IPs. No cambia nada en la aplicación.
 

@@ -20,8 +20,8 @@ export interface FetchOptions {
 
 export interface Fetcher {
   /** Marca como leídos y mueve (por UID) los correos ya procesados de una carpeta a otra; crea la carpeta destino si no existe */
-  finish?(cfg: ImapConfig, from: string, to: string, uids: number[]): Promise<number>;
-  fetch(cfg: ImapConfig, opts: FetchOptions): Promise<{ mails: RawMail[]; seen: number; missingFolders: string[] }>;
+  finish?(cfg: ImapConfig, from: string, to: string, uids: number[], markSeen?: boolean): Promise<number>;
+  fetch(cfg: ImapConfig, opts: FetchOptions): Promise<{ mails: RawMail[]; seen: number; missingFolders: string[]; known?: { messageId: string; folder: string; uid: number }[] }>;
   listFolders(cfg: ImapConfig): Promise<string[]>;
 }
 
@@ -47,7 +47,7 @@ const textOf = async (source: Buffer): Promise<{ text: string; subject: string; 
 };
 
 export const imapFetcher: Fetcher = {
-  async finish(cfg, from, to, uids) {
+  async finish(cfg, from, to, uids, markSeen = true) {
     if (!uids.length) return 0;
     const c = client(cfg);
     c.on('error', () => undefined);
@@ -66,7 +66,7 @@ export const imapFetcher: Fetcher = {
       const lock = await c.getMailboxLock(src);
       try {
         const set = uids.join(',');
-        await c.messageFlagsAdd(set, ['\\Seen'], { uid: true });
+        if (markSeen) await c.messageFlagsAdd(set, ['\\Seen'], { uid: true });
         await c.messageMove(set, dst, { uid: true });
       } finally { lock.release(); }
       return uids.length;
@@ -86,6 +86,7 @@ export const imapFetcher: Fetcher = {
     await c.connect();
     const mails: RawMail[] = [];
     const missingFolders: string[] = [];
+    const known: { messageId: string; folder: string; uid: number }[] = []; // ya leídos antes: se necesitan para marcarlos y moverlos
     let seen = 0;
     try {
       const list = await c.list();
@@ -102,7 +103,7 @@ export const imapFetcher: Fetcher = {
             if (!head) continue;
             seen++;
             const mid = head.envelope?.messageId ?? `${path}#${uid}`;
-            if (opts.skip(mid)) continue;
+            if (opts.skip(mid)) { known.push({ messageId: mid, folder: want, uid }); continue; }
             const full = await c.fetchOne(String(uid), { source: true }, { uid: true });
             if (!full || !full.source) continue;
             const p = await textOf(full.source);
@@ -116,7 +117,7 @@ export const imapFetcher: Fetcher = {
         } finally { lock.release(); }
       }
     } finally { await c.logout().catch(() => undefined); }
-    return { mails, seen, missingFolders };
+    return { mails, seen, missingFolders, known };
   },
 };
 

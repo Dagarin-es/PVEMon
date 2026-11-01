@@ -1,6 +1,21 @@
 # PVEMon ChangeLog
 History rebuilt from the first numbered version. Most recent first.
 
+## 1.5.7 · 01/11/2026
+- New: a third folder in “Mailbox where the backup notifications arrive”: “Folder excluded emails are moved to”. Emails from excluded senders are moved there **without being marked as read**, so you can review them and decide whether they still need to be excluded. Leave it empty not to move them. It works even if “Mark as read and move” is off. The folder is created if it does not exist.
+- Excluded emails no longer appear in the “not moved” notice when this folder is set.
+
+## 1.5.6 · 01/11/2026
+- Improved: the mailbox status line now says which emails in the inbox folder were not moved and why (format not recognised, type of email that PVEMon ignores, excluded sender, or the source “X” has not been added).
+
+## 1.5.5 · 01/11/2026
+- Fixed: with “Mark as read and move”, emails of a task set to “Stop monitoring” always stayed in the inbox folder. They are now moved too (the source is added and the email is recognised).
+- New: after each check, the mailbox status line says how many emails in the inbox folder were not moved and why (“not moved: N (their source is not added or the email is not recognised)”). To get them moved, add their source under “Backup sources”.
+
+## 1.5.4 · 01/11/2026
+- Fixed: with “Mark as read and move” on, emails that PVEMon had already read in an earlier check (for example because you turned the option on later, or a previous attempt failed) were never marked or moved to the processed folder; only newly arrived ones were. They are now handled too.
+- Improved: every field in Settings (mail, notifications, users, backups, API, kiosks…) now has a visible title above it that does not disappear once it is filled in. The example stays inside the field.
+
 ## 1.5.3 · 01/11/2026
 - New on GitHub: forms to open Issues (bug and suggestion) in Spanish and English, asking for version and logs and warning not to paste keys or IPs. Nothing changes in the application.
 

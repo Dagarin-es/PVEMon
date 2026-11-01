@@ -25,10 +25,12 @@ interface ImapStored {
   host: string; port: number; secure: boolean; user: string; passwordEnc: string;
   /** carpeta donde llegan los correos de copias y carpeta a la que se mueven una vez procesados */
   inFolder: string; doneFolder: string; moveDone: boolean;
+  /** carpeta a la que se mueven (sin marcar como leídos) los correos de remitentes excluidos; vacía = no se mueven */
+  excludedFolder: string;
   lookbackDays: number; enabled: boolean;
 }
 const DEFAULT_IMAP: ImapStored = {
-  host: '', port: 993, secure: true, user: '', passwordEnc: '', inFolder: 'Alertas', doneFolder: 'Alertas/Procesados', moveDone: false, lookbackDays: 60, enabled: false,
+  host: '', port: 993, secure: true, user: '', passwordEnc: '', inFolder: 'Alertas', doneFolder: 'Alertas/Procesados', moveDone: false, excludedFolder: '', lookbackDays: 60, enabled: false,
 };
 const readImap = (): ImapStored => {
   const raw = getSetting<Partial<ImapStored> & { folders?: string[] }>('mail.imap') ?? {};
@@ -39,19 +41,19 @@ const readImap = (): ImapStored => {
 
 export function getImapView() {
   const c = readImap();
-  return { host: c.host, port: c.port, secure: c.secure, user: c.user, hasPassword: !!c.passwordEnc, inFolder: c.inFolder, doneFolder: c.doneFolder, moveDone: c.moveDone, lookbackDays: c.lookbackDays, enabled: c.enabled };
+  return { host: c.host, port: c.port, secure: c.secure, user: c.user, hasPassword: !!c.passwordEnc, inFolder: c.inFolder, doneFolder: c.doneFolder, excludedFolder: c.excludedFolder, moveDone: c.moveDone, lookbackDays: c.lookbackDays, enabled: c.enabled };
 }
 
 export interface ImapInput {
   host: string; port: number; secure: boolean; user: string; password?: string;
-  inFolder: string; doneFolder: string; moveDone: boolean; lookbackDays: number; enabled: boolean;
+  inFolder: string; doneFolder: string; excludedFolder?: string; moveDone: boolean; lookbackDays: number; enabled: boolean;
 }
 export function setImap(i: ImapInput): void {
   const prev = readImap();
   setSetting('mail.imap', {
     host: i.host, port: i.port, secure: i.secure, user: i.user,
     passwordEnc: i.password ? encrypt(i.password) : prev.passwordEnc,
-    inFolder: i.inFolder, doneFolder: i.doneFolder, moveDone: i.moveDone, lookbackDays: i.lookbackDays, enabled: i.enabled,
+    inFolder: i.inFolder, doneFolder: i.doneFolder, excludedFolder: i.excludedFolder ?? '', moveDone: i.moveDone, lookbackDays: i.lookbackDays, enabled: i.enabled,
   } satisfies ImapStored);
 }
 
@@ -122,10 +124,10 @@ export function createMailSource(name: string, backupMaxHours?: number) {
 
 /* ───────────── estado en memoria ───────────── */
 
-type Entry = { kind: 'parsed'; parsed: Parsed; from: string } | { kind: 'ignored' } | { kind: 'unknown'; subject: string; from: string; date: number };
+type Entry = { kind: 'parsed'; parsed: Parsed; from: string } | { kind: 'ignored'; why?: 'excluded' | 'type'; subject?: string } | { kind: 'unknown'; subject: string; from: string; date: number };
 const cache = new Map<string, Entry>();
 
-export interface PollInfo { at: number; ok: boolean; error: string | null; seen: number; fetched: number; missingFolders: string[]; moved?: number; moveError?: string | null }
+export interface PollInfo { at: number; ok: boolean; error: string | null; seen: number; fetched: number; missingFolders: string[]; moved?: number; moveError?: string | null; notMoved?: number; movedExcluded?: number; notMovedList?: { subject: string; why: 'unknown' | 'excluded' | 'type' | 'source' | 'unseen'; source?: string }[] }
 let lastPoll: PollInfo | null = null;
 let polling = false;
 export const isPolling = () => polling;
@@ -248,22 +250,45 @@ export async function pollMail(store: MetricsStore): Promise<PollInfo> {
       folders, sinceDays: stored.lookbackDays, skip: (id) => cache.has(id),
     });
     for (const m of r.mails) {
-      if (isExcluded(m.from)) { cache.set(m.messageId, { kind: 'ignored' }); continue; }
+      if (isExcluded(m.from)) { cache.set(m.messageId, { kind: 'ignored', why: 'excluded', subject: m.subject }); continue; }
       const p = parseMail(m, formats);
-      cache.set(m.messageId, p.kind === 'parsed' ? { kind: 'parsed', parsed: p.parsed, from: m.from } : p.kind === 'ignored' ? p : { kind: 'unknown', subject: m.subject, from: m.from, date: m.date });
+      cache.set(m.messageId, p.kind === 'parsed' ? { kind: 'parsed', parsed: p.parsed, from: m.from } : p.kind === 'ignored' ? { kind: 'ignored', why: 'type', subject: m.subject } : { kind: 'unknown', subject: m.subject, from: m.from, date: m.date });
     }
     applyCache();
     evaluateAll(store);
     // Opcional: marcar como leídos y mover los correos ya incorporados (solo los de la carpeta de entrada y de orígenes dados de alta)
-    let moved = 0, moveError: string | null = null;
+    let moved = 0, movedExcluded = 0, notMoved = 0, moveError: string | null = null; let notMovedList: PollInfo['notMovedList'] = [];
     const fetcher = getFetcher();
-    if (stored.moveDone && stored.doneFolder && fetcher.finish) {
+    if (((stored.moveDone && stored.doneFolder) || stored.excludedFolder) && fetcher.finish) {
       const done = new Set(db.select({ m: mailEvents.messageId }).from(mailEvents).all().map((x) => x.m));
-      const uids = r.mails.filter((m) => m.folder === stored.inFolder && m.uid && done.has(m.messageId)).map((m) => m.uid!);
-      try { moved = await fetcher.finish(conn, stored.inFolder, stored.doneFolder, uids); }
-      catch (e) { moveError = (e as Error).message || String(e); }
+      // También los correos reconocidos de un origen dado de alta cuya tarea se dejó de monitorizar: no generan datos, pero ya están gestionados
+      const regs = new Set(mailSources().map((s) => norm(s.name)));
+      for (const [mid, e] of cache) if (e.kind === 'parsed' && regs.has(norm(e.parsed.source))) done.add(mid);
+      // Incluye los correos nuevos y los ya leídos en consultas anteriores (si se activó la opción después, o un intento falló)
+      const cands = [...r.mails.map((m) => ({ messageId: m.messageId, folder: m.folder, uid: m.uid })), ...(r.known ?? [])];
+      const inIn = cands.filter((m) => m.folder === stored.inFolder && m.uid);
+      const doMove = stored.moveDone && !!stored.doneFolder;
+      const isEx = (id: string) => { const e = cache.get(id); return e?.kind === 'ignored' && e.why === 'excluded'; };
+      const exUids = stored.excludedFolder ? [...new Set(inIn.filter((m) => isEx(m.messageId)).map((m) => m.uid!))] : [];
+      const uids = doMove ? [...new Set(inIn.filter((m) => done.has(m.messageId)).map((m) => m.uid!))] : [];
+      const pend = new Map<string, NonNullable<PollInfo['notMovedList']>[number]>();
+      const subj = new Map(r.mails.map((x) => [x.messageId, x.subject]));
+      for (const m of inIn) {
+        if (!doMove || done.has(m.messageId) || pend.has(m.messageId) || (stored.excludedFolder && isEx(m.messageId))) continue;
+        const e = cache.get(m.messageId);
+        pend.set(m.messageId, !e ? { subject: subj.get(m.messageId) ?? m.messageId, why: 'unseen' }
+          : e.kind === 'unknown' ? { subject: e.subject, why: 'unknown' }
+          : e.kind === 'ignored' ? { subject: e.subject ?? subj.get(m.messageId) ?? '', why: e.why ?? 'type' }
+          : { subject: `${e.parsed.task}`, why: 'source', source: e.parsed.source });
+      }
+      notMoved = pend.size; notMovedList = [...pend.values()].slice(0, 3);
+      try {
+        // Los excluidos se mueven sin marcarlos como leídos (para poder revisarlos)
+        if (exUids.length) movedExcluded = await fetcher.finish(conn, stored.inFolder, stored.excludedFolder, exUids, false);
+        if (uids.length) moved = await fetcher.finish(conn, stored.inFolder, stored.doneFolder, uids);
+      } catch (e) { moveError = (e as Error).message || String(e); }
     }
-    lastPoll = { at, ok: true, error: null, seen: r.seen, fetched: r.mails.length, missingFolders: r.missingFolders, moved, moveError };
+    lastPoll = { at, ok: true, error: null, seen: r.seen, fetched: r.mails.length, missingFolders: r.missingFolders, moved, movedExcluded, moveError, notMoved, notMovedList };
   } catch (e) {
     lastPoll = { at, ok: false, error: (e as Error).message || String(e), seen: 0, fetched: 0, missingFolders: [] };
   } finally { polling = false; }

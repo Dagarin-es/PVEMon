@@ -21,6 +21,7 @@ const imapBody = z.object({
   password: z.string().max(300).optional(),
   inFolder: z.string().trim().min(1).max(200),
   doneFolder: z.string().trim().min(1).max(200),
+  excludedFolder: z.string().trim().max(200).optional(),
   moveDone: z.boolean(),
   lookbackDays: z.number().int().min(3).max(90),
   enabled: z.boolean(),
@@ -86,7 +87,7 @@ export const mailRoutes: FastifyPluginAsync = async (app) => {
     }
     setImap(b.data);
     resetMailCache();
-    audit(req.user!.id, 'mail.imap', b.data.host, { user: b.data.user, inFolder: b.data.inFolder, doneFolder: b.data.doneFolder, moveDone: b.data.moveDone, enabled: b.data.enabled });
+    audit(req.user!.id, 'mail.imap', b.data.host, { user: b.data.user, inFolder: b.data.inFolder, doneFolder: b.data.doneFolder, excludedFolder: b.data.excludedFolder, moveDone: b.data.moveDone, enabled: b.data.enabled });
     return view();
   });
 
@@ -99,7 +100,7 @@ export const mailRoutes: FastifyPluginAsync = async (app) => {
     try {
       const folders = await getFetcher().listFolders(conn);
       const v = getImapView();
-      const want = [b.data.inFolder ?? v.inFolder, b.data.doneFolder ?? v.doneFolder].filter(Boolean);
+      const want = [b.data.inFolder ?? v.inFolder, b.data.doneFolder ?? v.doneFolder, b.data.excludedFolder ?? v.excludedFolder].filter(Boolean);
       const missing = want.filter((w) => !resolveFolder(w, folders.map((path) => ({ path }))));
       return { ok: true, folders, missing, canCreate: true };
     } catch (e) {
