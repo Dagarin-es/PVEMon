@@ -1,6 +1,12 @@
 # PVEMon ChangeLog
 History rebuilt from the first numbered version. Most recent first.
 
+## 2.0.0-beta.11 · 01/11/2026
+- **Colour palettes** in both applications: Aurora (cyan/violet, PVEMon's), Lima (green, BCKMon's so far), Cobre (copper), Índigo and Grafito (graphite). Each has dark and light mode and its own logo (app icon, favicon and PWA manifest). By default PVEMon stays on Aurora (unchanged) and BCKMon moves to Cobre. Pick it in Personalize by clicking the logo; it is saved per user.
+- **Personalize** reorganised: a “Profile” tab with a single card (photo, language, colour, password and two-step verification) and a separate “Notifications” tab. Language is no longer in the user menu.
+- **Login**: language is now a small dropdown on the left of the footer (Spanish by default), so it is not mistaken for the sign-in button.
+- “PVEMon” is now written in capitals in the PVEMon edition texts (some screens used to show the name in lowercase).
+
 ## 2.0.0-beta.10 · 01/11/2026
 - “BCKMon” is now written in capitals throughout the BCKMon edition (it used to show “bckmon” in the heartbeat card and its help).
 - Backups using the built-in Synology Hyper Backup format have their own icon (a blue NAS) in the backup lists and in settings.

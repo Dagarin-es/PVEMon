@@ -2,7 +2,7 @@ import compress from '@fastify/compress';
 import cookie from '@fastify/cookie';
 import rateLimit from '@fastify/rate-limit';
 import fastifyStatic from '@fastify/static';
-import { EDITION, brandScript, manifest } from './edition.js';
+import { EDITION, PAL_DEFAULT, brandScript, isPalette, manifest } from './edition.js';
 import Fastify from 'fastify';
 import { resolve } from 'node:path';
 import { purgeExpiredSessions } from './auth/sessions.js';
@@ -142,11 +142,18 @@ if (EDITION === 'pvemon') await app.register(diskRoutes, { prefix: '/api' });
 await app.register(apiV1Routes, { prefix: '/api' });
 // Marca de la edición: script, manifiesto e iconos propios (PVEMon por defecto; BCKMon con EDITION=bckmon)
 app.get('/brand.js', async (_req, reply) => reply.header('Cache-Control', 'no-cache').type('application/javascript; charset=utf-8').send(brandScript()));
-app.get('/manifest.webmanifest', async (_req, reply) => reply.header('Cache-Control', 'no-cache').type('application/manifest+json').send(manifest()));
-if (EDITION !== 'pvemon') {
-  for (const f of ['icon.svg', 'icon-192.png', 'icon-512.png', 'favicon-32.png', 'favicon-48.png', 'apple-touch-icon.png', 'badge-96.png']) {
-    app.get('/' + f, async (_req, reply) => reply.header('Cache-Control', 'public, max-age=3600').sendFile(`editions/${EDITION}/${f}`));
-  }
+app.get('/manifest.webmanifest', async (req, reply) => {
+  const p = (req.query as { p?: string }).p;
+  return reply.header('Cache-Control', 'no-cache').type('application/manifest+json').send(manifest(isPalette(p) ? p : PAL_DEFAULT));
+});
+// Iconos según edición y paleta (?p=). PVEMon con su paleta original (aurora) sigue sirviendo los iconos de siempre de public/
+for (const f of ['icon.svg', 'icon-192.png', 'icon-512.png', 'favicon-32.png', 'favicon-48.png', 'apple-touch-icon.png', 'badge-96.png']) {
+  app.get('/' + f, async (req, reply) => {
+    const q = (req.query as { p?: string }).p;
+    const pal = isPalette(q) ? q : PAL_DEFAULT;
+    const file = EDITION === 'pvemon' && pal === 'aurora' ? f : `palettes/${EDITION}/${pal}/${f}`;
+    return reply.header('Cache-Control', 'public, max-age=3600').sendFile(file);
+  });
 }
 await app.register(fastifyStatic, {
   root: resolve('public'), // la PWA

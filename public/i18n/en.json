@@ -1013,5 +1013,9 @@
   "Es el formato de los avisos de Hyper Backup (Backup_local, NAS externo…). Origen: el nombre entre corchetes del asunto. Tarea: «Nombre de la tarea». Bien: «se ha completado / se ha realizado» (completed / performed). Mal: «ha fallado», «parcialmente» (failed / partially). Se ignoran los avisos de integridad, rotación, versiones y restauración. Es fijo: para cambiar algo, crea una copia editable.": "This is the format of Hyper Backup notices (Backup_local, external NAS…). Source: the name in square brackets in the subject. Task: “Task name”. Good: “completed / performed”. Bad: “failed”, “partially”. Integrity, rotation, version and restore notices are ignored. It is fixed: to change anything, create an editable copy.",
   "Synology Hyper Backup (copia)": "Synology Hyper Backup (copy)",
   "Crear copia editable": "Create editable copy",
-  "Copia de Synology creada: cámbiale lo que haga falta y guarda. Ojo: los formatos propios se aplican antes que el integrado.": "Synology copy created: change whatever you need and save. Note: custom formats are applied before the built-in one."
+  "Copia de Synology creada: cámbiale lo que haga falta y guarda. Ojo: los formatos propios se aplican antes que el integrado.": "Synology copy created: change whatever you need and save. Note: custom formats are applied before the built-in one.",
+  "Índigo": "Indigo",
+  "Color": "Colour",
+  "Perfil": "Profile",
+  "Se guarda para tu usuario.": "Saved for your user."
 }

@@ -1,6 +1,12 @@
 # ChangeLog de PVEMon
 Historial reconstruido desde la primera versión numerada. Lo más reciente, primero.
 
+## 2.0.0-beta.11 · 01/11/2026
+- **Paletas de color** en las dos aplicaciones: Aurora (cian/violeta, la de PVEMon), Lima (verde, la de BCKMon hasta ahora), Cobre, Índigo y Grafito. Cada una tiene modo oscuro y claro, y su propio logo (icono de la app, favicon y manifiesto de la PWA). Por defecto PVEMon sigue en Aurora (sin cambios) y BCKMon pasa a Cobre. Se elige en Personalizar pulsando el logo; se guarda por usuario.
+- **Personalizar** reorganizado: pestaña «Perfil» con una sola tarjeta (foto, idioma, color, contraseña y verificación en dos pasos) y pestaña «Avisos» aparte. El idioma ya no está en el menú del usuario.
+- **Login**: el idioma es ahora un desplegable pequeño a la izquierda del pie (español por defecto), para no confundirlo con el botón de entrar.
+- «PVEMon» se escribe con mayúsculas en los textos de la edición PVEMon (antes salían nombres en minúscula en algunas pantallas).
+
 ## 2.0.0-beta.10 · 01/11/2026
 - «BCKMon» se escribe con mayúsculas en todos los textos de la edición BCKMon (antes salía «bckmon» en la tarjeta del latido y su ayuda).
 - Las copias del formato integrado de Synology Hyper Backup tienen su propio icono (un NAS azul) en las listas de copias y en los ajustes.

@@ -501,16 +501,18 @@ label.f.ck{flex-direction:row;align-items:center;gap:10px}label.f.ck input{width
 .brand .wm2{position:relative;align-self:flex-start}
 .brand .wm2 .beta{position:absolute;top:-9px;right:0;font:700 8px/1 var(--sans);font-style:normal;letter-spacing:.1em;color:var(--ac);padding:0;margin:0;border:0;-webkit-text-fill-color:currentColor;pointer-events:none}
 
-/* ───── Edición BCKMon: identidad verde (lima y esmeralda). Rojo y verde menta de «correcto» no cambian de significado. ───── */
-:root[data-ed=bckmon]{
+/* ───── Paletas de color (data-pal). «aurora» (cian y violeta) es la base de :root y no necesita bloque; el resto la sustituyen.
+   Rojo, ámbar y el verde menta de «correcto» no cambian de significado en ninguna. ───── */
+:root[data-pal=lima]:not([data-theme=light]){
   --bg:#060a05;--card:#0e1609;--well:#0a1006;--tx:#eefbe0;--mu:#9fb38b;--bd:#25341b;--bd2:#3a4f29;
   --ac:#a3e635;--ac2:#4ade80;--on-ac:#0c1402;--free:#1c2a14;--sys:#6f8a58;--oth:#86a06c;
+  --glow:0 0 14px color-mix(in srgb,var(--ac) 45%,transparent);
   --grid:rgba(160,230,80,.05);
   --mesh:radial-gradient(900px 520px at 8% -8%,rgba(74,222,128,.12),transparent 62%),radial-gradient(820px 520px at 100% 100%,rgba(163,230,53,.10),transparent 62%);
   --grad:linear-gradient(135deg,#d4f26a,#5fd36a);
-  --btn:linear-gradient(135deg,#3b6a16,#2a6a35);--btn-tx:#f1ffe0;--btn-bd:rgba(163,230,53,.42);--btn-glow:0 0 14px -4px rgba(140,220,70,.5);
+  --btn:linear-gradient(135deg,#3b6a16,#2a6a35);--btn-tx:#f1ffe0;--btn-bd:rgba(163,230,53,.42);--btn-glow:0 0 8px -5px rgba(140,220,70,.5);
 }
-:root[data-ed=bckmon][data-theme=light]{
+:root[data-pal=lima][data-theme=light]{
   --bg:#eef3e6;--card:#ffffff;--well:#f4f8ee;--tx:#12200a;--mu:#566a45;--bd:#d6e1c6;--bd2:#b3c59a;
   --ac:#3f7d0f;--ac2:#15803d;--on-ac:#fff;--free:#e0e9d2;--sys:#8da476;--oth:#8ea77a;
   --grid:rgba(60,120,20,.06);
@@ -518,6 +520,71 @@ label.f.ck{flex-direction:row;align-items:center;gap:10px}label.f.ck input{width
   --grad:linear-gradient(135deg,#4d8f12,#15803d);
   --btn:linear-gradient(135deg,#4d8f12,#15803d);--btn-tx:#fff;--btn-bd:transparent;--btn-glow:none;
 }
-:root[data-ed=bckmon] .tabs button.on{box-shadow:0 0 0 1px var(--ac) inset,0 0 14px color-mix(in srgb,var(--ac) 35%,transparent)}
+:root[data-pal=cobre]:not([data-theme=light]){
+  --bg:#0a0706;--card:#160e0b;--well:#100a08;--tx:#f3e6dc;--mu:#b09a8c;--bd:#3a2519;--bd2:#593a26;
+  --ac:#d9773a;--ac2:#e8a35e;--on-ac:#1a0b02;--free:#2a1b13;--sys:#8a6a52;--oth:#a08068;
+  --glow:0 0 8px color-mix(in srgb,var(--ac) 20%,transparent);
+  --grid:rgba(225,130,60,.04);
+  --mesh:radial-gradient(900px 520px at 8% -8%,rgba(232,163,94,.09),transparent 62%),radial-gradient(820px 520px at 100% 100%,rgba(217,119,58,.07),transparent 62%);
+  --grad:linear-gradient(135deg,#e8a35e,#cc5f2a);
+  --btn:linear-gradient(135deg,#7a3c14,#6a3010);--btn-tx:#ffeadb;--btn-bd:rgba(217,119,58,.40);--btn-glow:0 0 8px -5px rgba(217,119,58,.4);
+}
+:root[data-pal=cobre][data-theme=light]{
+  --bg:#f7efe7;--card:#ffffff;--well:#fbf6f0;--tx:#2a1608;--mu:#7a5f4a;--bd:#e8d9c9;--bd2:#d0b59b;
+  --ac:#b4561c;--ac2:#c9822f;--on-ac:#fff;--free:#ecdfd1;--sys:#b39a82;--oth:#b8a089;
+  --grid:rgba(180,90,30,.06);
+  --mesh:radial-gradient(900px 520px at 0 -10%,rgba(201,130,47,.09),transparent 62%),radial-gradient(820px 520px at 100% 100%,rgba(180,86,28,.08),transparent 62%);
+  --grad:linear-gradient(135deg,#c9822f,#b4561c);
+  --btn:linear-gradient(135deg,#c9822f,#b4561c);--btn-tx:#fff;--btn-bd:transparent;--btn-glow:none;
+}
+:root[data-pal=indigo]:not([data-theme=light]){
+  --bg:#080810;--card:#11121f;--well:#0c0d18;--tx:#e4e6f6;--mu:#9599bd;--bd:#262a4a;--bd2:#3a4170;
+  --ac:#7c83e0;--ac2:#9d8de0;--on-ac:#08091c;--free:#1c1e36;--sys:#6a6f9a;--oth:#7f84ac;
+  --glow:0 0 8px color-mix(in srgb,var(--ac) 20%,transparent);
+  --grid:rgba(120,130,230,.04);
+  --mesh:radial-gradient(900px 520px at 8% -8%,rgba(157,141,224,.09),transparent 62%),radial-gradient(820px 520px at 100% 100%,rgba(124,131,224,.07),transparent 62%);
+  --grad:linear-gradient(135deg,#9d8de0,#6470d6);
+  --btn:linear-gradient(135deg,#3a4290,#30387c);--btn-tx:#eceeff;--btn-bd:rgba(124,131,224,.40);--btn-glow:0 0 8px -5px rgba(124,131,224,.4);
+}
+:root[data-pal=indigo][data-theme=light]{
+  --bg:#eef0fb;--card:#ffffff;--well:#f4f5fd;--tx:#12142e;--mu:#565a86;--bd:#dcdff2;--bd2:#b8bde0;
+  --ac:#4b55c9;--ac2:#6d5fd0;--on-ac:#fff;--free:#e1e4f6;--sys:#8d92bf;--oth:#9296c0;
+  --grid:rgba(80,90,200,.06);
+  --mesh:radial-gradient(900px 520px at 0 -10%,rgba(109,95,208,.09),transparent 62%),radial-gradient(820px 520px at 100% 100%,rgba(75,85,201,.08),transparent 62%);
+  --grad:linear-gradient(135deg,#6d5fd0,#4b55c9);
+  --btn:linear-gradient(135deg,#6d5fd0,#4b55c9);--btn-tx:#fff;--btn-bd:transparent;--btn-glow:none;
+}
+:root[data-pal=grafito]:not([data-theme=light]){
+  --bg:#0b0d10;--card:#14181d;--well:#0f1216;--tx:#e6e9ee;--mu:#98a1ad;--bd:#262d36;--bd2:#3a4552;
+  --ac:#c9d3df;--ac2:#8fa3b8;--on-ac:#0b0d10;--free:#1d232b;--sys:#6c7886;--oth:#808c9a;
+  --glow:0 0 8px color-mix(in srgb,var(--ac) 14%,transparent);
+  --grid:rgba(170,185,205,.04);
+  --mesh:radial-gradient(900px 520px at 8% -8%,rgba(143,163,184,.08),transparent 62%),radial-gradient(820px 520px at 100% 100%,rgba(201,211,223,.05),transparent 62%);
+  --grad:linear-gradient(135deg,#dfe6ee,#8fa3b8);
+  --btn:linear-gradient(135deg,#46535f,#37424d);--btn-tx:#f0f4f8;--btn-bd:rgba(201,211,223,.35);--btn-glow:0 0 8px -5px rgba(201,211,223,.35);
+}
+:root[data-pal=grafito][data-theme=light]{
+  --bg:#eef0f3;--card:#ffffff;--well:#f5f6f8;--tx:#151a20;--mu:#5b6572;--bd:#dde1e6;--bd2:#bcc4cd;
+  --ac:#3d4a59;--ac2:#5b6b7d;--on-ac:#fff;--free:#e3e7ec;--sys:#8b97a5;--oth:#9aa5b1;
+  --grid:rgba(60,75,95,.05);
+  --mesh:radial-gradient(900px 520px at 0 -10%,rgba(91,107,125,.08),transparent 62%),radial-gradient(820px 520px at 100% 100%,rgba(61,74,89,.06),transparent 62%);
+  --grad:linear-gradient(135deg,#5b6b7d,#3d4a59);
+  --btn:linear-gradient(135deg,#5b6b7d,#3d4a59);--btn-tx:#fff;--btn-bd:transparent;--btn-glow:none;
+}
+:root:not([data-pal=aurora]) .tabs button.on{box-shadow:0 0 0 1px var(--ac) inset,0 0 14px color-mix(in srgb,var(--ac) 35%,transparent)}
 
 .lver{font-weight:700;letter-spacing:.04em;color:var(--ac)}
+
+/* Selector de idioma desplegable del login (pequeño, a la izquierda) */
+.ft .langpick{font:inherit;font-size:11.5px;color:var(--mu);background:transparent;border:1px solid var(--bd2);border-radius:6px;padding:2px 4px;margin:0;width:auto;min-width:0;min-height:0;height:auto;line-height:1.3;cursor:pointer}
+/* Personalizar: bloques dentro de una sola tarjeta y selector de color con logos */
+.card .sec{margin:10px 0;display:flex;flex-direction:column;align-items:flex-start;gap:8px;background:none;border:0;box-shadow:none;padding:0}
+.card .sec input,.card .sec select{margin:0;max-width:340px}
+.card .sec .pals{margin:0}
+.card .sec>*{flex:0 0 auto}
+.card hr{border:0;border-top:1px solid var(--bd);margin:14px 0}
+.pals{display:flex;flex-wrap:wrap;gap:10px}
+.pals .pal{display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 8px;min-width:84px;background:var(--well);border:1px solid var(--bd2);border-radius:12px;color:var(--mu);cursor:pointer;font-size:12.5px}
+.pals .pal img{border-radius:13px}
+.pals .pal.on{border-color:var(--ac);color:var(--tx);box-shadow:0 0 0 1px var(--ac) inset}
+.pals .pal:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
