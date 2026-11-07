@@ -1017,5 +1017,14 @@
   "Índigo": "Indigo",
   "Color": "Colour",
   "Perfil": "Profile",
-  "Se guarda para tu usuario.": "Saved for your user."
+  "Se guarda para tu usuario.": "Saved for your user.",
+  "{0} hilos · {1} %": "{0} threads · {1} %",
+  "de {0} hilos": "of {0} threads",
+  "CPU usada por cada máquina": "CPU used by each machine",
+  "El centro es el uso real del procesador. Cada trozo es lo que consume la máquina ahora mismo.": "The centre is the real processor usage. Each slice is what the machine is using right now.",
+  "{0} hilos en uso": "{0} threads in use",
+  " Usar el formato integrado (desactívalo si prefieres tus propios formatos)": " Use the built-in format (turn it off if you prefer your own formats)",
+  "Formato de Synology activado": "Synology format enabled",
+  "Formato de Synology desactivado: los correos de Hyper Backup solo se leerán si coinciden con un formato propio": "Synology format disabled: Hyper Backup emails will only be read if they match a custom format",
+  "Plantillas orientativas (rellenan el formulario; ajústalas con un correo real y pon el nombre del equipo): ": "Sample templates (they fill in the form; adjust them with a real email and set the machine name): "
 }

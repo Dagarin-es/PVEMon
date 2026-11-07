@@ -1,6 +1,12 @@
 # PVEMon ChangeLog
 History rebuilt from the first numbered version. Most recent first.
 
+## 2.0.0-beta.12 · 07/11/2026
+- **“CPU” card** on each node, next to Memory and Disk: a ring with the real processor usage in the centre (“of N threads”) and the split by machine (threads each one is using right now), “System and others” and “Free”.
+- **Independent sessions**: BCKMon uses its own session cookie (`bckmon_sid`), so signing in to PVEMon and BCKMon from the same browser and IP (different port) no longer logs you out of the other application. PVEMon is unchanged. In BCKMon you have to sign in once after updating.
+- **Synology Hyper Backup format**: new switch to turn off the built-in format (Settings › Backups › Other backup programs) and use only custom formats.
+- **Sample templates** for custom formats for Duplicati and Cobian: they fill in the “Add a new format” form so you can adjust it with a real email.
+
 ## 2.0.0-beta.11 · 01/11/2026
 - **Colour palettes** in both applications: Aurora (cyan/violet, PVEMon's), Lima (green, BCKMon's so far), Cobre (copper), Índigo and Grafito (graphite). Each has dark and light mode and its own logo (app icon, favicon and PWA manifest). By default PVEMon stays on Aurora (unchanged) and BCKMon moves to Cobre. Pick it in Personalize by clicking the logo; it is saved per user.
 - **Personalize** reorganised: a “Profile” tab with a single card (photo, language, colour, password and two-step verification) and a separate “Notifications” tab. Language is no longer in the user menu.

@@ -129,10 +129,10 @@ function parseCustom(m: RawMail, fm: CustomFormat): ParseResult {
   };
 }
 
-export function parseMail(m: RawMail, formats: CustomFormat[]): ParseResult {
+export function parseMail(m: RawMail, formats: CustomFormat[], builtinSynology = true): ParseResult {
   for (const fm of formats) {
     const r = parseCustom(m, fm);
     if (r.kind !== 'unknown') return r;
   }
-  return parseSynology(m);
+  return builtinSynology ? parseSynology(m) : { kind: 'unknown' };
 }

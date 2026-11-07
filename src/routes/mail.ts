@@ -7,7 +7,7 @@ import { db, schema } from '../db/index.js';
 import { lastFiles, listChecks, runChecks } from '../filecheck/monitor.js';
 import { getFetcher, resolveFolder } from '../mail/imap.js';
 import {
-  applyCache, createMailSource, evaluateAll, deleteAccount, duplicateAccount, getAccountsView, getExcluded, getFormats, getLastPoll, ignoreTask, imapConn, isPolling,
+  applyCache, createMailSource, evaluateAll, deleteAccount, duplicateAccount, getAccountsView, getExcluded, getFormats, getSynologyOn, setSynologyOn, getLastPoll, ignoreTask, imapConn, isPolling,
   mailSources, pendingSources, pollMail, readAccounts, resetMailCache, saveAccount, setExcluded, setFormats, unrecognized,
 } from '../mail/monitor.js';
 
@@ -59,6 +59,7 @@ export const mailRoutes: FastifyPluginAsync = async (app) => {
     return {
       accounts: getAccountsView(),
       formats: getFormats(),
+      synologyOn: getSynologyOn(),
       excludedSenders: getExcluded(),
       sources: srv.map((s) => ({
         id: s.id, name: s.name, backupMaxHours: s.backupMaxHours,
@@ -207,6 +208,17 @@ export const mailRoutes: FastifyPluginAsync = async (app) => {
     setExcluded(b.data.senders);
     audit(req.user!.id, 'mail.excluded', undefined, { n: b.data.senders.length });
     if (readAccounts().some((a) => a.enabled)) void pollMail(app.metrics).catch(() => undefined); else evaluateAll(app.metrics);
+    return view();
+  });
+
+  /** Activa o desactiva el formato integrado de Synology Hyper Backup */
+  app.put('/mail/synology', async (req, reply) => {
+    const b = z.object({ enabled: z.boolean() }).safeParse(req.body);
+    if (!b.success) return reply.code(400).send({ error: 'Datos no válidos' });
+    setSynologyOn(b.data.enabled);
+    resetMailCache();
+    audit(req.user!.id, 'mail.synology', undefined, { enabled: b.data.enabled });
+    if (readAccounts().some((a) => a.enabled)) void pollMail(app.metrics).catch(() => undefined);
     return view();
   });
 

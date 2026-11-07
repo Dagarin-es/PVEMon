@@ -116,6 +116,9 @@ export function imapConn(accountId?: string, over?: Partial<ImapInput>): ImapCon
 
 export const getFormats = (): CustomFormat[] => getSetting<CustomFormat[]>('mail.formats') ?? [];
 export const setFormats = (f: CustomFormat[]): void => setSetting('mail.formats', f);
+/** Formato integrado de Synology Hyper Backup: activado salvo que se desactive (ajuste «mail.synology» = false) */
+export const getSynologyOn = (): boolean => getSetting<boolean>('mail.synology') !== false;
+export const setSynologyOn = (on: boolean): void => setSetting('mail.synology', on);
 /* Remitentes excluidos: si el «De» del correo contiene alguno de estos textos, no se procesa */
 export const getExcluded = (): string[] => getSetting<string[]>('mail.excludedSenders') ?? [];
 export const isExcluded = (from: string): boolean => {
@@ -300,14 +303,14 @@ async function pollAccount(stored: MailAccount, store: MetricsStore): Promise<Po
   const conn = imapConn(stored.id);
   if (!conn) return { at, ok: false, error: 'Falta configurar el servidor de correo (IMAP)', seen: 0, fetched: 0, missingFolders: [] };
   try {
-    const formats = getFormats();
+    const formats = getFormats(), syno = getSynologyOn();
     const folders = [...new Set([stored.inFolder, stored.doneFolder].filter(Boolean))];
     const r = await getFetcher().fetch(conn, {
       folders, sinceDays: stored.lookbackDays, skip: (id) => cache.has(id),
     });
     for (const m of r.mails) {
       if (isExcluded(m.from)) { cache.set(m.messageId, { kind: 'ignored', why: 'excluded', subject: m.subject }); continue; }
-      const p = parseMail(m, formats);
+      const p = parseMail(m, formats, syno);
       cache.set(m.messageId, p.kind === 'parsed' ? { kind: 'parsed', parsed: p.parsed, from: m.from } : p.kind === 'ignored' ? { kind: 'ignored', why: 'type', subject: m.subject } : { kind: 'unknown', subject: m.subject, from: m.from, date: m.date });
     }
     applyCache();

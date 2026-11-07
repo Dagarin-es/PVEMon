@@ -43,10 +43,10 @@ nueva de `dagarines/bckmon` en Docker Hub (tu `bckmon-local` sigue funcionando).
 - **PVEMon:** todo el código, con sus README. Sin la carpeta `repo-bckmon/`.
 - **BCKMon:** el mismo código, pero con el README de BCKMon (ES/EN) y su `docker-compose.yml`. Los README de PVEMon
   quedan como `README-PVEMON.md` y `README-PVEMON.es.md`. Tampoco lleva `repo-bckmon/`.
-- Las betas van a la rama `beta` de cada repositorio y llevan su etiqueta (`v2.0.0-beta.10`); las estables, a `main`.
+- Las betas van a la rama `beta` de cada repositorio y llevan su etiqueta (`v2.0.0-beta.12`); las estables, a `main`.
 - La etiqueta lanza la construcción de la imagen en cada repositorio (pestaña *Actions*).
 
 ## Después de cada beta
 
 Crear la Release de la etiqueta **en cada repositorio** marcando *Set as a pre-release*. Las notas están en
-`NOTAS-RELEASE-2.0.0-beta.10.md` (PVEMon y BCKMon comparten el texto).
+`NOTAS-RELEASE-2.0.0-beta.12.md` (PVEMon y BCKMon comparten el texto).

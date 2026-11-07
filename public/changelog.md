@@ -1,6 +1,12 @@
 # ChangeLog de PVEMon
 Historial reconstruido desde la primera versión numerada. Lo más reciente, primero.
 
+## 2.0.0-beta.12 · 07/11/2026
+- **Tarjeta «CPU»** en cada nodo, junto a Memoria y Disco: anillo con el uso real del procesador en el centro («de N hilos») y el reparto por máquina (hilos que consume cada una ahora mismo), «Sistema y otros» y «Libre».
+- **Sesiones independientes**: BCKMon usa su propia cookie de sesión (`bckmon_sid`), así que entrar en PVEMon y en BCKMon desde el mismo navegador y la misma IP (distinto puerto) ya no cierra la sesión de la otra aplicación. PVEMon no cambia. En BCKMon hay que iniciar sesión una vez tras actualizar.
+- **Formato de Synology Hyper Backup**: nuevo interruptor para desactivar el formato integrado (Ajustes › Copias › Otros programas de copia) y usar solo formatos propios.
+- **Plantillas orientativas** de formato propio para Duplicati y Cobian: rellenan el formulario de «Añadir un formato nuevo» para ajustarlo con un correo real.
+
 ## 2.0.0-beta.11 · 01/11/2026
 - **Paletas de color** en las dos aplicaciones: Aurora (cian/violeta, la de PVEMon), Lima (verde, la de BCKMon hasta ahora), Cobre, Índigo y Grafito. Cada una tiene modo oscuro y claro, y su propio logo (icono de la app, favicon y manifiesto de la PWA). Por defecto PVEMon sigue en Aurora (sin cambios) y BCKMon pasa a Cobre. Se elige en Personalizar pulsando el logo; se guarda por usuario.
 - **Personalizar** reorganizado: pestaña «Perfil» con una sola tarjeta (foto, idioma, color, contraseña y verificación en dos pasos) y pestaña «Avisos» aparte. El idioma ya no está en el menú del usuario.
