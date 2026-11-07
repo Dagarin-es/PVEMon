@@ -9,6 +9,8 @@ import { requireAuth } from '../auth/guard.js';
 import { DUMMY_HASH, MIN_PASSWORD_LENGTH, hashPassword, verifyPassword } from '../auth/password.js';
 import { COOKIE_NAME, SESSION_TTL_SEC, createSession, deleteSession, deleteUserSessions } from '../auth/sessions.js';
 import { db, schema } from '../db/index.js';
+import { getSetting, setSetting } from '../alerts/notify.js';
+import { PAL_DEFAULT, isPalette } from '../edition.js';
 
 const { users, userAvatars } = schema;
 
@@ -22,6 +24,9 @@ const passwordBody = z.object({
 const avatarAt = (userId: string): number | null =>
   db.select({ at: userAvatars.updatedAt }).from(userAvatars).where(eq(userAvatars.userId, userId)).get()?.at ?? null;
 
+/** Paleta de color elegida por cada usuario (sin cambiar el esquema de la base de datos: va en la tabla de ajustes) */
+const userPalette = (id: string): string => getSetting<Record<string, string>>('ui.palettes')?.[id] ?? PAL_DEFAULT;
+
 export const publicUser = (u: typeof users.$inferSelect) => ({
   avatarAt: avatarAt(u.id),
   id: u.id,
@@ -34,6 +39,7 @@ export const publicUser = (u: typeof users.$inferSelect) => ({
   createdAt: u.createdAt,
   lastLoginAt: u.lastLoginAt,
   lang: u.lang === 'en' ? 'en' : 'es',
+  palette: userPalette(u.id),
 });
 
 /* Bloqueo por cuenta: 10 fallos en 15 min => 15 min sin poder entrar con ese usuario (además del límite por IP) */
@@ -115,6 +121,13 @@ export const authRoutes: FastifyPluginAsync = async (app) => {
     const lang = (req.body as { lang?: string } | null)?.lang;
     if (lang !== 'es' && lang !== 'en') return reply.code(400).send({ error: 'Idioma no válido' });
     db.update(users).set({ lang }).where(eq(users.id, req.user!.id)).run();
+    return { ok: true };
+  });
+
+  app.put('/auth/palette', { preHandler: requireAuth }, async (req, reply) => {
+    const palette = (req.body as { palette?: string } | null)?.palette;
+    if (!isPalette(palette)) return reply.code(400).send({ error: 'Paleta no válida' });
+    setSetting('ui.palettes', { ...(getSetting<Record<string, string>>('ui.palettes') ?? {}), [req.user!.id]: palette });
     return { ok: true };
   });
 

@@ -1,6 +1,88 @@
 # ChangeLog de PVEMon
 Historial reconstruido desde la primera versión numerada. Lo más reciente, primero.
 
+## 2.1.0 · 07/11/2026
+**Primera versión estable de la serie 2.** Reúne todo lo de las betas 2.0.0-beta.1 a beta.16 (ver abajo). Puedes volver a la 1.5.7 cuando quieras (`docs/VOLVER-A-1.5.7.md`); la base de datos no cambia.
+- Nuevo desplegable de plantillas de formato con una opción **«Plantilla en blanco»** que vacía el formulario para empezar desde cero.
+- Los desplegables tienen una flecha propia, más clara y visible en modo claro y oscuro.
+- Se retira la etiqueta «Beta» de la cabecera y del login: se mostrará sola en cualquier versión futura con guion (por ejemplo 2.2.0-beta.1).
+
+## 2.0.0-beta.16 · 07/11/2026
+- **Cabecera de los anillos**: el texto «usado/total» pasa debajo del título (ya no se desalinea) y a la derecha hay un **semáforo** según el porcentaje de uso: verde por debajo del 80 %, amarillo del 80 al 95 %, rojo por encima del 95 %. Vale para nodos, máquinas y contenedores.
+- **Formato integrado de Synology Hyper Backup**: el interruptor es ahora un botón claro («Desactivar / Activar formato integrado») con su estado («activado / desactivado») junto al nombre.
+- **Plantillas de formato**: los botones pasan a ser un desplegable con Duplicati, Cobian, Synology Hyper Backup y **Proxmox** (correos «vzdump backup status»: origen = nodo del asunto). Al elegir una se rellena el formulario y se indica qué falta por completar.
+
+## 2.0.0-beta.15 · 07/11/2026
+- Los tres anillos (CPU, Memoria y Disco) van ahora **encima** de la tabla, tanto en el panel de nodos como en la ficha de cada máquina.
+- **Ficha de un contenedor**: ahora también muestra sus tres anillos (CPU, memoria y disco) respecto a la máquina que lo aloja.
+
+## 2.0.0-beta.14 · 07/11/2026
+- **Nodos**: los tres anillos (CPU, Memoria y Disco) van ahora en una fila, bajo la tabla de máquinas, sin leyendas. Los textos se reducen a «4,2/12 hilos», «8,9 GB/15 GB» y «75 GB/326 GB», y la tabla pasa a tener las columnas CPU, Memoria y Disco (usado/asignado).
+- Al marcar una fila de la tabla (o un trozo de cualquier anillo) se resalta esa máquina en los tres anillos y el % del centro cambia al de esa máquina; sin marcar, vuelve al total.
+- **Ficha de una máquina**: una sola tarjeta con la tabla de sus contenedores (CPU, Memoria y Disco) y, debajo, los tres anillos con el mismo comportamiento. La ficha de un nodo también muestra ya los tres indicadores.
+
+## 2.0.0-beta.13 · 07/11/2026
+- **Tabla por máquina** sobre los anillos de cada nodo, con columnas CPU («2,4 de 4 hilos»), porcentaje y memoria, y una fila con el total del nodo. Al pasar el ratón (o el foco) por una fila, o por un trozo o línea de cualquier anillo, se resalta a la vez esa máquina en los tres anillos (CPU, Memoria y Disco). Pulsar abre su ficha.
+- Tarjeta CPU: la leyenda indica «x de y hilos · porcentaje» por máquina y el encabezado «x hilos en uso de N».
+
+## 2.0.0-beta.12 · 07/11/2026
+- **Tarjeta «CPU»** en cada nodo, junto a Memoria y Disco: anillo con el uso real del procesador en el centro («de N hilos») y el reparto por máquina (hilos que consume cada una ahora mismo), «Sistema y otros» y «Libre».
+- **Sesiones independientes**: BCKMon usa su propia cookie de sesión (`bckmon_sid`), así que entrar en PVEMon y en BCKMon desde el mismo navegador y la misma IP (distinto puerto) ya no cierra la sesión de la otra aplicación. PVEMon no cambia. En BCKMon hay que iniciar sesión una vez tras actualizar.
+- **Formato de Synology Hyper Backup**: nuevo interruptor para desactivar el formato integrado (Ajustes › Copias › Otros programas de copia) y usar solo formatos propios.
+- **Plantillas orientativas** de formato propio para Duplicati y Cobian: rellenan el formulario de «Añadir un formato nuevo» para ajustarlo con un correo real.
+
+## 2.0.0-beta.11 · 01/11/2026
+- **Paletas de color** en las dos aplicaciones: Aurora (cian/violeta, la de PVEMon), Lima (verde, la de BCKMon hasta ahora), Cobre, Índigo y Grafito. Cada una tiene modo oscuro y claro, y su propio logo (icono de la app, favicon y manifiesto de la PWA). Por defecto PVEMon sigue en Aurora (sin cambios) y BCKMon pasa a Cobre. Se elige en Personalizar pulsando el logo; se guarda por usuario.
+- **Personalizar** reorganizado: pestaña «Perfil» con una sola tarjeta (foto, idioma, color, contraseña y verificación en dos pasos) y pestaña «Avisos» aparte. El idioma ya no está en el menú del usuario.
+- **Login**: el idioma es ahora un desplegable pequeño a la izquierda del pie (español por defecto), para no confundirlo con el botón de entrar.
+- «PVEMon» se escribe con mayúsculas en los textos de la edición PVEMon (antes salían nombres en minúscula en algunas pantallas).
+
+## 2.0.0-beta.10 · 01/11/2026
+- «BCKMon» se escribe con mayúsculas en todos los textos de la edición BCKMon (antes salía «bckmon» en la tarjeta del latido y su ayuda).
+- Las copias del formato integrado de Synology Hyper Backup tienen su propio icono (un NAS azul) en las listas de copias y en los ajustes.
+- Imagen Docker basada en Debian 13 (`node:22-trixie-slim`) en lugar de Debian 12: menos vulnerabilidades conocidas en el informe de Docker Scout. El código y las dependencias de la aplicación ya salían limpios.
+- Repositorio propio para BCKMon: el flujo de GitHub Actions construye solo la imagen del repositorio en el que se ejecuta (PVEMon → `dagarines/pvemon`, BCKMon → `dagarines/bckmon`). Incluye README y docker-compose de BCKMon.
+
+## 2.0.0-beta.9 · 01/11/2026
+- Las reglas del formato integrado de Synology Hyper Backup (Backup_local, NAS externo…) ya se pueden ver en «Otros programas de copia» y hay un botón **Crear copia editable** que genera un formato propio equivalente, con todos sus campos modificables. Los formatos propios se aplican antes que el integrado.
+- Los formatos propios tienen un campo nuevo: «Ignorar si el asunto contiene…» (para avisos que no son una copia, como comprobaciones de integridad).
+
+## 2.0.0-beta.8 · 01/11/2026
+- Nuevo: botón **Duplicar** en los formatos de correo propios («Otros programas de copia»). Crea una copia con otro nombre y abre el formulario con todos sus campos (asunto, remitente, texto, palabras de bien/mal, origen y tarea) para cambiar lo que haga falta. Útil con formatos parecidos o si cambia el formato de un correo.
+
+## 2.0.0-beta.7 · 01/11/2026
+- Al editar una copia que llega por correo ahora aparecen todos sus campos: origen, nombre y el plazo (días y horas) tras el cual avisa si no llega una copia correcta, con botón «Usar el límite del origen».
+- Al editar una comprobación de archivo se ve el origen y hay botón **Probar** para comprobar la conexión antes de guardar.
+- Botón **Cancelar** también en el formulario de añadir comprobación de archivo.
+
+## 2.0.0-beta.6 · 01/11/2026
+- Corregido: no se podían editar las cuentas de correo (error de orden en el código de la beta 4) ni las copias que llegan por correo (fallo antiguo: el formulario de edición se rompía). Ya se editan en PVEMon y en BCKMon.
+- Nuevo: botón **Duplicar** en las cuentas de correo (la copia queda desactivada, con la misma contraseña) y en las comprobaciones de archivo (misma ruta y límites, con otro nombre). Al duplicar se abre el formulario para ajustar lo que haga falta. Las copias que llegan por correo no se duplican: se crean solas con cada correo, y una copia sin correos propios se quedaría siempre «sin datos».
+
+## 2.0.0-beta.5 · 01/11/2026
+- Corregido: la etiqueta BETA de la cabecera ya no ocupa ancho. Ahora es un pequeño superíndice pegado al nombre, así que en el móvil el menú y el avatar ya no se descuadran (PVEMon y BCKMon).
+
+## 2.0.0-beta.4 · 01/11/2026
+- Nuevo: **varias cuentas de correo**. En Ajustes › Copias puedes añadir, editar, probar y quitar cuentas; cada una tiene sus carpetas (entrada, procesados, excluidos), su marcado como leído y su interruptor. La cuenta que ya tenías se convierte sola en la primera (la configuración antigua queda intacta, por si vuelves a la 1.5.7). Los remitentes excluidos y los formatos propios valen para todas.
+- Nuevo: Ajustes › Copias se reorganiza en tres vistas: **Por correo** (cuentas, copias que llegan por correo, remitentes excluidos, correos que no se entienden y formatos propios), **Por archivo** (comprobaciones NFS y las copias que se comprueban así) y **Por origen** (cada NAS o equipo con todas sus copias).
+- Nuevo: la pantalla de acceso muestra la versión (y BETA).
+- Pasar las copias entre aplicaciones: las cuentas de correo se exportan con la contraseña (el archivo va cifrado) y al importar quedan **desactivadas**, para que PVEMon y BCKMon no lean y muevan a la vez los mismos correos. Los archivos de la beta 2 y 3 siguen valiendo.
+
+## 2.0.0-beta.3 · 01/11/2026
+- Las copias ahora se pueden pasar **en los dos sentidos**: exportar en PVEMon e importar en BCKMon, o exportar en BCKMon e importar en PVEMon (Ajustes › Sistema tiene las dos tarjetas en ambas aplicaciones). Mismo formato de archivo (`.bckmonx`); solo añade lo que falta.
+- Nuevo script `actualizar.sh` para actualizar en local las dos imágenes y los dos contenedores a partir de un zip en `/opt`.
+
+## 2.0.0-beta.2 · 01/11/2026
+- Nuevo: **Exportar a BCKMon** (PVEMon, Ajustes › Sistema). Crea un archivo cifrado (`.bckmonx`) solo con lo que necesita BCKMon: orígenes de copias, copias, correo IMAP, remitentes excluidos, formatos propios y comprobaciones de archivo (NFS), con su historial. No lleva servidores Proxmox, Docker, usuarios, kioscos ni alertas.
+- Nuevo: **Importar desde PVEMon** (BCKMon, Ajustes › Sistema). Solo añade lo que falta, no sustituye nada; el correo se configura únicamente si BCKMon aún no tiene uno. La contraseña del correo se vuelve a cifrar con la `SECRET_KEY` de BCKMon.
+- Corregido: BCKMon podía seguir mostrando el icono de PVEMon si el navegador lo tenía guardado en la misma dirección (los iconos se guardan 30 días). Ahora BCKMon pide sus iconos con una dirección propia.
+
+## 2.0.0-beta.1 · 01/11/2026
+- **Versión beta.** La cabecera muestra «BETA» mientras la versión lleve «-beta». La estable sigue siendo la 1.5.7 (`dagarines/pvemon:1.5.7`); en Docker Hub `latest` no apunta a la beta. Guía para volver: `docs/VOLVER-A-1.5.7.md`.
+- **Nace BCKMon**, una segunda aplicación hecha con la misma base de código y centrada solo en las copias de seguridad: se llega con `EDITION=bckmon` (imagen `dagarines/bckmon`). Otro nombre, icono y colores (verdes), la pantalla de inicio es Backups, Ajustes reordenados (Copias, Alertas de copias, Notificaciones, Usuarios, Sistema), sin nodos, VM, LXC, Docker, discos ni actualizaciones, y la API de solo lectura solo ofrece copias y alertas. No se conecta a Proxmox, ni a Docker, ni explora la red.
+- PVEMon sigue exactamente igual (salvo el distintivo «BETA»). No hay cambios en la base de datos: `data/` vale también para la 1.5.7.
+- Interno: nueva variable `EDITION` (`pvemon` por defecto) y archivos `/brand.js`, `/manifest.webmanifest` e iconos propios de cada edición.
+
 ## 1.5.7 · 01/11/2026
 - Nuevo: tercera carpeta en «Correo donde llegan los avisos de copias»: «Carpeta a la que se mueven los excluidos». Los correos de remitentes excluidos se mueven ahí **sin marcarlos como leídos**, para que puedas revisarlos y decidir si ya no hace falta excluirlos. Déjala vacía para no moverlos. Funciona aunque «Marcar como leído y mover» esté desactivado. La carpeta se crea si no existe.
 - Los correos excluidos ya no salen en el aviso «sin mover» cuando esta carpeta está configurada.

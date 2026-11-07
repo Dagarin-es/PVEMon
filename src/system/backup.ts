@@ -15,7 +15,7 @@ import { sqlite } from '../db/index.js';
 import { pendingPath } from './restore.js';
 
 const MAGIC = Buffer.from('PVEMONBK1');
-const kdf = (pass: string, salt: Buffer) => scryptSync(pass, salt, 32, { N: 2 ** 15, r: 8, p: 1, maxmem: 128 * 1024 * 1024 });
+export const kdf = (pass: string, salt: Buffer) => scryptSync(pass, salt, 32, { N: 2 ** 15, r: 8, p: 1, maxmem: 128 * 1024 * 1024 });
 
 export class BackupError extends Error {}
 

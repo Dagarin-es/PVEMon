@@ -1,5 +1,5 @@
 # ---- build ----
-FROM node:22-slim AS build
+FROM node:22-trixie-slim AS build
 WORKDIR /app
 # por si better-sqlite3 no encuentra binario precompilado y tiene que compilar
 RUN apt-get update && apt-get install -y --no-install-recommends python3 make g++ \
@@ -11,13 +11,14 @@ COPY src ./src
 RUN npm run build && npm prune --omit=dev
 
 # ---- runtime ----
-FROM node:22-slim
+FROM node:22-trixie-slim
 WORKDIR /app
 LABEL org.opencontainers.image.title="PVEMon" \
       org.opencontainers.image.description="PVE nodes and Backups monitor" \
       org.opencontainers.image.source="https://github.com/Dagarin-es/pvemon" \
       org.opencontainers.image.licenses="MIT"
-ENV NODE_ENV=production DATA_DIR=/data PORT=3000
+ARG EDITION=pvemon
+ENV NODE_ENV=production DATA_DIR=/data PORT=3000 EDITION=$EDITION
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
 COPY package.json ./

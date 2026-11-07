@@ -12,6 +12,7 @@
   window.T = function (s) {
     var r = s;
     if (L === 'en') { var d = window.I18N_EN; if (d && typeof d[s] === 'string' && d[s]) r = d[s]; }
+    if (window.EDITION === 'bckmon') r = r.replace(/PVEMON/g, 'BCKMON').replace(/PVEMon/g, 'BCKMon').replace(/(^|[^.\w])pvemon(?![-@\w])/g, '$1bckmon');
     if (arguments.length < 2) return r;
     var a = arguments;
     return r.replace(/\{(\d+)\}/g, function (m, i) { return +i + 1 < a.length ? String(a[+i + 1]) : m; });

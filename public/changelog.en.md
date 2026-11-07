@@ -1,6 +1,88 @@
 # PVEMon ChangeLog
 History rebuilt from the first numbered version. Most recent first.
 
+## 2.1.0 · 07/11/2026
+**First stable release of the 2 series.** It gathers everything from betas 2.0.0-beta.1 to beta.16 (see below). You can go back to 1.5.7 at any time (`docs/VOLVER-A-1.5.7.md`); the database does not change.
+- New format-template dropdown with a **“Blank template”** option that clears the form so you can start from scratch.
+- Dropdowns have their own, clearer arrow, visible in light and dark mode.
+- The “Beta” tag is removed from the header and the login: it will show up by itself on any future version with a hyphen (for example 2.2.0-beta.1).
+
+## 2.0.0-beta.16 · 07/11/2026
+- **Ring headers**: the “used/total” text moves below the title (no more misalignment) and on the right there is a **traffic light** based on the usage percentage: green below 80 %, yellow 80–95 %, red above 95 %. Applies to nodes, machines and containers.
+- **Built-in Synology Hyper Backup format**: the switch is now a clear button (“Turn off / Turn on built-in format”) with its state (“on / off”) next to the name.
+- **Format templates**: the buttons become a dropdown with Duplicati, Cobian, Synology Hyper Backup and **Proxmox** (“vzdump backup status” emails: source = node from the subject). Choosing one fills in the form and tells you what is still missing.
+
+## 2.0.0-beta.15 · 07/11/2026
+- The three rings (CPU, Memory and Disk) now sit **above** the table, both in the nodes panel and on each machine's page.
+- **Container page**: it now also shows its three rings (CPU, memory and disk) relative to the machine hosting it.
+
+## 2.0.0-beta.14 · 07/11/2026
+- **Nodes**: the three rings (CPU, Memory and Disk) now sit in one row, below the machines table, without legends. Texts are shortened to “4.2/12 threads”, “8.9 GB/15 GB” and “75 GB/326 GB”, and the table now has CPU, Memory and Disk columns (used/assigned).
+- Selecting a table row (or a slice of any ring) highlights that machine in all three rings and the % in the centre changes to that machine's; with nothing selected it goes back to the total.
+- **Machine page**: a single card with its containers table (CPU, Memory and Disk) and, below, the three rings with the same behaviour. A node's page also shows all three indicators now.
+
+## 2.0.0-beta.13 · 07/11/2026
+- **Per-machine table** above each node's rings, with columns CPU (“2.4 of 4 threads”), percentage and memory, plus a node total row. Hovering (or focusing) a row, or a slice or line of any ring, highlights that machine in all three rings (CPU, Memory and Disk) at once. Clicking opens its page.
+- CPU card: the legend shows “x of y threads · percentage” per machine and the header “x threads in use of N”.
+
+## 2.0.0-beta.12 · 07/11/2026
+- **“CPU” card** on each node, next to Memory and Disk: a ring with the real processor usage in the centre (“of N threads”) and the split by machine (threads each one is using right now), “System and others” and “Free”.
+- **Independent sessions**: BCKMon uses its own session cookie (`bckmon_sid`), so signing in to PVEMon and BCKMon from the same browser and IP (different port) no longer logs you out of the other application. PVEMon is unchanged. In BCKMon you have to sign in once after updating.
+- **Synology Hyper Backup format**: new switch to turn off the built-in format (Settings › Backups › Other backup programs) and use only custom formats.
+- **Sample templates** for custom formats for Duplicati and Cobian: they fill in the “Add a new format” form so you can adjust it with a real email.
+
+## 2.0.0-beta.11 · 01/11/2026
+- **Colour palettes** in both applications: Aurora (cyan/violet, PVEMon's), Lima (green, BCKMon's so far), Cobre (copper), Índigo and Grafito (graphite). Each has dark and light mode and its own logo (app icon, favicon and PWA manifest). By default PVEMon stays on Aurora (unchanged) and BCKMon moves to Cobre. Pick it in Personalize by clicking the logo; it is saved per user.
+- **Personalize** reorganised: a “Profile” tab with a single card (photo, language, colour, password and two-step verification) and a separate “Notifications” tab. Language is no longer in the user menu.
+- **Login**: language is now a small dropdown on the left of the footer (Spanish by default), so it is not mistaken for the sign-in button.
+- “PVEMon” is now written in capitals in the PVEMon edition texts (some screens used to show the name in lowercase).
+
+## 2.0.0-beta.10 · 01/11/2026
+- “BCKMon” is now written in capitals throughout the BCKMon edition (it used to show “bckmon” in the heartbeat card and its help).
+- Backups using the built-in Synology Hyper Backup format have their own icon (a blue NAS) in the backup lists and in settings.
+- Docker image based on Debian 13 (`node:22-trixie-slim`) instead of Debian 12: fewer known vulnerabilities in the Docker Scout report. The application's own code and dependencies were already clean.
+- Own repository for BCKMon: the GitHub Actions workflow builds only the image of the repository it runs in (PVEMon → `dagarines/pvemon`, BCKMon → `dagarines/bckmon`). Includes a BCKMon README and docker-compose.
+
+## 2.0.0-beta.9 · 01/11/2026
+- The rules of the built-in Synology Hyper Backup format (Backup_local, external NAS…) can now be seen under “Other backup programs”, with a **Create editable copy** button that generates an equivalent custom format with every field editable. Custom formats are applied before the built-in one.
+- Custom formats have a new field: “Ignore if the subject contains…” (for notices that are not a backup, such as integrity checks).
+
+## 2.0.0-beta.8 · 01/11/2026
+- New: **Duplicate** button for custom email formats (“Other backup programs”). It creates a copy with another name and opens the form with all its fields (subject, sender, text, good/bad words, source and task) so you can change what you need. Handy for similar formats or when an email's format changes.
+
+## 2.0.0-beta.7 · 01/11/2026
+- Editing a backup that arrives by email now shows all its fields: source, name and the deadline (days and hours) after which it warns if no successful backup arrives, with a “Use the source limit” button.
+- Editing a file check shows its source and has a **Test** button to check the connection before saving.
+- **Cancel** button also on the add-file-check form.
+
+## 2.0.0-beta.6 · 01/11/2026
+- Fixed: mail accounts (a code-ordering error in beta 4) and backups arriving by email (an old bug: the edit form broke) could not be edited. They can be edited again in PVEMon and BCKMon.
+- New: **Duplicate** button for mail accounts (the copy is disabled and keeps the same password) and for file checks (same path and limits, different name). The edit form opens so you can adjust what you need. Backups arriving by email cannot be duplicated: they are created on their own with each email, and a copy with no emails of its own would always stay “no data”.
+
+## 2.0.0-beta.5 · 01/11/2026
+- Fixed: the BETA tag in the header no longer takes up width. It is now a small superscript attached to the name, so on mobile the menu and avatar no longer get misaligned (PVEMon and BCKMon).
+
+## 2.0.0-beta.4 · 01/11/2026
+- New: **several mail accounts**. In Settings › Backups you can add, edit, test and remove accounts; each one has its own folders (inbox, processed, excluded), its own mark-as-read option and its own switch. The account you already had becomes the first one automatically (the old setting is left untouched, in case you go back to 1.5.7). Excluded senders and custom formats apply to all of them.
+- New: Settings › Backups is reorganised into three views: **By email** (accounts, backups arriving by email, excluded senders, emails that are not understood and custom formats), **By file** (NFS checks and the backups checked that way) and **By source** (each NAS or computer with all its backups).
+- New: the sign-in screen shows the version (and BETA).
+- Moving backups between applications: mail accounts are exported with their password (the file is encrypted) and, when imported, are left **disabled**, so PVEMon and BCKMon do not read and move the same emails at once. Files from beta 2 and 3 are still valid.
+
+## 2.0.0-beta.3 · 01/11/2026
+- Backups can now be moved **in both directions**: export from PVEMon and import in BCKMon, or export from BCKMon and import in PVEMon (Settings › System has both cards in both applications). Same file format (`.bckmonx`); it only adds what is missing.
+- New `actualizar.sh` script to update both local images and containers from a zip in `/opt`.
+
+## 2.0.0-beta.2 · 01/11/2026
+- New: **Export to BCKMon** (PVEMon, Settings › System). Creates an encrypted file (`.bckmonx`) with only what BCKMon needs: backup sources, backups, IMAP mail, excluded senders, custom formats and file checks (NFS), with their history. It does not include Proxmox servers, Docker, users, kiosks or alerts.
+- New: **Import from PVEMon** (BCKMon, Settings › System). It only adds what is missing and replaces nothing; mail is configured only if BCKMon has none yet. The mail password is re-encrypted with BCKMon's own `SECRET_KEY`.
+- Fixed: BCKMon could keep showing the PVEMon icon if the browser had it cached at the same address (icons are cached for 30 days). BCKMon now requests its icons from its own address.
+
+## 2.0.0-beta.1 · 01/11/2026
+- **Beta version.** The header shows “BETA” while the version carries “-beta”. The stable one is still 1.5.7 (`dagarines/pvemon:1.5.7`); on Docker Hub `latest` does not point to the beta. How to go back: `docs/VOLVER-A-1.5.7.md`.
+- **BCKMon is born**, a second application built from the same code and focused only on backups: you get it with `EDITION=bckmon` (image `dagarines/bckmon`). Different name, icon and colours (greens), Backups is the home screen, Settings reorganised (Backups, Backup alerts, Notifications, Users, System), no nodes, VMs, LXC, Docker, disks or updates, and the read-only API only offers backups and alerts. It does not connect to Proxmox or Docker, nor scan the network.
+- PVEMon stays exactly the same (apart from the “BETA” badge). The database does not change: `data/` also works with 1.5.7.
+- Internal: new `EDITION` variable (`pvemon` by default) and `/brand.js`, `/manifest.webmanifest` and icons for each edition.
+
 ## 1.5.7 · 01/11/2026
 - New: a third folder in “Mailbox where the backup notifications arrive”: “Folder excluded emails are moved to”. Emails from excluded senders are moved there **without being marked as read**, so you can review them and decide whether they still need to be excluded. Leave it empty not to move them. It works even if “Mark as read and move” is off. The folder is created if it does not exist.
 - Excluded emails no longer appear in the “not moved” notice when this folder is set.

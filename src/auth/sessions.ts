@@ -1,10 +1,12 @@
 import { createHash, randomBytes } from 'node:crypto';
 import { and, eq, lt, ne } from 'drizzle-orm';
 import { db, schema } from '../db/index.js';
+import { EDITION } from '../edition.js';
 
 const { sessions, users } = schema;
 export const SESSION_TTL_SEC = 14 * 24 * 3600;
-export const COOKIE_NAME = 'pvemon_sid';
+// Una cookie por edición: el navegador no distingue puertos, y si PVEMon y BCKMon compartieran nombre se cerrarían la sesión entre sí
+export const COOKIE_NAME = EDITION === 'bckmon' ? 'bckmon_sid' : 'pvemon_sid';
 
 // En la BD solo se guarda el hash del token: si se filtra la BD, las sesiones no sirven.
 const hashToken = (t: string) => createHash('sha256').update(t).digest('hex');

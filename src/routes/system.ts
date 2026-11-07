@@ -11,6 +11,9 @@ import { storageUsage } from '../backups/collector.js';
 import { config } from '../config.js';
 import { db, restored, schema } from '../db/index.js';
 import { BackupError, exportBackup, openBackup, stageRestore } from '../system/backup.js';
+import { exportCopias, importCopias } from '../system/bckexport.js';
+import { BRAND } from '../edition.js';
+import { evaluateAll, resetMailCache } from '../mail/monitor.js';
 import { DEFAULT_DIGEST, getDigest, sendDigest } from '../system/digest.js';
 import { getHeartbeat, getHeartbeatLast, maskUrl, pingNow, saveUrl, validUrl } from '../system/heartbeat.js';
 import { listSnapshots } from '../system/restore.js';
@@ -49,6 +52,31 @@ export const systemRoutes: FastifyPluginAsync = async (app) => {
     audit(req.user!.id, 'system.backup.export');
     const d = new Date().toISOString().slice(0, 16).replace(/[-:]/g, '').replace('T', '-');
     return reply.header('Content-Type', 'application/octet-stream').header('Content-Disposition', `attachment; filename="pvemon-${d}.pvemonbak"`).send(file);
+  });
+
+  /* ───── pasar las copias entre PVEMon y BCKMon, en los dos sentidos (sin servidores Proxmox) ───── */
+  app.post('/system/bckmon/export', strict, async (req, reply) => {
+    const b = z.object({ passphrase: z.string().min(8).max(200) }).safeParse(req.body);
+    if (!b.success) return reply.code(400).send({ error: 'La contraseña del archivo debe tener al menos 8 caracteres' });
+    const { file, counts } = exportCopias(b.data.passphrase, VERSION);
+    audit(req.user!.id, 'system.bckmon.export', undefined, counts);
+    const d = new Date().toISOString().slice(0, 16).replace(/[-:]/g, '').replace('T', '-');
+    return reply.header('Content-Type', 'application/octet-stream').header('X-Counts', JSON.stringify(counts)).header('Content-Disposition', `attachment; filename="copias-${BRAND.name.toLowerCase()}-${d}.bckmonx"`).send(file);
+  });
+
+  app.post('/system/bckmon/import', { ...strict, bodyLimit: 40 * 1024 * 1024 }, async (req, reply) => {
+    const b = z.object({ passphrase: z.string().min(1).max(200), data: z.string().min(100) }).safeParse(req.body);
+    if (!b.success) return reply.code(400).send({ error: 'Falta el archivo o la contraseña' });
+    try {
+      const r = importCopias(Buffer.from(b.data.data, 'base64'), b.data.passphrase);
+      resetMailCache();
+      evaluateAll(app.metrics);
+      audit(req.user!.id, 'system.bckmon.import', undefined, r as unknown as Record<string, unknown>);
+      return { ok: true, ...r };
+    } catch (e) {
+      if (e instanceof BackupError) return reply.code(400).send({ error: e.message });
+      throw e;
+    }
   });
 
   app.post('/system/backup/restore', { ...strict, bodyLimit: 40 * 1024 * 1024 }, async (req, reply) => {

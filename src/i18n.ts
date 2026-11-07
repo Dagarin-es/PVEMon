@@ -6,6 +6,7 @@
  */
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { brand } from './edition.js';
 
 export type Lang = 'es' | 'en';
 export const parseLang = (v: unknown): Lang => (v === 'en' ? 'en' : 'es');
@@ -37,7 +38,7 @@ const patterns = Object.entries(dict)
 const memo = new Map<string, string>();
 
 /** Traduce un texto del servidor (exacto o por plantilla). Si no lo conoce, lo devuelve igual. */
-export function tr(s: string, lang: Lang, depth = 0): string {
+function trRaw(s: string, lang: Lang, depth = 0): string {
   if (lang !== 'en' || !s || s.length > 2000) return s;
   const hit = exact.get(s);
   if (hit !== undefined) return hit;
@@ -48,7 +49,7 @@ export function tr(s: string, lang: Lang, depth = 0): string {
     for (const p of patterns) {
       const m = p.re.exec(s);
       if (!m) continue;
-      const args = p.idx.map((_, i) => tr(m[i + 1] ?? '', lang, depth + 1));
+      const args = p.idx.map((_, i) => trRaw(m[i + 1] ?? '', lang, depth + 1));
       const byIdx = new Map<number, string>();
       p.idx.forEach((n, i) => byIdx.set(n, args[i]!));
       out = p.en.replace(/\{(\d+)\}/g, (_, n: string) => byIdx.get(Number(n)) ?? '');
@@ -56,8 +57,8 @@ export function tr(s: string, lang: Lang, depth = 0): string {
     }
     if (out === s && depth === 0) {
       // textos con varias líneas o frases: se traduce trozo a trozo
-      if (s.includes('\n')) out = s.split('\n').map((l) => tr(l, lang, depth + 1)).join('\n');
-      else if (s.includes(' · ')) { const parts = s.split(' · '); const t = parts.map((x) => tr(x, lang, depth + 1)); if (t.some((x, i) => x !== parts[i])) out = t.join(' · '); }
+      if (s.includes('\n')) out = s.split('\n').map((l) => trRaw(l, lang, depth + 1)).join('\n');
+      else if (s.includes(' · ')) { const parts = s.split(' · '); const t = parts.map((x) => trRaw(x, lang, depth + 1)); if (t.some((x, i) => x !== parts[i])) out = t.join(' · '); }
     }
   }
   if (memo.size > 5000) memo.clear();
@@ -65,10 +66,12 @@ export function tr(s: string, lang: Lang, depth = 0): string {
   return out;
 }
 
+export const tr = (s: string, lang: Lang, depth = 0): string => brand(trRaw(s, lang, depth));
+
 /** T con huecos, para textos que escribe el servidor: tf('{0} alertas en pvemon', lang, n) */
 export function tf(s: string, lang: Lang, ...a: unknown[]): string {
   const base = lang === 'en' ? (exact.get(s) ?? s) : s;
-  return base.replace(/\{(\d+)\}/g, (m, i: string) => (Number(i) < a.length ? String(a[Number(i)]) : m));
+  return brand(base.replace(/\{(\d+)\}/g, (m, i: string) => (Number(i) < a.length ? String(a[Number(i)]) : m)));
 }
 
 /* Campos que nunca se traducen aunque su texto coincida con una frase conocida: son datos del usuario o de la configuración */
