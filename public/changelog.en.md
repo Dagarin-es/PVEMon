@@ -1,6 +1,24 @@
 # PVEMon ChangeLog
 History rebuilt from the first numbered version. Most recent first.
 
+## 2.0.0-beta.16 · 07/11/2026
+- **Ring headers**: the “used/total” text moves below the title (no more misalignment) and on the right there is a **traffic light** based on the usage percentage: green below 80 %, yellow 80–95 %, red above 95 %. Applies to nodes, machines and containers.
+- **Built-in Synology Hyper Backup format**: the switch is now a clear button (“Turn off / Turn on built-in format”) with its state (“on / off”) next to the name.
+- **Format templates**: the buttons become a dropdown with Duplicati, Cobian, Synology Hyper Backup and **Proxmox** (“vzdump backup status” emails: source = node from the subject). Choosing one fills in the form and tells you what is still missing.
+
+## 2.0.0-beta.15 · 07/11/2026
+- The three rings (CPU, Memory and Disk) now sit **above** the table, both in the nodes panel and on each machine's page.
+- **Container page**: it now also shows its three rings (CPU, memory and disk) relative to the machine hosting it.
+
+## 2.0.0-beta.14 · 07/11/2026
+- **Nodes**: the three rings (CPU, Memory and Disk) now sit in one row, below the machines table, without legends. Texts are shortened to “4.2/12 threads”, “8.9 GB/15 GB” and “75 GB/326 GB”, and the table now has CPU, Memory and Disk columns (used/assigned).
+- Selecting a table row (or a slice of any ring) highlights that machine in all three rings and the % in the centre changes to that machine's; with nothing selected it goes back to the total.
+- **Machine page**: a single card with its containers table (CPU, Memory and Disk) and, below, the three rings with the same behaviour. A node's page also shows all three indicators now.
+
+## 2.0.0-beta.13 · 07/11/2026
+- **Per-machine table** above each node's rings, with columns CPU (“2.4 of 4 threads”), percentage and memory, plus a node total row. Hovering (or focusing) a row, or a slice or line of any ring, highlights that machine in all three rings (CPU, Memory and Disk) at once. Clicking opens its page.
+- CPU card: the legend shows “x of y threads · percentage” per machine and the header “x threads in use of N”.
+
 ## 2.0.0-beta.12 · 07/11/2026
 - **“CPU” card** on each node, next to Memory and Disk: a ring with the real processor usage in the centre (“of N threads”) and the split by machine (threads each one is using right now), “System and others” and “Free”.
 - **Independent sessions**: BCKMon uses its own session cookie (`bckmon_sid`), so signing in to PVEMon and BCKMon from the same browser and IP (different port) no longer logs you out of the other application. PVEMon is unchanged. In BCKMon you have to sign in once after updating.

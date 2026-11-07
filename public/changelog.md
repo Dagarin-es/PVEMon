@@ -1,6 +1,24 @@
 # ChangeLog de PVEMon
 Historial reconstruido desde la primera versión numerada. Lo más reciente, primero.
 
+## 2.0.0-beta.16 · 07/11/2026
+- **Cabecera de los anillos**: el texto «usado/total» pasa debajo del título (ya no se desalinea) y a la derecha hay un **semáforo** según el porcentaje de uso: verde por debajo del 80 %, amarillo del 80 al 95 %, rojo por encima del 95 %. Vale para nodos, máquinas y contenedores.
+- **Formato integrado de Synology Hyper Backup**: el interruptor es ahora un botón claro («Desactivar / Activar formato integrado») con su estado («activado / desactivado») junto al nombre.
+- **Plantillas de formato**: los botones pasan a ser un desplegable con Duplicati, Cobian, Synology Hyper Backup y **Proxmox** (correos «vzdump backup status»: origen = nodo del asunto). Al elegir una se rellena el formulario y se indica qué falta por completar.
+
+## 2.0.0-beta.15 · 07/11/2026
+- Los tres anillos (CPU, Memoria y Disco) van ahora **encima** de la tabla, tanto en el panel de nodos como en la ficha de cada máquina.
+- **Ficha de un contenedor**: ahora también muestra sus tres anillos (CPU, memoria y disco) respecto a la máquina que lo aloja.
+
+## 2.0.0-beta.14 · 07/11/2026
+- **Nodos**: los tres anillos (CPU, Memoria y Disco) van ahora en una fila, bajo la tabla de máquinas, sin leyendas. Los textos se reducen a «4,2/12 hilos», «8,9 GB/15 GB» y «75 GB/326 GB», y la tabla pasa a tener las columnas CPU, Memoria y Disco (usado/asignado).
+- Al marcar una fila de la tabla (o un trozo de cualquier anillo) se resalta esa máquina en los tres anillos y el % del centro cambia al de esa máquina; sin marcar, vuelve al total.
+- **Ficha de una máquina**: una sola tarjeta con la tabla de sus contenedores (CPU, Memoria y Disco) y, debajo, los tres anillos con el mismo comportamiento. La ficha de un nodo también muestra ya los tres indicadores.
+
+## 2.0.0-beta.13 · 07/11/2026
+- **Tabla por máquina** sobre los anillos de cada nodo, con columnas CPU («2,4 de 4 hilos»), porcentaje y memoria, y una fila con el total del nodo. Al pasar el ratón (o el foco) por una fila, o por un trozo o línea de cualquier anillo, se resalta a la vez esa máquina en los tres anillos (CPU, Memoria y Disco). Pulsar abre su ficha.
+- Tarjeta CPU: la leyenda indica «x de y hilos · porcentaje» por máquina y el encabezado «x hilos en uso de N».
+
 ## 2.0.0-beta.12 · 07/11/2026
 - **Tarjeta «CPU»** en cada nodo, junto a Memoria y Disco: anillo con el uso real del procesador en el centro («de N hilos») y el reparto por máquina (hilos que consume cada una ahora mismo), «Sistema y otros» y «Libre».
 - **Sesiones independientes**: BCKMon usa su propia cookie de sesión (`bckmon_sid`), así que entrar en PVEMon y en BCKMon desde el mismo navegador y la misma IP (distinto puerto) ya no cierra la sesión de la otra aplicación. PVEMon no cambia. En BCKMon hay que iniciar sesión una vez tras actualizar.
