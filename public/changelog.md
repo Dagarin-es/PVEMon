@@ -1,6 +1,9 @@
 # ChangeLog de PVEMon
 Historial reconstruido desde la primera versión numerada. Lo más reciente, primero.
 
+## 2.3.2 · 12/11/2026
+- **Ficha de una copia más clara:** se quita el cuadro de arriba («Copia · en marcha» y «Origen»), que repetía lo que ya dice el estado. El botón **Dejar de monitorizar / Monitorizar** pasa al cuadro principal, abajo a la derecha.
+
 ## 2.3.1 · 12/11/2026
 - **Tarjetas de Ajustes con banda de título:** todas las tarjetas con título interior llevan ahora la misma banda de color separada del contenido que las de «Activas» y «Últimas alertas».
 - **Copias por correo:** «Copias que llegan por correo» pasa a «Copias por mail» y va dentro de una tarjeta propia, como las cuentas de correo. El texto queda centrado con su icono y los botones Editar/Quitar a la altura del título (también en cuentas y orígenes).

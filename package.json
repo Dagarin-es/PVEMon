@@ -1,6 +1,6 @@
 {
   "name": "pvemon",
-  "version": "2.3.1",
+  "version": "2.3.2",
   "private": true,
   "license": "MIT",
   "repository": { "type": "git", "url": "git+https://github.com/Dagarin-es/pvemon.git" },

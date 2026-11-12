@@ -1,6 +1,9 @@
 # PVEMon ChangeLog
 History rebuilt from the first numbered version. Most recent first.
 
+## 2.3.2 · 12/11/2026
+- **Clearer backup sheet:** the top card («Backup · running» and «Source») is removed, as it repeated what the state already says. The **Stop monitoring / Monitor** button moves to the main card, bottom right.
+
 ## 2.3.1 · 12/11/2026
 - **Settings cards with a title band:** every card with an inner title now carries the same colour band, separated from the content, as «Active» and «Latest alerts».
 - **Backups by mail:** «Copias que llegan por correo» becomes «Backups by mail» and sits in its own card, like the e-mail accounts. Text is centred with its icon and the Edit/Remove buttons line up with the title (also on accounts and sources).
