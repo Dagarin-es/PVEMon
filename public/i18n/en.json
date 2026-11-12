@@ -1150,5 +1150,18 @@
  "Tarea: nombre fijo (vacío = se usa el asunto del correo)": "Task: fixed name (empty = the e-mail subject is used)",
  "Tarea: patrón que la saca del correo, ej. Tarea:\\s*(.+)": "Task: pattern that extracts it from the e-mail, e.g. Task:\\s*(.+)",
  "¿Cómo saber de qué equipo y de qué tarea es cada correo?": "How does it know which machine and which task each e-mail is about?",
- "Cada correo se convierte en una fila del panel con un EQUIPO (origen: quien hace la copia) y una TAREA (el nombre del trabajo de copia). Para cada uno puedes escribir un nombre fijo, o un patrón (expresión regular) que lo busca en el asunto y el texto del correo: lo que quede entre paréntesis ( ) es el nombre. Si el patrón encuentra algo, se usa; si no, se usa el nombre fijo. El equipo es obligatorio (fijo o patrón). Ejemplo: con el asunto «[PC-Oficina] Copia completada», el patrón ^\\[([^\\]]+)\\] da el equipo PC-Oficina. Si la tarea queda vacía, se usa el asunto.": "Each e-mail becomes a row in the panel with a MACHINE (source: who makes the backup) and a TASK (the name of the backup job). For each one you can type a fixed name, or a pattern (regular expression) that looks for it in the e-mail subject and text: whatever sits between the parentheses ( ) is the name. If the pattern finds something it is used; otherwise the fixed name is used. The machine is required (fixed or pattern). Example: with the subject «[PC-Office] Backup completed», the pattern ^\\[([^\\]]+)\\] gives the machine PC-Office. If the task is left empty, the subject is used."
+ "Cada correo se convierte en una fila del panel con un EQUIPO (origen: quien hace la copia) y una TAREA (el nombre del trabajo de copia). Para cada uno puedes escribir un nombre fijo, o un patrón (expresión regular) que lo busca en el asunto y el texto del correo: lo que quede entre paréntesis ( ) es el nombre. Si el patrón encuentra algo, se usa; si no, se usa el nombre fijo. El equipo es obligatorio (fijo o patrón). Ejemplo: con el asunto «[PC-Oficina] Copia completada», el patrón ^\\[([^\\]]+)\\] da el equipo PC-Oficina. Si la tarea queda vacía, se usa el asunto.": "Each e-mail becomes a row in the panel with a MACHINE (source: who makes the backup) and a TASK (the name of the backup job). For each one you can type a fixed name, or a pattern (regular expression) that looks for it in the e-mail subject and text: whatever sits between the parentheses ( ) is the name. If the pattern finds something it is used; otherwise the fixed name is used. The machine is required (fixed or pattern). Example: with the subject «[PC-Office] Backup completed», the pattern ^\\[([^\\]]+)\\] gives the machine PC-Office. If the task is left empty, the subject is used.",
+ "Aún sin copias": "No backups yet",
+ "La última copia falló": "The last backup failed",
+ "Se ha pasado la fecha": "The deadline has passed",
+ "Recién hecha": "Just made",
+ "Muy al día": "Well up to date",
+ "Va bien": "Going fine",
+ "Se acerca la fecha": "The deadline is approaching",
+ "{0} PARA LA ALARMA": "{0} TO ALARM",
+ "ALARMA": "ALARM",
+ "SIN DATOS": "NO DATA",
+ "Copias por mail": "Backups by mail",
+ "Las copias que llegan por correo, agrupadas por origen. Aparecen solas con el primer correo de cada una; aquí fijas cada cuánto tiempo debe llegar una copia correcta.": "Backups that arrive by e-mail. They appear on their own with the first e-mail of each one; here you set how often a successful backup must arrive.",
+ "Las comprobaciones de archivo o carpeta en un disco de red que has dado de alta.": "The file or folder checks on a network drive that you have added."
 }

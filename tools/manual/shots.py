@@ -1,10 +1,10 @@
-import sys
+import os, sys
 from playwright.sync_api import sync_playwright
 PW='OPe6NYDDgS6ipSRaiNUk'
 TABS={'es':dict(alertas='Alertas',backups='Backups',notif='Notificaciones',usuarios='Usuarios',sistema='Sistema'),
       'en':dict(alertas='Alerts',backups='Backups',notif='Notifications',usuarios='Users',sistema='System')}
 def run(port,ed,lang):
-    out=f'/tmp/man/shots/{ed}-{lang}-'
+    out=os.path.join(os.path.dirname(os.path.abspath(__file__)),'shots')+f'/{ed}-{lang}-'   # PNG: conviértelas a JPG (convert -quality 80) antes de build.py
     with sync_playwright() as p:
         b=p.chromium.launch(); ctx=b.new_context(viewport={'width':900,'height':900},device_scale_factor=1.6)
         ctx.add_init_script(f"localStorage.setItem('pvemon.theme','dark');localStorage.setItem('pvemon.lang','{lang}')")
@@ -39,6 +39,10 @@ def run(port,ed,lang):
         tab('sistema'); shot('sis-exp')
         pg.locator('.tabs.sub button').nth(1).click(); pg.wait_for_timeout(900); shot('sis-ext')
         pg.locator('.tabs.sub button').nth(2).click(); pg.wait_for_timeout(1200); shot('sis-bk')
+        import sqlite3
+        db='/tmp/ui2/config.db' if ed=='bckmon' else '/tmp/ui/config.db'
+        eid=sqlite3.connect(db).execute("select id from elements where kind='backup' and name='Cobian - Facturas'").fetchone()[0]
+        go('#/e/'+eid); shot('ficha')
         go('#/cuenta'); shot('cuenta')
         b.close()
 for a in sys.argv[1:]:

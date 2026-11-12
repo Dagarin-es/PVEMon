@@ -1,6 +1,15 @@
 # ChangeLog de PVEMon
 Historial reconstruido desde la primera versión numerada. Lo más reciente, primero.
 
+## 2.3.1 · 12/11/2026
+- **Tarjetas de Ajustes con banda de título:** todas las tarjetas con título interior llevan ahora la misma banda de color separada del contenido que las de «Activas» y «Últimas alertas».
+- **Copias por correo:** «Copias que llegan por correo» pasa a «Copias por mail» y va dentro de una tarjeta propia, como las cuentas de correo. El texto queda centrado con su icono y los botones Editar/Quitar a la altura del título (también en cuentas y orígenes).
+- Ajustes › Backups (BCKMon): desaparece la pestaña «Copias», que ya no tenía sentido.
+- **Menú:** el Tema pasa a ser lo primero.
+- **Ficha de cada copia:** se quitan las tarjetas repetidas de «Correcta» y de la antigüedad (y los botones de rango) y se añade, junto al estado, una **carita con contador** como la del tiempo encendido de PVEMon: cambia de cara y color según se acerca la fecha de la alarma, y está en crisis si la copia falló o se pasó la fecha.
+- **Nombre de la aplicación:** «PVEMon» y «BCKMon» se escriben siempre con mayúsculas (antes salía «bckmon» o «pvemon» en varios textos, p. ej. el latido).
+- Guías PDF actualizadas con todo lo anterior.
+
 ## 2.3.0 · 12/11/2026
 - **Manuales actualizados y el primero exclusivo de BCKMon.** Cuatro guías en PDF (PVEMon y BCKMon, en castellano y en inglés) con capturas nuevas, que se descargan desde el menú: **Manual · PDF**, debajo del © (en tu idioma y de tu edición). Se generan con `tools/manual/build.py`.
 - **Menú reordenado:** **Salir** va justo después de las opciones (sin separador), y **Tema** pasa al final, en una sola línea con los tres botones (Auto, Claro, Oscuro) más pequeños y con icono.

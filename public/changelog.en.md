@@ -1,6 +1,15 @@
 # PVEMon ChangeLog
 History rebuilt from the first numbered version. Most recent first.
 
+## 2.3.1 · 12/11/2026
+- **Settings cards with a title band:** every card with an inner title now carries the same colour band, separated from the content, as «Active» and «Latest alerts».
+- **Backups by mail:** «Copias que llegan por correo» becomes «Backups by mail» and sits in its own card, like the e-mail accounts. Text is centred with its icon and the Edit/Remove buttons line up with the title (also on accounts and sources).
+- Settings › Backups (BCKMon): the «Copies» tab is gone, as it no longer made sense.
+- **Menu:** Theme now comes first.
+- **Each backup’s sheet:** the repeated «Correct» and age cards (and range buttons) are removed and, next to the state, a **face with a counter** like PVEMon’s uptime one is added: it changes face and colour as the alarm date approaches, and is in crisis if the backup failed or the date has passed.
+- **App name:** «PVEMon» and «BCKMon» are always written with that exact capitalisation (before, «bckmon» or «pvemon» appeared in several texts, e.g. the heartbeat).
+- PDF guides updated with all of the above.
+
 ## 2.3.0 · 12/11/2026
 - **Updated manuals, and the first one exclusive to BCKMon.** Four PDF guides (PVEMon and BCKMon, in Spanish and English) with new screenshots, downloadable from the menu: **Manual · PDF**, below the © line (in your language and for your edition). They are generated with `tools/manual/build.py`.
 - **Menu reordered:** **Log out** now sits right after the options (no separator), and **Theme** moves to the bottom, on a single line with the three buttons (Auto, Light, Dark) smaller and with an icon.

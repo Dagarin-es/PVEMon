@@ -10,7 +10,7 @@ from playwright.sync_api import sync_playwright
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, '..', '..', 'public', 'manuals')
-VER = '2.3.0'
+VER = '2.3.1'
 DATE = {'es': '12 de noviembre de 2026', 'en': '12 November 2026'}
 
 
@@ -150,16 +150,16 @@ def header_menu(d):
         d.ul([('**Backups**: el panel de todas las copias.', '**Backups**: the panel with all your backups.'), ('**Kiosko**: abre un kiosko en pantalla completa (si tienes varios, eliges cuál).', '**Kiosk**: opens a kiosk full screen (if you have several, you choose which).')])
     else:
         d.ul([('**Estado**: el panel principal.', '**Status**: the main dashboard.'), ('**Backups**: el panel de copias.', '**Backups**: the backups panel.'), ('**Kiosko**: abre un kiosko en pantalla completa.', '**Kiosk**: opens a kiosk full screen.')])
-    d.img('menu', 'El menú: opciones, Salir, versión, manual y tema', 'The menu: options, Log out, version, manual and theme', narrow=True)
+    d.img('menu', 'El menú: tema, opciones, Salir, versión y manual', 'The menu: theme, options, Log out, version and manual', narrow=True)
     d.p('El **Menú** reúne, de arriba abajo:', 'The **Menu** contains, from top to bottom:')
+    d.ul([('**Tema** (Auto, Claro, Oscuro), en una sola línea, lo primero.', '**Theme** (Auto, Light, Dark), on a single line, at the very top.')])
     if d.bck:
         d.ul([('Las pantallas: **Backups, Kioscos, Personalizar** y, solo para administradores, **Ajustes** (con el escudo).', 'The screens: **Backups, Kiosks, Customise** and, for administrators only, **Settings** (with the shield).')])
     else:
         d.ul([('Las pantallas: **Panel, Nodos, VM, LXC, Docker, Backups, Kioscos, Personalizar** y **Ajustes** (administradores). Un usuario monitor solo ve Alertas y Backups además de lo común.', 'The screens: **Dashboard, Nodes, VM, LXC, Docker, Backups, Kiosks, Customise** and **Settings** (administrators). A monitor user only sees Alerts and Backups besides the common ones.')])
     d.ul([('**Salir**, justo debajo de las opciones.', '**Log out**, right below the options.'),
           ('Tu sesión, la versión y el botón **ChangeLog** (historial de cambios).', 'Your session, the version and the **ChangeLog** button (history of changes).'),
-          ('**Manual · PDF**: descarga esta guía en tu idioma.', '**Manual · PDF**: downloads this guide in your language.'),
-          ('**Tema** (Auto, Claro, Oscuro), en una sola línea al final.', '**Theme** (Auto, Light, Dark), on a single line at the bottom.')])
+          ('**Manual · PDF**: descarga esta guía en tu idioma.', '**Manual · PDF**: downloads this guide in your language.')])
 
 
 def backups_panel(d):
@@ -179,8 +179,9 @@ def backups_panel(d):
              (('Última correcta', 'Last successful'), ('Fecha y hora de la última copia buena.', 'Date and time of the last good backup.')),
              (('Tamaño', 'Size'), ('Lo que ocupó esa copia.', 'How much that backup took.')),
              (('Alarma en', 'Alarm in'), ('Tiempo que falta para que salte el aviso si no llega otra copia correcta («vencida» si ya pasó).', 'Time left before the warning if no other good backup arrives («overdue» if already past).'))])
-    d.p('Puedes **ordenar** por cualquier columna pulsando su título (en el móvil, con el desplegable «Ordenar por»). Pulsa una fila para abrir su ficha; la fila de la copia de la aplicación te lleva a su configuración.',
-        'You can **sort** by any column by clicking its heading (on a phone, with the «Sort by» drop-down). Click a row to open its sheet; the application-backup row takes you to its settings.')
+    d.p('Puedes **ordenar** por cualquier columna pulsando su título (en el móvil, con el desplegable «Ordenar por»). Pulsa una fila para abrir su ficha: arriba el estado y, junto a él, una **carita con contador** que cambia de cara y de color según se acerca la fecha de la alarma (y entra en crisis si la copia falló o se pasó la fecha); debajo, última copia correcta, tamaño, último intento y límite. La fila de la copia de la aplicación te lleva a su configuración.',
+        'You can **sort** by any column by clicking its heading (on a phone, with the «Sort by» drop-down). Click a row to open its sheet: the state on top and, next to it, a **face with a counter** that changes face and colour as the alarm date approaches (and goes into crisis if the backup failed or the date has passed); below, last successful backup, size, last attempt and limit. The application-backup row takes you to its settings.')
+    d.img('ficha', 'Ficha de una copia, con la carita y el contador hacia la alarma', 'Backup sheet, with the face and the counter towards the alarm')
     d.note('Si una copia sale en rojo aunque la última fue correcta, mira el motivo: suele ser que ha pasado más tiempo del permitido sin otra copia.', 'If a backup is red even though the last one was successful, read the reason: it usually means more time than allowed has passed without another backup.')
 
 
@@ -362,7 +363,7 @@ def whats_new(d):
     d.h1('Novedades recientes', 'Recent changes')
     d.p('El historial completo está en el botón **ChangeLog** del menú.', 'The full history is under the **ChangeLog** button in the menu.')
     d.table([('Versión', 'Version'), ('Novedad', 'Change')],
-            [(('2.3.x', '2.3.x'), ('Cabecera con la navegación centrada; menú reordenado (Salir tras las opciones, Tema al final en una línea, enlace al manual); resumen semanal dentro de Notificaciones («Enviar resumen semanal»); alertas en una sola tarjeta; formatos de correo mejor explicados; copia de la aplicación primera en Backups; guías PDF actualizadas y la primera de BCKMon.', 'Header with centred navigation; reordered menu (Log out after the options, Theme last on one line, manual link); weekly summary inside Notifications («Send weekly summary»); alerts in a single card; better-explained e-mail formats; application backup first in Backups; updated PDF guides and the first one for BCKMon.')),
+            [(('2.3.x', '2.3.x'), ('Tarjetas de Ajustes con banda de título; «Copias por mail» en su propia tarjeta; ficha de copia con carita y contador hacia la alarma; Tema primero en el menú. Cabecera con la navegación centrada; menú reordenado (Salir tras las opciones, Tema al final en una línea, enlace al manual); resumen semanal dentro de Notificaciones («Enviar resumen semanal»); alertas en una sola tarjeta; formatos de correo mejor explicados; copia de la aplicación primera en Backups; guías PDF actualizadas y la primera de BCKMon.', 'Settings cards with a title band; «Backups by mail» in its own card; backup sheet with a face and a counter towards the alarm; Theme first in the menu. Header with centred navigation; reordered menu (Log out after the options, Theme last on one line, manual link); weekly summary inside Notifications («Send weekly summary»); alerts in a single card; better-explained e-mail formats; application backup first in Backups; updated PDF guides and the first one for BCKMon.')),
              (('2.2.x', '2.2.x'), ('Copia automática de la aplicación a carpeta, NFS, SMB, SFTP, Dropbox, Google Drive y OneDrive; Ajustes reorganizados con pestañas de segundo nivel; la copia propia aparece en el panel Backups.', 'Automatic application backup to folder, NFS, SMB, SFTP, Dropbox, Google Drive and OneDrive; Settings reorganised with second-level tabs; the own backup shows in the Backups panel.')),
              (('2.0 – 2.1', '2.0 – 2.1'), ('Edición BCKMon (solo copias), cinco paletas de color y nombre propio por edición.', 'BCKMon edition (backups only), five colour palettes and a name per edition.')),
              (('1.5.x', '1.5.x'), ('Castellano e inglés; imagen Docker; guía en PDF.', 'Spanish and English; Docker image; PDF guide.')),
