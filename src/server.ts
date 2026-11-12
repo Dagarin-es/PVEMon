@@ -36,6 +36,8 @@ import { notificationRoutes } from './routes/notifications.js';
 import { serverRoutes } from './routes/servers.js';
 import { serverUpdateRoutes } from './routes/serverUpdate.js';
 import { systemRoutes } from './routes/system.js';
+import { backupRoutes } from './routes/backup.js';
+import { startBackupJobs } from './system/backupJobs.js';
 import { startHeartbeat } from './system/heartbeat.js';
 import { startDigest } from './system/digest.js';
 import { healthRoutes } from './routes/health.js';
@@ -128,6 +130,7 @@ await app.register(avatarRoutes, { prefix: '/api' });
 if (EDITION === 'pvemon') await app.register(serverRoutes, { prefix: '/api' });
 if (EDITION === 'pvemon') await app.register(serverUpdateRoutes, { prefix: '/api' });
 await app.register(systemRoutes, { prefix: '/api' });
+await app.register(backupRoutes, { prefix: '/api' });
 await app.register(elementRoutes, { prefix: '/api' });
 await app.register(metricRoutes, { prefix: '/api' });
 await app.register(notificationRoutes, { prefix: '/api' });
@@ -175,6 +178,7 @@ const stopMail = startMailMonitor(app.log, metrics);
 const stopFiles = startFileChecks(app.log, metrics);
 const stopHeartbeat = startHeartbeat(app.log);
 const stopDigest = startDigest(app.log);
+const stopBackupJobs = startBackupJobs(app.log);
 const stopUpdates = PVE ? startUpdateWatcher(app.log) : noop;
 
 // Mantenimiento: agregación de métricas y sesiones caducadas, cada 5 min
@@ -192,6 +196,7 @@ app.addHook('onClose', async () => {
   stopMail(); stopFiles();
   stopHeartbeat();
   stopDigest();
+  stopBackupJobs();
   stopUpdates();
   stopAlerts();
   metrics.close();

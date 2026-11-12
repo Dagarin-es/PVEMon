@@ -17,6 +17,9 @@ LABEL org.opencontainers.image.title="PVEMon" \
       org.opencontainers.image.description="PVE nodes and Backups monitor" \
       org.opencontainers.image.source="https://github.com/Dagarin-es/pvemon" \
       org.opencontainers.image.licenses="MIT"
+# rclone: copias automáticas a SMB, SFTP, Dropbox y Google Drive (Ajustes → Copia de seguridad)
+RUN apt-get update && apt-get install -y --no-install-recommends rclone ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
 ARG EDITION=pvemon
 ENV NODE_ENV=production DATA_DIR=/data PORT=3000 EDITION=$EDITION
 COPY --from=build /app/node_modules ./node_modules

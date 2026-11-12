@@ -1,6 +1,56 @@
 # PVEMon ChangeLog
 History rebuilt from the first numbered version. Most recent first.
 
+## 2.3.0 · 12/11/2026
+- **Updated manuals, and the first one exclusive to BCKMon.** Four PDF guides (PVEMon and BCKMon, in Spanish and English) with new screenshots, downloadable from the menu: **Manual · PDF**, below the © line (in your language and for your edition). They are generated with `tools/manual/build.py`.
+- **Menu reordered:** **Log out** now sits right after the options (no separator), and **Theme** moves to the bottom, on a single line with the three buttons (Auto, Light, Dark) smaller and with an icon.
+- **Header:** the navigation buttons are now centred on the page (they used to drift to the right).
+- **The weekly summary moves to Settings › Notifications**, below the e-mail card, titled **«Send weekly summary»**; the Summary tab under Backups is gone.
+- **Alerts:** the title and the «Backup with a problem» rule are merged into one card, with «For N min [severity]» and Save on one line and the checkbox below.
+- **E-mail formats better explained:** the machine and task fields are renamed («fixed name» / «pattern that extracts it from the e-mail», with an example) and a full worked explanation is added.
+- **Backups:** the application’s own backup comes first and is named «PVEMon backup» / «BCKMon backup».
+- Fixed: in the Backups panel, the reason of a backup with a problem overflowed the row and misaligned the columns.
+
+## 2.2.4 · 08/11/2026
+- **The application’s own backup now appears in the Backups panel** as one more backup (administrators only), in its own card: status (OK / error / old), last successful, size and “Alarm in”, with its own monochrome icon that follows the palette and light/dark mode. Clicking it opens Settings › System › Backups. It shows up as soon as you enable automatic backup or make the first one. It turns “old” if longer than expected passes (the longest gap between scheduled backups plus 3 hours).
+- The Settings tab pills are no longer transparent: they have a solid background almost identical to the page’s.
+
+## 2.2.3 · 08/11/2026
+- **Automatic backup: new Microsoft OneDrive destination** (personal or business account), with the same folder browser. Authorise it with `rclone authorize "onedrive"`; pvemon detects the account’s drive by itself when saving.
+- Dropbox, Google Drive and OneDrive: if rclone renews the access token, pvemon stores the new one (encrypted) so backups do not stop working over time.
+
+## 2.2.2 · 08/11/2026
+- Automatic backup: fields with a button (“Destination folder” + “Choose folder…”, “New folder name” + “Create folder”) are now aligned.
+- Clearer message when the NFS server answers “read-only”: the NFS rule applied to pvemon’s IP does not allow writing.
+
+## 2.2.1 · 08/11/2026
+- **Settings reorganised** so they are not so long:
+  - **Backups** (new): tabs **PVE backups**, **Other backups** and **Summary** (the weekly summary that used to be in System). In BCKMon: **Backups** and **Summary**.
+  - **System** now has three tabs: **BCKMon export** (move backups between applications), **External services** (heartbeat and Home Assistant API) and **PVEMon backups** (automatic backup to a destination and restore from a file).
+  - The manual “download encrypted backup” button is gone: automatic backups cover it.
+- **Automatic backup: NFS destination** (NFSv3, with pvemon’s own client, nothing is mounted). The browser shows the folders the NAS exports, lets you create subfolders and also works for restoring. The NAS must allow pvemon’s IP to write (on Synology: read/write NFS rule with “Map all users to admin”).
+- The “Powered on since” card now reads **“Powered on for”**, so it fits on one line.
+
+## 2.2.0 · 07/11/2026
+- **Automatic backup to a destination** (Settings → **Backup**, administrators only). It stores the usual encrypted backup (configuration, users, keys and notices) wherever you choose and deletes the oldest ones:
+  - **Destinations**: a folder on the server (a mounted folder works too: USB drive, NFS NAS…), an **SMB/CIFS network share** (Synology, Ugreen…), **SFTP/SSH**, **Dropbox** and **Google Drive**. The last four use **rclone**, which is now included in the image.
+  - **Folder browser**: after choosing the destination, press “Choose folder…”, browse, open folders, create a new one and pick it. “Test connection” checks user, password and folder.
+  - **Schedule**: pick the **days of the week** and one or more **times** (up to 6 a day) and how many backups to keep (older ones are deleted). The server time and the next backup are shown. If pvemon was off at that time, the backup runs as soon as it starts that same day. If a backup fails, administrators are notified by e-mail and Telegram.
+  - **Encryption**: backups are encrypted with a password you set (minimum 8 characters), stored encrypted in the database. Destination passwords and the Dropbox/Drive token are also stored encrypted and never shown again.
+  - **Restore from the app**: “Show backups at the destination” lists what is there and **Restore** downloads, checks and applies it (pvemon restarts; the previous configuration is kept just in case). There is also “Back up now”.
+  - Dropbox and Google Drive: authorise the account with `rclone authorize` on a computer with a browser and paste the token into the screen (the screen explains it). A mounted folder is needed for “Server folder” (example in `docker-compose.yml`).
+- **Backups**: the “Last successful” data is centred in its column.
+
+## 2.1.3 · 07/11/2026
+- **Backups**: the table headers fit on a single line; “Backup type” becomes **“Type”** and “Alarm in” replaces the longer title (the full text remains as a tooltip). Columns readjusted so status and size don't wrap.
+
+## 2.1.2 · 07/11/2026
+- **Backups**: tidier backups table. The “Monitored” traffic light, the status and “Alarm in” are centred under their titles, the size is right-aligned and wider, and “Last successful” shows only the date (no “… ago”).
+
+## 2.1.1 · 07/11/2026
+- **Backups**: the backups table has two new columns, **Backup type** (Proxmox, Synology Hyper Backup, Duplicati, NFS file…) and **Monitored** (green/red traffic light).
+- You can **sort by any column** by clicking its title; the active column is highlighted and an arrow (▲ ascending, ▼ descending) shows the direction. Clicking again reverses the order. On mobile there is a “Sort by” selector with a direction button. Default: Status ascending (problems first).
+
 ## 2.1.0 · 07/11/2026
 **First stable release of the 2 series.** It gathers everything from betas 2.0.0-beta.1 to beta.16 (see below). You can go back to 1.5.7 at any time (`docs/VOLVER-A-1.5.7.md`); the database does not change.
 - New format-template dropdown with a **“Blank template”** option that clears the form so you can start from scratch.

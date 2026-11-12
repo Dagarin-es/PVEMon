@@ -105,7 +105,7 @@ export interface NfsEntry { name: string; type: 'dir' | 'file' | 'other'; size: 
 
 const NFS3 = 100003, MOUNT = 100005;
 const NFSERR: Record<number, [string, NfsError['code']]> = {
-  1: ['Sin permiso (el servidor NFS no deja ver este archivo)', 'denied'], 2: ['No existe', 'notfound'], 13: ['Acceso denegado en el servidor NFS', 'denied'],
+  1: ['Sin permiso (el servidor NFS no deja ver este archivo)', 'denied'], 28: ['No queda espacio en el servidor NFS', 'proto'], 30: ['El servidor NFS contesta «sistema de archivos de solo lectura»: la regla NFS que se aplica a la IP de pvemon no permite escribir (en Synology, mira el permiso de esa regla y que no haya otra regla anterior, por subred, que sea de solo lectura)', 'denied'], 2: ['No existe', 'notfound'], 13: ['Acceso denegado en el servidor NFS', 'denied'],
   20: ['La ruta pasa por algo que no es una carpeta', 'notfound'], 70: ['Referencia caducada en el servidor NFS', 'proto'], 10001: ['Acceso denegado en el servidor NFS', 'denied'],
 };
 const nfsErr = (st: number, what: string) => { const [m, c] = NFSERR[st] ?? [`Error NFS ${st}`, 'proto']; return new NfsError(`${what}: ${m}`, c); };
@@ -272,5 +272,102 @@ export async function browseNfs(host: string, exportPath: string, dir: string): 
     return (await s.readdir(fh))
       .filter((e) => !e.name.startsWith('.') && e.type !== 'other')
       .sort((a, b) => (a.type === b.type ? a.name.localeCompare(b.name, 'es') : a.type === 'dir' ? -1 : 1));
+  });
+}
+
+
+/* ───────── escritura (copias automáticas a un servidor NFS) ───────── */
+
+/** sattr3 con permisos (modo) y nada más */
+const sattrMode = (mode: number) => new W().u32(1).u32(mode).u32(0).u32(0).u32(0).u32(0).u32(0).done();
+const CHUNK = 32768;
+
+/** Busca la carpeta; si «create», crea las que falten */
+async function dirFh(s: Sess, parts: string[], create: boolean): Promise<Buffer> {
+  let fh = (await s.walk([])).fh;
+  for (const name of parts) {
+    let r = await s.call(3, new W().opaque(fh).str(name).done());
+    let st = r.u32();
+    if (st === 2 && create) {
+      r = await s.call(9, new W().opaque(fh).str(name).raw(sattrMode(0o755)).done());
+      st = r.u32();
+      if (st !== 0) throw nfsErr(st, `No se pudo crear la carpeta «${name}»`);
+      if (!r.u32()) { r = await s.call(3, new W().opaque(fh).str(name).done()); st = r.u32(); if (st !== 0) throw nfsErr(st, `La carpeta «${name}»`); }
+      fh = Buffer.from(r.opaque());
+      continue;
+    }
+    if (st !== 0) throw nfsErr(st, `La carpeta «${name}»`);
+    fh = Buffer.from(r.opaque());
+  }
+  return fh;
+}
+
+/** Crea la carpeta (y las intermedias) dentro de la exportación */
+export async function nfsMkdirs(host: string, exportPath: string, dir: string): Promise<void> {
+  await withExport(host, exportPath, async (s) => { await dirFh(s, split(dir), true); });
+}
+
+/** Archivos de una carpeta con tamaño y fecha */
+export async function nfsListFiles(host: string, exportPath: string, dir: string): Promise<NfsEntry[]> {
+  return withExport(host, exportPath, async (s) => {
+    const fh = await dirFh(s, split(dir), false);
+    return (await s.readdir(fh)).filter((e) => e.type === 'file');
+  });
+}
+
+/** Escribe un archivo nuevo (crea la carpeta si falta) */
+export async function nfsWriteFile(host: string, exportPath: string, dir: string, name: string, data: Buffer): Promise<void> {
+  await withExport(host, exportPath, async (s) => {
+    const d = await dirFh(s, split(dir), true);
+    let r = await s.call(8, new W().opaque(d).str(name).u32(0).raw(sattrMode(0o644)).done()); // CREATE (UNCHECKED)
+    let st = r.u32();
+    if (st !== 0) throw nfsErr(st, 'No se pudo crear el archivo');
+    let fh = r.u32() ? Buffer.from(r.opaque()) : null;
+    if (!fh) { r = await s.call(3, new W().opaque(d).str(name).done()); st = r.u32(); if (st !== 0) throw nfsErr(st, 'El archivo'); fh = Buffer.from(r.opaque()); }
+    for (let off = 0; off < data.length;) {
+      const part = data.subarray(off, off + CHUNK);
+      const w = await s.call(7, new W().opaque(fh).u32(Math.floor(off / 2 ** 32)).u32(off % 2 ** 32).u32(part.length).u32(2).opaque(part).done()); // WRITE, FILE_SYNC
+      st = w.u32();
+      if (st !== 0) throw nfsErr(st, 'No se pudo escribir en el archivo');
+      const wcc = w.u32(); if (wcc) { /* pre_op_attr */ w.u64(); w.u32(); w.u32(); w.u32(); w.u32(); }
+      postOpAttr(w);
+      const n = w.u32();
+      if (!n) throw new NfsError('El servidor NFS no escribe datos en el archivo', 'proto');
+      off += n;
+    }
+  });
+}
+
+/** Lee un archivo entero */
+export async function nfsReadFile(host: string, exportPath: string, dir: string, name: string): Promise<Buffer> {
+  return withExport(host, exportPath, async (s) => {
+    const d = await dirFh(s, split(dir), false);
+    const l = await s.call(3, new W().opaque(d).str(name).done());
+    const ls = l.u32();
+    if (ls !== 0) throw nfsErr(ls, 'El archivo');
+    const fh = Buffer.from(l.opaque());
+    const out: Buffer[] = [];
+    let off = 0;
+    for (let i = 0; i < 100000; i++) {
+      const r = await s.call(6, new W().opaque(fh).u32(Math.floor(off / 2 ** 32)).u32(off % 2 ** 32).u32(CHUNK).done());
+      const st = r.u32();
+      if (st !== 0) throw nfsErr(st, 'No se pudo leer el archivo');
+      postOpAttr(r);
+      r.u32();
+      const eof = r.u32() === 1, part = r.opaque();
+      out.push(Buffer.from(part)); off += part.length;
+      if (eof || !part.length) break;
+    }
+    return Buffer.concat(out);
+  });
+}
+
+/** Borra un archivo (si no existe, no es error) */
+export async function nfsRemoveFile(host: string, exportPath: string, dir: string, name: string): Promise<void> {
+  await withExport(host, exportPath, async (s) => {
+    const d = await dirFh(s, split(dir), false);
+    const r = await s.call(12, new W().opaque(d).str(name).done());
+    const st = r.u32();
+    if (st !== 0 && st !== 2) throw nfsErr(st, 'No se pudo borrar el archivo');
   });
 }

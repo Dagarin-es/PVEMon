@@ -8,7 +8,7 @@ Microsoft Teams. Stable version 1.5. The change history is in [`public/changelog
 (also behind the **ChangeLog** button in the menu). The interface is available in **English and Spanish**
 (Spanish by default; switch with the language selector on the login screen or in the menu).
 
-📘 **User guide (PDF, 33 pages, with screenshots):** [⬇ English](https://github.com/Dagarin-es/PVEMon/raw/HEAD/docs/PVEMon-User-Guide.pdf) · [⬇ Castellano](https://github.com/Dagarin-es/PVEMon/raw/HEAD/docs/PVEMon-Guia-de-usuario.pdf)
+📘 **User guides (PDF, with screenshots):** PVEMon [⬇ English](https://github.com/Dagarin-es/PVEMon/raw/HEAD/public/manuals/PVEMon-User-Guide.pdf) · [⬇ Castellano](https://github.com/Dagarin-es/PVEMon/raw/HEAD/public/manuals/PVEMon-Guia-de-usuario.pdf) — BCKMon [⬇ English](https://github.com/Dagarin-es/PVEMon/raw/HEAD/public/manuals/BCKMon-User-Guide.pdf) · [⬇ Castellano](https://github.com/Dagarin-es/PVEMon/raw/HEAD/public/manuals/BCKMon-Guia-de-usuario.pdf)
 
 > PVEMon **only reads**: it does not power off, power on, update, reboot or change anything on your servers. The only write outside itself is optional: moving already-processed backup emails to another folder.
 
@@ -91,6 +91,10 @@ curl localhost:3000/api/health
 **2.1** is the first stable release of the 2 series (`dagarines/pvemon:2.1.0`; `latest` points to it). The previous stable version, **1.5.7**, is still available and you can go back to it at any time: [`docs/VOLVER-A-1.5.7.md`](docs/VOLVER-A-1.5.7.md) (in Spanish). The database does not change between them.
 
 New in the 2 series: **BCKMon**, a second application built from the same code and focused only on **backups** (IMAP mail, NFS file checks, alerts, notifications, kiosks and users). It does not connect to Proxmox or Docker, nor scan the network. Install it like PVEMon with the `dagarines/bckmon` image (or with `EDITION=bckmon`). BCKMon has its own repository for Issues and releases: [github.com/Dagarin-es/BCKMon](https://github.com/Dagarin-es/BCKMon).
+
+### Automatic backup to a destination (2.2)
+
+Settings → **Backup** (administrators only): scheduled encrypted backups (days and times of your choice, keep the last N) to a server folder, an SMB/CIFS share (Synology, Ugreen…), SFTP, Dropbox or Google Drive, with a folder browser and restore from the app. Cloud, SMB and SFTP use rclone, included in the image. Details (in Spanish): [`docs/COPIA-A-DESTINOS.md`](docs/COPIA-A-DESTINOS.md).
 
 ### Approximate resources
 

@@ -11,3 +11,4 @@ services:
       - "3000:3000"
     volumes:
       - ./data:/data       # config.db + metrics.db (incluir en las copias de seguridad)
+      # - /ruta/en/tu/equipo:/backups   # carpeta para las copias automáticas (Ajustes → Copia de seguridad → «Carpeta del servidor»)

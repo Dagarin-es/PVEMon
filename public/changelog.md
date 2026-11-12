@@ -1,6 +1,56 @@
 # ChangeLog de PVEMon
 Historial reconstruido desde la primera versión numerada. Lo más reciente, primero.
 
+## 2.3.0 · 12/11/2026
+- **Manuales actualizados y el primero exclusivo de BCKMon.** Cuatro guías en PDF (PVEMon y BCKMon, en castellano y en inglés) con capturas nuevas, que se descargan desde el menú: **Manual · PDF**, debajo del © (en tu idioma y de tu edición). Se generan con `tools/manual/build.py`.
+- **Menú reordenado:** **Salir** va justo después de las opciones (sin separador), y **Tema** pasa al final, en una sola línea con los tres botones (Auto, Claro, Oscuro) más pequeños y con icono.
+- **Cabecera:** los botones de navegación quedan centrados con la página (antes se desplazaban a la derecha).
+- **El resumen semanal pasa a Ajustes › Notificaciones**, debajo del correo, con el título **«Enviar resumen semanal»**; desaparece la pestaña Resumen de Backups.
+- **Alertas:** el título y la regla «Copia de seguridad con problema» se unen en una sola tarjeta, con «Durante N min [gravedad]» y Guardar en una línea y la casilla debajo.
+- **Formatos de correo mejor explicados:** los campos de equipo y tarea se renombran («nombre fijo» / «patrón que lo saca del correo», con ejemplo) y se añade una explicación con un ejemplo completo.
+- **Backups:** la copia de la propia aplicación sale la primera y se llama «Copia de PVEMon» / «Copia de BCKMon».
+- Corregido: en el panel Backups, el motivo de una copia con problema desbordaba la fila y descolocaba las columnas.
+
+## 2.2.4 · 08/11/2026
+- **La copia de la propia aplicación sale en el panel Backups** como una copia más (solo administradores), en su propia tarjeta: estado (correcta / con error / antigua), última correcta, tamaño y «Alarma en», con un icono propio monocromo que sigue la paleta y el modo claro/oscuro. Pulsarla lleva a Ajustes › Sistema › Backups. Aparece en cuanto activas la copia automática o haces la primera copia. Salta como «antigua» si pasa más tiempo del previsto (el mayor hueco entre copias programadas más 3 horas).
+- Las píldoras de las pestañas de Ajustes ya no son transparentes: tienen un fondo sólido casi igual al de la página.
+
+## 2.2.3 · 08/11/2026
+- **Copia automática: nuevo destino Microsoft OneDrive** (cuenta personal o de empresa), con el mismo explorador de carpetas. Se autoriza con `rclone authorize "onedrive"` y pvemon detecta solo la unidad de la cuenta al guardar.
+- Dropbox, Google Drive y OneDrive: si rclone renueva el token de acceso, pvemon guarda el nuevo (cifrado) para que las copias no dejen de funcionar con el tiempo.
+
+## 2.2.2 · 08/11/2026
+- Copia automática: los campos con botón («Carpeta de destino» + «Elegir carpeta…», «Nombre de la carpeta nueva» + «Crear carpeta») quedan alineados.
+- Mensaje más claro cuando el servidor NFS responde «solo lectura»: indica que la regla NFS que se aplica a la IP de pvemon no permite escribir.
+
+## 2.2.1 · 08/11/2026
+- **Ajustes reorganizados** para que no se hagan tan largos:
+  - **Backups** (nuevo): pestañas **Backups PVE**, **Otros backups** y **Resumen** (el resumen semanal que estaba en Sistema). En BCKMon: **Copias** y **Resumen**.
+  - **Sistema** ahora tiene tres pestañas: **Exportación BCKMon** (pasar y traer copias entre aplicaciones), **Servicios externos** (latido y API de Home Assistant) y **Backups PVEMon** (la copia automática a un destino y la restauración desde un archivo).
+  - Se quita el botón de descargar a mano la copia cifrada: ya están las copias automáticas.
+- **Copia automática: destino NFS** (NFSv3, con el cliente propio de pvemon, sin montar nada). El explorador muestra las carpetas que exporta el NAS, deja crear subcarpetas y sirve también para restaurar. El NAS tiene que permitir escribir a la IP de pvemon (en Synology: regla NFS de lectura/escritura con «Asignar todos los usuarios a admin»).
+- La tarjeta «Encendido desde hace» pasa a **«Encendido hace»**, para que quepa en una línea.
+
+## 2.2.0 · 07/11/2026
+- **Copia de seguridad automática a un destino** (Ajustes → **Copia de seguridad**, solo administradores). Guarda la misma copia cifrada de siempre (configuración, usuarios, claves y avisos) en el sitio que elijas y borra las más antiguas:
+  - **Destinos**: carpeta del servidor (también una carpeta montada: disco USB, NAS por NFS…), **carpeta de red SMB/CIFS** (Synology, Ugreen…), **SFTP/SSH**, **Dropbox** y **Google Drive**. Los cuatro últimos usan **rclone**, que ya viene en la imagen.
+  - **Explorador de carpetas**: tras indicar el destino, pulsas «Elegir carpeta…», navegas, entras en las carpetas, creas una nueva y eliges la que quieras. «Probar conexión» comprueba usuario, clave y carpeta.
+  - **Programación**: marcas los **días de la semana** y una o varias **horas** (hasta 6 al día) y cuántas copias conservar (las más antiguas se borran). Se muestra la hora del servidor y la próxima copia. Si pvemon estaba apagado a la hora, la copia sale en cuanto arranca ese mismo día. Si una copia falla, avisa por correo y Telegram a los administradores.
+  - **Cifrado**: las copias van cifradas con una contraseña que pones tú (mínimo 8 caracteres) y que se guarda cifrada en la base de datos. Las claves del destino y el token de Dropbox/Drive también se guardan cifrados y no vuelven a mostrarse.
+  - **Restaurar desde la app**: «Ver copias del destino» lista lo que hay y **Restaurar** descarga, comprueba y aplica la copia (reinicia pvemon; la configuración anterior se guarda por si acaso). También hay «Copiar ahora».
+  - Dropbox y Google Drive: la cuenta se autoriza con `rclone authorize` en un ordenador con navegador y se pega el token en la pantalla (la pantalla lo explica). Hace falta una carpeta montada si usas «Carpeta del servidor» (ejemplo en `docker-compose.yml`).
+- **Backups**: los datos de «Última correcta» van centrados en su columna.
+
+## 2.1.3 · 07/11/2026
+- **Backups**: las cabeceras de la tabla caben en una sola línea; «Tipo de copia» pasa a **«Tipo»** y «Salta la alarma en» a **«Alarma en»** (el texto largo sigue como ayuda al pasar el ratón). Columnas reajustadas para que el estado y el tamaño no se partan.
+
+## 2.1.2 · 07/11/2026
+- **Backups**: tabla de copias más ordenada. El semáforo de «Monitorizada», el estado y «Salta la alarma en» van centrados bajo su título, el tamaño alineado a la derecha y con más ancho, y «Última correcta» muestra solo la fecha (sin el «hace…»).
+
+## 2.1.1 · 07/11/2026
+- **Backups**: la tabla de copias tiene dos columnas nuevas, **Tipo de copia** (Proxmox, Synology Hyper Backup, Duplicati, archivo NFS…) y **Monitorizada** (semáforo verde/rojo).
+- Se puede **ordenar por cualquier columna** pulsando su título; la columna activa se marca y una flecha (▲ ascendente, ▼ descendente) indica el sentido. Pulsar de nuevo invierte el orden. En móvil hay un selector «Ordenar por» con botón de sentido. Por defecto: Estado ascendente (primero las que tienen problemas).
+
 ## 2.1.0 · 07/11/2026
 **Primera versión estable de la serie 2.** Reúne todo lo de las betas 2.0.0-beta.1 a beta.16 (ver abajo). Puedes volver a la 1.5.7 cuando quieras (`docs/VOLVER-A-1.5.7.md`); la base de datos no cambia.
 - Nuevo desplegable de plantillas de formato con una opción **«Plantilla en blanco»** que vacía el formulario para empezar desde cero.

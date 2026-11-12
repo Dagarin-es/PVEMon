@@ -7,7 +7,7 @@ contenedores LXC y Docker, el estado de los discos y las copias de seguridad, co
 Telegram, webhook y Microsoft Teams. Versión estable 1.5. El historial de cambios está en
 [`public/changelog.md`](public/changelog.md) (en inglés: [`changelog.en.md`](public/changelog.en.md); también en el botón **ChangeLog** del menú).
 
-📘 **Guía de usuario (PDF, 33 páginas, con capturas):** [⬇ Castellano](https://github.com/Dagarin-es/PVEMon/raw/HEAD/docs/PVEMon-Guia-de-usuario.pdf) · [⬇ English](https://github.com/Dagarin-es/PVEMon/raw/HEAD/docs/PVEMon-User-Guide.pdf)
+📘 **Guías de usuario (PDF, con capturas):** PVEMon [⬇ Castellano](https://github.com/Dagarin-es/PVEMon/raw/HEAD/public/manuals/PVEMon-Guia-de-usuario.pdf) · [⬇ English](https://github.com/Dagarin-es/PVEMon/raw/HEAD/public/manuals/PVEMon-User-Guide.pdf) — BCKMon [⬇ Castellano](https://github.com/Dagarin-es/PVEMon/raw/HEAD/public/manuals/BCKMon-Guia-de-usuario.pdf) · [⬇ English](https://github.com/Dagarin-es/PVEMon/raw/HEAD/public/manuals/BCKMon-User-Guide.pdf)
 
 > PVEMon **solo lee**: no apaga, enciende, actualiza, reinicia ni modifica nada de los servidores. La única escritura fuera de sí mismo es opcional: mover a otra carpeta los correos de copias ya procesados.
 
@@ -90,6 +90,10 @@ curl localhost:3000/api/health
 La **2.1** es la primera versión estable de la serie 2 (`dagarines/pvemon:2.1.0`; `latest` apunta a ella). La estable anterior, la **1.5.7**, sigue disponible y se puede volver a ella en cualquier momento: [`docs/VOLVER-A-1.5.7.md`](docs/VOLVER-A-1.5.7.md). La base de datos no cambia entre ambas.
 
 Novedad de la serie 2: **BCKMon**, una segunda aplicación con la misma base de código y centrada solo en las **copias de seguridad** (correo IMAP, comprobación de archivos por NFS, alertas, avisos, kioscos y usuarios). No se conecta a Proxmox, ni a Docker, ni explora la red. Se instala igual que PVEMon con la imagen `dagarines/bckmon` (o con `EDITION=bckmon`). BCKMon tiene su propio repositorio para Issues y releases: [github.com/Dagarin-es/BCKMon](https://github.com/Dagarin-es/BCKMon).
+
+### Copia de seguridad automática a un destino (2.2)
+
+Ajustes → **Copia de seguridad** (solo administradores): copias cifradas programadas (días y horas a tu gusto, conservando las últimas N) en una carpeta del servidor, una carpeta SMB/CIFS (Synology, Ugreen…), SFTP, Dropbox o Google Drive, con explorador de carpetas y restauración desde la app. Nube, SMB y SFTP usan rclone, incluido en la imagen. Detalles: [`docs/COPIA-A-DESTINOS.md`](docs/COPIA-A-DESTINOS.md).
 
 ### Recursos orientativos
 
@@ -176,7 +180,7 @@ la selección (con Mayús, saltos de 5).
 Contraseñas scrypt, 2FA TOTP, cookie `HttpOnly` + `SameSite=Strict` (+`Secure` en HTTPS), sesión de 14 días,
 límite de intentos por IP y bloqueo de cuenta, comprobación de origen, CSP y cabeceras de seguridad, errores
 genéricos, tokens y claves cifrados con `SECRET_KEY`, huella del certificado de cada nodo fijada, SSH limitado y
-diario de auditoría. Detalles y recomendaciones en la [guía de usuario](https://github.com/Dagarin-es/PVEMon/raw/HEAD/docs/PVEMon-Guia-de-usuario.pdf).
+diario de auditoría. Detalles y recomendaciones en la [guía de usuario](https://github.com/Dagarin-es/PVEMon/raw/HEAD/public/manuals/PVEMon-Guia-de-usuario.pdf).
 
 ## API principal
 
