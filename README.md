@@ -1,73 +1,61 @@
-# PVEMon
+# Notas para la Release de GitHub · 2.1.0 (versión estable)
 
-🇬🇧 English · 🇪🇸 [Castellano](README.es.md)
+**Título:** `2.1.0`
+**Etiqueta:** `v2.1.0` · marcar **Set as the latest release** (NO es pre-release)
 
-**PVE nodes and Backups monitor.** A read-only PWA to watch Proxmox servers, their virtual machines, LXC and
-Docker containers, disk health and backups, with notifications through push, email, Telegram, webhook and
-Microsoft Teams. Stable version 1.5. The change history is in [`public/changelog.en.md`](public/changelog.en.md)
-(also behind the **ChangeLog** button in the menu). The interface is available in **English and Spanish**
-(Spanish by default; switch with the language selector on the login screen or in the menu).
+Pega este texto en la descripción (sirve igual para el repositorio de PVEMon y para el de BCKMon):
 
 📘 **User guides (PDF, with screenshots):** PVEMon [⬇ English](https://github.com/Dagarin-es/PVEMon/raw/HEAD/public/manuals/PVEMon-User-Guide.pdf) · [⬇ Castellano](https://github.com/Dagarin-es/PVEMon/raw/HEAD/public/manuals/PVEMon-Guia-de-usuario.pdf) — BCKMon [⬇ English](https://github.com/Dagarin-es/PVEMon/raw/HEAD/public/manuals/BCKMon-User-Guide.pdf) · [⬇ Castellano](https://github.com/Dagarin-es/PVEMon/raw/HEAD/public/manuals/BCKMon-Guia-de-usuario.pdf)
 
-> PVEMon **only reads**: it does not power off, power on, update, reboot or change anything on your servers. The only write outside itself is optional: moving already-processed backup emails to another folder.
+## 🇪🇸 Castellano
 
-## What it includes
+**Primera versión estable de la serie 2.** Reúne todo lo de las betas 2.0.0-beta.1 a beta.16. La estable anterior, la **1.5.7**, sigue disponible
+([`docs/VOLVER-A-1.5.7.md`](docs/VOLVER-A-1.5.7.md)); la base de datos no cambia entre ellas.
 
-| Area | Summary |
-|---|---|
-| **Status panel** | One card per node: status, temperature, uptime, machine data (with all its disks), disk health, backups and memory and disk rings. No “all OK” messages: the banner and the warning pill only appear when there are problems and lead to the first affected item. |
-| **Nodes, VM, LXC, Docker** | Lists and cards with charts (1 h to 90 d), maintenance mode (1/4/24 h) and aliases. |
-| **Disks** | SMART, wear, temperature, hours and ZFS pools every 30 min; “Failing disk”, “High SSD wear” and “Disk running very hot” alerts. |
-| **Backups** | Proxmox backups (age and size), NAS backups by email (IMAP: Hyper Backup, Cobian…), file check on a network disk (NFS), storage space and a weekly summary. |
-| **Alerts** | Editable rules, grouping by parent, snooze/reactivate, notification when they fire and when they recover. |
-| **Notifications** | Push (Web Push), SMTP email, Telegram, generic JSON webhook and Teams (Workflows). |
-| **Kiosk** | Canvas panels (gauges, summaries, text), kiosks with several panels and transitions (pixels or blur), kiosk selector, undo and arrow keys in the editor, uptime marker with a little face (“days without accidents” style) and swiping between panels on mobile. |
-| **Users** | Administrator and monitor roles (sees only what is assigned), TOTP 2FA, photo, own password change, account lockout and audit log. |
-| **Languages** | English and Spanish, per user. Screens, errors, alerts, emails, push and the weekly summary are translated. |
-| **System** | Encrypted PVEMon backup (`.pvemonbak`), external heartbeat (Healthchecks, Uptime Kuma…), ChangeLog. |
+### Imágenes
+- `dagarines/pvemon:2.1.0` · `dagarines/pvemon:latest`
+- `dagarines/bckmon:2.1.0` · `dagarines/bckmon:latest`
 
-## Installation
+### Novedades respecto a la 1.5.7
+- **BCKMon**: segunda aplicación, con el mismo código, centrada solo en las **copias de seguridad** (correo IMAP, comprobación de archivos NFS, alertas, notificaciones, kioscos y usuarios). No se conecta a Proxmox ni a Docker.
+- **5 paletas de color** (Aurora, Lima, Cobre, Índigo y Grafito) en las dos aplicaciones, con modo oscuro y claro y logo propio; se eligen en Personalizar. PVEMon sigue en Aurora por defecto; BCKMon usa Cobre.
+- **Nodos y máquinas**: tres anillos (CPU, Memoria y Disco) con semáforo (verde < 80 %, amarillo 80–95 %, rojo > 95 %) y una tabla con cada máquina o contenedor; al marcar una fila se resalta en los tres anillos. Ficha de contenedor con sus tres anillos.
+- **Varias cuentas de correo** para leer los avisos de copias, con editar y duplicar.
+- **Formatos de correo**: plantillas (Duplicati, Cobian, Synology Hyper Backup, Proxmox y en blanco), editar y duplicar, «Ignorar si el asunto contiene…» y botón para desactivar el formato integrado de Synology.
+- **Exportar / importar la configuración de copias entre PVEMon y BCKMon** (`.bckmonx`, cifrado con una frase).
+- **Personalizar** reorganizado (Perfil y Avisos); selector de idioma del login más discreto.
+- **Sesiones independientes**: BCKMon usa su propia cookie, así que no cierra la sesión de PVEMon en el mismo navegador e IP.
+- Imagen basada en Debian 13 (`node:22-trixie-slim`); BCKMon tiene su propio repositorio e imagen.
 
-### Option A · Docker Hub image (recommended)
-
-Image: [`dagarines/pvemon`](https://hub.docker.com/r/dagarines/pvemon) (amd64 and arm64). Create a folder with this `docker-compose.yml`:
-
-```yaml
-services:
-  pvemon:
-    image: dagarines/pvemon:latest   # or a fixed version, e.g. dagarines/pvemon:1.5.7
-    container_name: pvemon
-    restart: unless-stopped
-    env_file: .env
-    environment:
-      DATA_DIR: /data
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./data:/data
+### Actualizar
 ```
-
-```bash
-echo "SECRET_KEY=$(openssl rand -base64 32)" > .env     # KEEP IT: it encrypts the stored secrets
-mkdir -p data
-docker compose up -d
-docker compose exec pvemon node dist/cli.js create-admin admin   # shows the password ONCE
-curl localhost:3000/api/health
+docker compose pull && docker compose up -d
 ```
+Conserva `data/` y `.env`. Las migraciones son automáticas. En BCKMon hay que iniciar sesión una vez tras actualizar.
 
-Update: `docker compose pull && docker compose up -d` (migrations are applied automatically; keep `data/` and `.env`).
+---
 
-### Option B · From the source code
+## 🇬🇧 English
 
-```bash
-git clone https://github.com/Dagarin-es/pvemon.git && cd pvemon
-cp .env.example .env
-sed -i "s|^SECRET_KEY=.*|SECRET_KEY=$(openssl rand -base64 32)|" .env
-mkdir -p data
-docker compose up -d --build
-docker compose exec pvemon node dist/cli.js create-admin admin   # shows the password ONCE
-curl localhost:3000/api/health
+**First stable release of the 2 series.** It gathers everything from betas 2.0.0-beta.1 to beta.16. The previous stable version, **1.5.7**, is still available
+([`docs/VOLVER-A-1.5.7.md`](docs/VOLVER-A-1.5.7.md), in Spanish); the database does not change between them.
+
+### Images
+- `dagarines/pvemon:2.1.0` · `dagarines/pvemon:latest`
+- `dagarines/bckmon:2.1.0` · `dagarines/bckmon:latest`
+
+### What's new compared with 1.5.7
+- **BCKMon**: a second application built from the same code, focused only on **backups** (IMAP mail, NFS file checks, alerts, notifications, kiosks and users). It does not connect to Proxmox or Docker.
+- **5 colour palettes** (Aurora, Lima, Cobre, Índigo and Grafito) in both applications, with dark and light mode and their own logo; pick one in Personalize. PVEMon stays on Aurora by default; BCKMon uses Cobre.
+- **Nodes and machines**: three rings (CPU, Memory and Disk) with a traffic light (green < 80 %, yellow 80–95 %, red > 95 %) and a table with each machine or container; selecting a row highlights it in all three rings. Container page with its three rings.
+- **Several mail accounts** to read backup notices, with edit and duplicate.
+- **Mail formats**: templates (Duplicati, Cobian, Synology Hyper Backup, Proxmox and blank), edit and duplicate, “Ignore if the subject contains…” and a button to turn off the built-in Synology format.
+- **Export / import backup settings between PVEMon and BCKMon** (`.bckmonx`, passphrase-encrypted).
+- **Personalize** reorganised (Profile and Notifications); a more discreet login language selector.
+- **Independent sessions**: BCKMon uses its own cookie, so it no longer logs you out of PVEMon in the same browser and IP.
+- Image based on Debian 13 (`node:22-trixie-slim`); BCKMon has its own repository and image.
+
+### Update
 ```
 
 - Recover access: `docker compose exec pvemon node dist/cli.js reset-password admin`.
@@ -142,96 +130,4 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
 ```
-
-Restrict port 2375 to PVEMon's IP with the firewall: anyone who can reach it can read the containers' data,
-including their environment variables. New containers appear as not monitored.
-
-## Backups
-
-- **Proxmox**: age limit per node (days and hours) in Settings → PVE backups; the size is read from the backup task log.
-- **By email (NAS, Cobian…)**: IMAP mailbox in Settings → Other backups, with an inbox folder and a processed folder (optionally pvemon marks as read and moves the emails already incorporated; it never deletes); each source has its own maximum age and everything can be edited.
-- **File on a network disk (NFS v3)**: server, exported folder and a specific file or the newest one, with maximum age and minimum size; checked every 5 min without mounting anything. The name accepts wildcards (`*`, `?`), e.g. `folder/backup_*.ics` checks the newest one matching the pattern.
-- **Weekly summary** by email and/or Telegram, and a storage space alert (>90 %).
-- **PVEMon backup**: Settings → System, a password-encrypted file (AES-256-GCM). Also include `data/` in your own backups.
-
-## Notifications
-
-- **Push**: each person turns it on in Customise → Notifications on this device (HTTPS and Internet access). On Android, install PVEMon as an app so the browser name does not show.
-- **Email / Telegram**: Settings → Notifications, with a test button; secrets encrypted.
-- **Webhook**: JSON with the alert; optional `X-Pvemon-Token` header. **Teams**: Workflows webhook.
-- Who receives each notification: Settings → Users → Notifications (per device and channel).
-- Each person receives emails and push in their own language; Telegram, webhook and Teams use the oldest administrator's language.
-
-## Kiosk
-
-Menu → Kiosks: create **panels** (＋ Item: gauges, summaries, text) and gather them into **kiosks** (a panel can be in several; with more than one they rotate by themselves with the order, seconds and transition you choose). The **Kiosk** button in the bar opens a menu to choose which one to open in full screen (and the kiosk's “⋯” menu lets you switch); with **★ Main** you mark the one opened by default and with **Use here** you assign it to each device.
-
-In the panel editor: **Cmd/Ctrl + Z** undoes, **Cmd/Ctrl + Shift + Z** redoes, the **arrow keys** move the selection (with Shift, jumps of 5).
-
-## Security
-
-scrypt passwords, TOTP 2FA, `HttpOnly` + `SameSite=Strict` cookie (+`Secure` on HTTPS), 14-day session, per-IP attempt limit and account lockout, origin check, CSP and security headers, generic errors, tokens and keys encrypted with `SECRET_KEY`, pinned certificate fingerprint of each node, restricted SSH and audit log. To report a vulnerability see [SECURITY.md](SECURITY.md).
-
-## Main API
-
-All routes hang from `/api` and require a session except `/health` and `/auth/login`.
-
-| Route | Access |
-|---|---|
-| `GET /health` · `POST /auth/login` | public (login: 5/min per IP) |
-| `POST /auth/logout` · `/auth/password` · `/auth/2fa/*` · `PUT /auth/lang` · `GET /auth/me` | authenticated |
-| `/users`, `/servers`, `/alert-rules`, `/settings/*` | administrator |
-| `GET /tree` · `/overview` · `/disks` · `/alerts` | authenticated (a monitor only sees what is assigned) |
-| `GET /elements/:id/metrics[/:key]?range=1h\|6h\|24h\|7d\|30d\|90d` · `/elements/:id/disks` | authenticated with permission |
-| `/kiosks`, `/kiosk-groups`, `/kiosks-main` | each user, their own |
-
-The browser sends `X-Lang: en` to get server texts (errors, alerts…) in English.
-
-### Read-only API (`/api/v1`)
-
-Meant for Home Assistant, the future Android app and scripts. One key per program is created in **Settings → System → Read-only API** (shown only once; only its hash is stored). It is sent as `Authorization: Bearer pvm_…` (or `X-Api-Key`). All routes are `GET`; a key is useless for the rest of `/api` and cannot change anything. Limit: 120 requests/min. Texts in this API stay in Spanish.
-
-| Route | Content |
-|---|---|
-| `/api/v1/summary` | Counters and names of what is failing: nodes, machines, backups (total and per source), disks, updates and alerts |
-| `/api/v1/nodes` | Per node: status, CPU, memory, disk, temperature, uptime, pending updates, disk summary |
-| `/api/v1/guests` | Per VM/LXC: status, IP, guest agent status, CPU, memory, disk, uptime, network |
-| `/api/v1/backups` (`?compact=1` for short lists) | Each backup PVEMon knows (Proxmox and email sources, monitored or not: see the `monitored` field): status, age, size, message; and backup storage usage. The summary only counts monitored ones |
-| `/api/v1/disks` | Each disk: health, wear, temperature, hours and power cycles, sectors; and ZFS pools |
-| `/api/v1/alerts` | Open alerts (snoozed ones are not listed) |
-
-## Structure
-
-```
-src/
-  server.ts      Fastify startup, headers and origin check
-  cli.ts         create-admin / reset-password
-  i18n.ts        languages (server side)
-  auth/          passwords, sessions, 2FA, role guards, audit
-  routes/        HTTP routes
-  proxmox/       client (pinned fingerprint), collector, discovery, disks
-  metrics/       catalogue and SQLite store with retention
-  alerts/        rule engine and notifications (push, SMTP, Telegram, webhook, Teams)
-  mail/          IMAP reading of backup notices (and, if enabled, moving processed ones)
-  update/        read-only SSH access and update check
-  db/schema.ts   configuration DB (Drizzle)
-public/          frontend (index.html, i18n.js, kiosk.js, app.css, sw.js, changelog.md, changelog.en.md)
-public/i18n/     English dictionaries: en.json (screens) and en-server.json (server)
-docs/            user guide in PDF (English and Spanish)
-drizzle/         migrations
-tools/           i18n-check.mjs (checks that every text is translated)
-```
-
-## Development
-
-`npm ci && npm run build && node dist/db/migrate.js && node dist/server.js` (Node ≥ 22).
-When releasing a version: bump `VER` in `public/index.html`, `version` in `package.json`, the cache name in
-`public/sw.js` and **add its entry to `public/changelog.md` and `public/changelog.en.md`**.
-
-### Languages
-
-The Spanish text is the key: in the front end write `T('Spanish text')` (with `{0}`, `{1}`… placeholders if it carries data) and on the server `tr()` / `tf()` (`src/i18n.ts`). The translation goes in `public/i18n/en.json` (screens) or `public/i18n/en-server.json` (server). A text without a translation is shown in Spanish. After touching texts, `npm run build && node tools/i18n-check.mjs` reports any that are missing.
-
-## License and support
-
-[MIT](LICENSE) © 2026 Dagarin. Provided **as is, without warranty or guaranteed support**: bugs and suggestions are discussed in [Issues](https://github.com/Dagarin-es/pvemon/issues) and handled when possible.
+Keeps `data/` and `.env`. Migrations are automatic. In BCKMon you have to sign in once after updating.
