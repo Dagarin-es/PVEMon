@@ -22,7 +22,7 @@ const dict: Record<string, string> = { ...clientDict, ...load('en-server.json') 
 /** Diccionario del navegador como script (se carga de forma síncrona antes del script principal) */
 export const clientDictScript = (): string => 'window.I18N_EN=' + JSON.stringify(clientDict).replace(/</g, '\\u003c') + ';';
 
-const exact = new Map(Object.entries(dict).filter(([k, v]) => v));
+const exact = new Map(Object.entries(dict).filter(([, v]) => v));
 const esc = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const patterns = Object.entries(dict)
   .filter(([k, v]) => v && /\{\d+\}/.test(k))

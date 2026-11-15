@@ -5,7 +5,6 @@
  *   /nodes/{n}/disks/zfs    → estado de los pools ZFS
  * Se consulta cada 30 min (SMART despierta los discos) y se convierte en métricas del nodo para las alertas.
  */
-import { eq } from 'drizzle-orm';
 import { db, schema } from '../db/index.js';
 import { observe } from '../alerts/engine.js';
 import type { MetricsStore, Point } from '../metrics/store.js';
@@ -117,4 +116,3 @@ export function maybeRefreshDisks(server: typeof schema.servers.$inferSelect, el
   })();
 }
 
-export const forgetDisks = (elementId: string) => { db.delete(schema.nodeDisks).where(eq(schema.nodeDisks.elementId, elementId)).run(); next.delete(elementId); };

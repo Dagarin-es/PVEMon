@@ -15,6 +15,7 @@ import { createToken, deleteToken, publicTokens, verifyToken } from '../api/toke
 import { db, schema } from '../db/index.js';
 import { getGuestNet } from '../proxmox/guestnet.js';
 import { getNodeDisks } from '../proxmox/disk-data.js';
+import { authSummary } from '../proxmox/authlog.js';
 import { cachedUpdates } from '../update/service.js';
 import { storageUsage } from '../backups/collector.js';
 import { describeValue } from '../alerts/engine.js';
@@ -181,11 +182,12 @@ export const apiV1Routes: FastifyPluginAsync = async (app) => {
           maxWearPercent: Math.max(0, ...s.disks.map((d) => d.wearPercent ?? 0)), maxTempC: Math.max(0, ...s.disks.map((d) => d.tempC ?? 0)),
           problemNames: [...s.disks.filter((d) => d.problem).map((d) => `${d.node}: ${d.model || d.device}`), ...s.pools.filter((p) => p.problem).map((p) => `${p.node}: ZFS ${p.pool}`)],
         },
+        security: (() => { const a = s.nodes.map((n) => authSummary(n.id)).filter((x): x is NonNullable<typeof x> => !!x); return { authFailures24h: a.reduce((t, x) => t + x.count24h, 0), authFailures15m: a.reduce((t, x) => t + x.recent, 0), topIps: a.flatMap((x) => x.top).sort((p, q) => q.count - p.count).slice(0, 5).map((x) => `${x.ip} (${x.count})`) }; })(),
         updates: { pending: upd.reduce((a, b) => a + b, 0), nodesWithUpdates: s.nodes.filter((n) => (n.updates?.pending ?? 0) > 0).map((n) => n.name) },
         alerts: { firing: s.alerts.length, critical: s.alerts.filter((a) => a.severity === 'critical').length, texts: s.alerts.slice(0, 10).map((a) => `${a.element}: ${a.text}`) },
       };
       // BCKMon: solo copias y alertas
-      if (EDITION === 'bckmon') for (const k of ['nodes', 'guests', 'disks', 'updates', 'backupStorageMaxPercent']) delete out[k];
+      if (EDITION === 'bckmon') for (const k of ['nodes', 'guests', 'disks', 'updates', 'security', 'backupStorageMaxPercent']) delete out[k];
       return out;
     });
 

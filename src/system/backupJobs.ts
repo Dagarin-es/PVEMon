@@ -311,7 +311,6 @@ const fileName = (d = new Date()) => {
 };
 
 let busy = false;
-export const isBusy = () => busy;
 
 /** Hace una copia ahora, la sube al destino guardado y aplica la retención. Lanza error si algo falla. */
 export async function runBackup(how: 'auto' | 'manual', logger?: FastifyBaseLogger): Promise<RunInfo> {

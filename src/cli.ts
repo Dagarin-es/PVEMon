@@ -2,6 +2,7 @@
  * Utilidades de consola (se ejecutan dentro del contenedor):
  *   node dist/cli.js create-admin <usuario>
  *   node dist/cli.js reset-password <usuario>
+ *   node dist/cli.js reset-2fa <usuario>
  * Imprimen una contraseña aleatoria UNA vez; cámbiala después en la app.
  */
 import { eq } from 'drizzle-orm';
@@ -15,7 +16,7 @@ const username = rawName?.trim().toLowerCase();
 const { users } = schema;
 
 if (!cmd || !username || !/^[a-z0-9._-]{3,32}$/.test(username)) {
-  console.error('Uso: cli.js <create-admin|reset-password> <usuario (3-32: a-z 0-9 . _ -)>');
+  console.error('Uso: cli.js <create-admin|reset-password|reset-2fa> <usuario (3-32: a-z 0-9 . _ -)>');
   process.exit(1);
 }
 

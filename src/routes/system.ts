@@ -1,5 +1,4 @@
 import { VERSION } from '../version.js';
-import { readFileSync } from 'node:fs';
 import { eq } from 'drizzle-orm';
 import type { FastifyPluginAsync } from 'fastify';
 import { z } from 'zod';

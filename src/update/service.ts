@@ -110,7 +110,6 @@ export function forgetSsh(s: Server): void {
 const tempCache = new Map<string, { v: number; at: number }>();
 const tempRetry = new Map<string, number>();
 const tempBusy = new Set<string>();
-export const sshReady = (id: string) => !!sshOk(id);
 export function cpuTemp(s: Server): number | null {
   const now = nowSec();
   const c = tempCache.get(s.id);

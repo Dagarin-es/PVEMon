@@ -4,11 +4,13 @@
 
 **PVE nodes and Backups monitor.** A read-only PWA to watch Proxmox servers, their virtual machines, LXC and
 Docker containers, disk health and backups, with notifications through push, email, Telegram, webhook and
-Microsoft Teams. Stable version 1.5. The change history is in [`public/changelog.en.md`](public/changelog.en.md)
+Microsoft Teams. Stable version 2.4. The change history is in [`public/changelog.en.md`](public/changelog.en.md)
 (also behind the **ChangeLog** button in the menu). The interface is available in **English and Spanish**
 (Spanish by default; switch with the language selector on the login screen or in the menu).
 
 📘 **User guides (PDF, with screenshots):** PVEMon [⬇ English](https://github.com/Dagarin-es/PVEMon/raw/HEAD/public/manuals/PVEMon-User-Guide.pdf) · [⬇ Castellano](https://github.com/Dagarin-es/PVEMon/raw/HEAD/public/manuals/PVEMon-Guia-de-usuario.pdf) — BCKMon [⬇ English](https://github.com/Dagarin-es/PVEMon/raw/HEAD/public/manuals/BCKMon-User-Guide.pdf) · [⬇ Castellano](https://github.com/Dagarin-es/PVEMon/raw/HEAD/public/manuals/BCKMon-Guia-de-usuario.pdf)
+
+🛠️ **Installation guide from scratch (PDF):** [⬇ English](https://github.com/Dagarin-es/PVEMon/raw/HEAD/public/manuals/PVEMon-Install-Guide.pdf) · [⬇ Castellano](https://github.com/Dagarin-es/PVEMon/raw/HEAD/public/manuals/PVEMon-Guia-de-instalacion.pdf) — Docker Compose, Docker Hub and graphical managers (Arcane, Portainer…).
 
 > PVEMon **only reads**: it does not power off, power on, update, reboot or change anything on your servers. The only write outside itself is optional: moving already-processed backup emails to another folder.
 
@@ -36,7 +38,7 @@ Image: [`dagarines/pvemon`](https://hub.docker.com/r/dagarines/pvemon) (amd64 an
 ```yaml
 services:
   pvemon:
-    image: dagarines/pvemon:latest   # or a fixed version, e.g. dagarines/pvemon:1.5.7
+    image: dagarines/pvemon:latest   # or a fixed version, e.g. dagarines/pvemon:2.4.1
     container_name: pvemon
     restart: unless-stopped
     env_file: .env
@@ -86,11 +88,9 @@ curl localhost:3000/api/health
 | `TELEGRAM_API`, `PVEMON_LAN_PORT` | api.telegram.org, `8006` | Advanced/testing |
 | `EDITION` | `pvemon` | `bckmon` turns on the BCKMon edition (backups only; see below). The `dagarines/bckmon` image already has it set |
 
-### Version 2.1 and BCKMon
+### PVEMon and BCKMon
 
-**2.1** is the first stable release of the 2 series (`dagarines/pvemon:2.1.0`; `latest` points to it). The previous stable version, **1.5.7**, is still available and you can go back to it at any time: [`docs/VOLVER-A-1.5.7.md`](docs/VOLVER-A-1.5.7.md) (in Spanish). The database does not change between them.
-
-New in the 2 series: **BCKMon**, a second application built from the same code and focused only on **backups** (IMAP mail, NFS file checks, alerts, notifications, kiosks and users). It does not connect to Proxmox or Docker, nor scan the network. Install it like PVEMon with the `dagarines/bckmon` image (or with `EDITION=bckmon`). BCKMon has its own repository for Issues and releases: [github.com/Dagarin-es/BCKMon](https://github.com/Dagarin-es/BCKMon).
+**BCKMon**, a second application built from the same code and focused only on **backups** (IMAP mail, NFS file checks, alerts, notifications, kiosks and users). It does not connect to Proxmox or Docker, nor scan the network. Install it like PVEMon with the `dagarines/bckmon` image (or with `EDITION=bckmon`). BCKMon has its own repository for Issues and releases: [github.com/Dagarin-es/BCKMon](https://github.com/Dagarin-es/BCKMon).
 
 ### Automatic backup to a destination (2.2)
 

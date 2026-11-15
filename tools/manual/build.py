@@ -10,13 +10,14 @@ from playwright.sync_api import sync_playwright
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, '..', '..', 'public', 'manuals')
-VER = '2.3.2'
-DATE = {'es': '12 de noviembre de 2026', 'en': '12 November 2026'}
+VER = '2.4.1'
+DATE = {'es': '15 de noviembre de 2026', 'en': '15 November 2026'}
 
 
 def b64(path):
+    mime = 'svg+xml' if path.endswith('svg') else 'png' if path.endswith('png') else 'jpeg'
     with open(path, 'rb') as f:
-        return 'data:image/' + ('png' if path.endswith('png') else 'jpeg') + ';base64,' + base64.b64encode(f.read()).decode()
+        return 'data:image/' + mime + ';base64,' + base64.b64encode(f.read()).decode()
 
 
 class Doc:
@@ -26,6 +27,9 @@ class Doc:
         self.name = 'BCKMon' if self.bck else 'PVEMon'
         self.other = 'PVEMon' if self.bck else 'BCKMon'
         self.parts, self.toc, self.n = [], [], 0
+        self.kind = 'manual'
+        self.extra_css = ''
+        self.title_es, self.title_en = 'Guía de usuario', 'User guide'
 
     # texto según idioma
     def t(self, es, en):
@@ -81,9 +85,13 @@ class Doc:
     def render(self):
         sub = self.t('Monitor de copias de seguridad', 'Backup monitor') if self.bck else self.t('Monitor de nodos PVE y Backups', 'PVE node and backup monitor')
         accent = '#d9822b' if self.bck else '#3a6df0'
+        g1, g2 = ('#f0b070', '#d9773a') if self.bck else ('#2de2ff', '#b26bff')
         icon = b64(os.path.join(HERE, '..', '..', 'public', 'editions', 'bckmon', 'icon.svg')) if False else None
         toc = ''.join(f'<li><a href="#{i}">{html.escape(t)}</a></li>' for i, t in self.toc)
-        title = self.t('Guía de usuario', 'User guide')
+        title = self.t(self.title_es, self.title_en)
+        pub = os.path.join(HERE, '..', '..', 'public')
+        logo = b64(os.path.join(pub, 'palettes', 'bckmon', 'cobre', 'icon.svg') if self.bck else os.path.join(pub, 'icon.svg'))
+        nm = self.name[:-3] + '<span class="mon">Mon</span>'
         css = f'''
 @page{{size:A4;margin:18mm 16mm 20mm}}
 *{{box-sizing:border-box}}
@@ -100,11 +108,11 @@ figure{{margin:2mm 0 5mm;page-break-inside:avoid;text-align:center}} figure img{
 figure.narrow img{{max-height:120mm;max-width:75%}}
 figcaption{{font-size:8.5pt;color:#667089;margin-top:1.2mm}}
 .cover{{height:250mm;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;page-break-after:always}}
-.cover .n{{font-size:44pt;font-weight:800;color:{accent};letter-spacing:1px}} .cover .s{{font-size:15pt;color:#44506b;margin:2mm 0 14mm}}
+.cover .lg{{width:42mm;height:42mm;margin-bottom:8mm}} .cover .n{{font-size:46pt;font-weight:800;color:#1b2233;letter-spacing:1px}} .cover .n .mon{{background:linear-gradient(90deg,{g1},{g2});-webkit-background-clip:text;color:transparent}} .cover .s{{font-size:15pt;color:#44506b;margin:2mm 0 14mm}}
 .cover .g{{font-size:26pt;font-weight:700}} .cover .v{{margin-top:6mm;color:#667089}}
-.toc li{{margin-bottom:1.6mm}} .toc a{{color:#1b2233;text-decoration:none}} .toc{{font-size:11pt}}
+.toc li{{margin-bottom:1.6mm}} {self.extra_css} .toc a{{color:#1b2233;text-decoration:none}} .toc{{font-size:11pt}}
 '''
-        cover = f'''<div class="cover"><div class="n">{self.name.upper()}</div><div class="s">{sub}</div><div class="g">{title}</div>
+        cover = f'''<div class="cover"><img class="lg" src="{logo}"><div class="n">{nm}</div><div class="s">{sub}</div><div class="g">{title}</div>
 <div class="v">{self.t("Versión", "Version")} {VER} · {DATE[self.lang]}<br>{self.t("Licencia MIT · Dagarin", "MIT licence · Dagarin")}</div></div>'''
         return f'<!doctype html><meta charset="utf-8"><style>{css}</style>{cover}<h1 style="page-break-before:auto;margin-top:0">{self.t("Índice", "Contents")}</h1><ol class="toc">{toc}</ol>' + ''.join(self.parts)
 
@@ -175,10 +183,10 @@ def backups_panel(d):
             [(('Copia', 'Backup'), ('Nombre, origen (equipo o NAS) y un icono por tipo.', 'Name, source (machine or NAS) and an icon per type.')),
              (('Tipo', 'Type'), ('Correo, Proxmox, archivo en un disco de red o copia de la aplicación.', 'E-mail, Proxmox, file on a network drive or application backup.')),
              (('Monitorizada', 'Monitored'), ('Punto verde: se vigila y avisa. Rojo: no se vigila.', 'Green dot: it is watched and warns. Red: it is not watched.')),
-             (('Estado', 'State'), ('Correcta, Con error, Antigua o Sin datos; con el motivo si hay problema.', 'Correct, Error, Old or No data; with the reason if there is a problem.')),
+             (('Resultado', 'Result'), ('Correcta, Con error, Antigua o Sin datos; con el motivo si hay problema.', 'Correct, Error, Old or No data; with the reason if there is a problem.')),
              (('Última correcta', 'Last successful'), ('Fecha y hora de la última copia buena.', 'Date and time of the last good backup.')),
              (('Tamaño', 'Size'), ('Lo que ocupó esa copia.', 'How much that backup took.')),
-             (('Alarma en', 'Alarm in'), ('Tiempo que falta para que salte el aviso si no llega otra copia correcta («vencida» si ya pasó).', 'Time left before the warning if no other good backup arrives («overdue» if already past).'))])
+             (('Estado', 'Status'), ('Carita y contador del tiempo que falta para la alarma: días, después horas:minutos y, en la última hora, minutos:segundos. La cara cambia según se acerca la fecha y entra en crisis si la copia falló o se pasó.', 'Face and counter for the time left before the alarm: days, then hours:minutes and, in the last hour, minutes:seconds. The face changes as the date approaches and goes into crisis if the backup failed or the date passed.'))])
     d.p('Puedes **ordenar** por cualquier columna pulsando su título (en el móvil, con el desplegable «Ordenar por»). Pulsa una fila para abrir su ficha: arriba el estado y, junto a él, una **carita con contador** que cambia de cara y de color según se acerca la fecha de la alarma (y entra en crisis si la copia falló o se pasó la fecha); debajo, última copia correcta, tamaño, último intento y límite. La fila de la copia de la aplicación te lleva a su configuración.',
         'You can **sort** by any column by clicking its heading (on a phone, with the «Sort by» drop-down). Click a row to open its sheet: the state on top and, next to it, a **face with a counter** that changes face and colour as the alarm date approaches (and goes into crisis if the backup failed or the date has passed); below, last successful backup, size, last attempt and limit. The application-backup row takes you to its settings.')
     d.img('ficha', 'Ficha de una copia, con la carita y el contador hacia la alarma', 'Backup sheet, with the face and the counter towards the alarm')
@@ -200,9 +208,19 @@ def kiosk_custom(d):
         'A kiosk is a read-only screen meant for a TV or fixed monitor: it shows the panels you choose, with no menus, and can rotate between groups of panels. It opens with the **Kiosk** button in the header (full screen) and you leave it with the Esc key.')
     d.p('En **Kioscos** (menú) creas y editas los tuyos con un editor de lienzo: añades paneles (resúmenes, estado de copias, texto), los colocas y les das tamaño, y puedes deshacer y rehacer. Puedes tener varios kioscos y marcar uno como principal.',
         'In **Kiosks** (menu) you create and edit your own with a canvas editor: you add panels (summaries, backup state, text), position and size them, and can undo and redo. You can have several kiosks and mark one as the main one.')
+    d.h2('Los elementos de un kiosko', 'The elements of a kiosk')
+    d.table([('Elemento', 'Element'), ('Qué muestra', 'What it shows')],
+            ([(('Una ficha (nodo, máquina, contenedor, copia…)', 'A tile (node, machine, container, backup…)'), ('El nombre, un LED de estado y los indicadores que elijas (CPU, memoria, disco); en versión «mini» solo nombre y LED.', 'The name, a status LED and the indicators you choose (CPU, memory, disk); in «mini» form only name and LED.')),
+              (('Estado de los sistemas', 'Systems status'), ('Resumen de todos los nodos con sus máquinas, LXC y Docker en marcha.', 'Summary of all nodes with their running machines, LXC and Docker.'))] if not d.bck else
+             [(('Una ficha (una copia)', 'A tile (one backup)'), ('El nombre, un LED de estado y el motivo si hay problema.', 'The name, a status LED and the reason if there is a problem.'))]) +
+            [(('Estado copias', 'Backup status'), ('Un único indicador: **verde «Copias correctas»** si todo va bien, o **rojo «Copias con errores»** con el listado de **solo** las que fallan. Ideal para una vista de un vistazo.', 'A single indicator: **green «Backups OK»** if all is well, or **red «Backups with errors»** listing **only** the ones that fail. Ideal for an at-a-glance view.')),
+             (('Detalle de copias', 'Backup detail'), ('Todas las copias con su resultado y la fecha de la última correcta.', 'Every backup with its result and the date of the last good one.')),
+             (('Cuadro de texto', 'Text box'), ('Un texto libre (título, aviso, nota) con tamaño y alineación a tu gusto.', 'Free text (title, notice, note) with the size and alignment you like.'))])
+    d.img('kiosko', 'Un kiosko con «Estado copias», «Detalle de copias» y un texto', 'A kiosk with «Backup status», «Backup detail» and a text box')
+    d.p('Si algo falla, la cabecera del kiosko se tiñe de rojo y lista los problemas; los títulos de los elementos son grandes para leerse desde lejos.',
+        'If something fails, the kiosk header turns red and lists the problems; the element titles are large so they can be read from a distance.')
     if not d.bck:
         d.img('008', 'Pantalla de Kioscos', 'Kiosks screen', old=True)
-        d.img('010', 'Un kiosko en pantalla', 'A kiosk on screen', old=True)
     d.h1('Personalizar tu cuenta', 'Customising your account')
     d.p('**Personalizar** reúne lo tuyo: tu foto (se recorta en círculo), tu nombre, el idioma, el cambio de contraseña (pide la actual y la nueva, mínimo 12 caracteres), la verificación en dos pasos (2FA, con una app de autenticación y un código QR) y **Mis avisos**, donde eliges qué canales usar.',
         '**Customise** gathers your own settings: your photo (cropped to a circle), your name, the language, the password change (asks for the current and the new one, minimum 12 characters), two-step verification (2FA, with an authenticator app and a QR code) and **My notices**, where you choose which channels to use.')
@@ -339,23 +357,87 @@ def security(d):
              (('Red', 'Network'), ('Entrada: puerto 3000. Salida: correo, Telegram, push, webhooks, NFS/SMB/SFTP o nubes de copia' + ('' if d.bck else ', nodos (8006) y Docker (2375)'), 'In: port 3000. Out: e-mail, Telegram, push, webhooks, NFS/SMB/SFTP or backup clouds' + ('' if d.bck else ', nodes (8006) and Docker (2375)')))])
 
 
-def install_bck(d):
-    d.h1('Instalación con Docker', 'Installing with Docker')
-    d.p('BCKMon se publica como imagen Docker (`dagarines/bckmon`). Un `docker-compose.yml` mínimo:', 'BCKMon is published as a Docker image (`dagarines/bckmon`). A minimal `docker-compose.yml`:')
-    d.parts.append('<pre style="background:#eef1f7;padding:3mm;border-radius:2mm;font:8.5pt/1.4 \'DejaVu Sans Mono\',monospace">services:\n  bckmon:\n    image: dagarines/bckmon:latest\n    container_name: bckmon\n    restart: unless-stopped\n    ports: ["3000:3000"]\n    environment:\n      SECRET_KEY: "pon-aqui-una-clave-larga-y-aleatoria"\n      TZ: Europe/Madrid\n    volumes:\n      - ./data:/app/data\n      # - /ruta/de/copias:/backups   # destino de copias en una carpeta</pre>')
-    d.ol([('Genera la clave con `openssl rand -base64 32` y guárdala: sin ella no se pueden leer los datos ni restaurar copias.', 'Generate the key with `openssl rand -base64 32` and keep it: without it the data cannot be read and copies cannot be restored.'),
-          ('Arranca con `docker compose up -d` y abre `http://servidor:3000`.', 'Start with `docker compose up -d` and open `http://server:3000`.'),
-          ('La primera vez te pide crear el usuario administrador.', 'The first time it asks you to create the administrator user.'),
-          ('Configura primero Ajustes › Notificaciones (correo), luego Ajustes › Backups (cuenta de correo y orígenes) y, por último, la copia de BCKMon en Ajustes › Sistema.', 'First configure Settings › Notifications (e-mail), then Settings › Backups (e-mail account and sources) and finally BCKMon\'s own backup in Settings › System.')])
-    d.h2('Primeros pasos recomendados', 'Recommended first steps')
-    d.ol([('Da de alta una **cuenta de correo (IMAP)** donde lleguen los avisos de tus programas de copia.', 'Add an **e-mail account (IMAP)** where your backup programs\' notices arrive.'),
-          ('Crea un **origen** por cada NAS o equipo y fija cada cuántos días debe llegar una copia correcta.', 'Create a **source** for every NAS or machine and set how many days may pass without a successful backup.'),
-          ('Si un programa no es Synology, añade su **formato** con una plantilla (ver «Formatos propios»).', 'If a program is not Synology, add its **format** from a template (see «Custom e-mail formats»).'),
-          ('Configura el **correo** y el **resumen semanal** en Notificaciones.', 'Set up **e-mail** and the **weekly summary** in Notifications.'),
-          ('Activa la **copia automática** de BCKMon a una carpeta, NAS o nube.', 'Enable BCKMon\'s **automatic backup** to a folder, NAS or cloud.')])
-    d.h2('Exportación a PVEMon', 'Export to PVEMon')
-    d.p('Si usas también PVEMon, la pestaña Sistema › Exportación PVEMon crea un archivo cifrado con la configuración de copias para importarlo en PVEMon (y trae la que exportes desde allí). No lleva usuarios, kioscos ni alertas, y la importación solo añade lo que falte.',
-        'If you also use PVEMon, the System › PVEMon export tab creates an encrypted file with the backup configuration to import into PVEMon (and brings in what you export from there). It carries no users, kiosks or alerts, and importing only adds what is missing.')
+def install_pointer(d):
+    N = d.name
+    img = 'dagarines/bckmon' if d.bck else 'dagarines/pvemon'
+    guide = d.t(f'{N}-Guia-de-instalacion.pdf', f'{N}-Install-Guide.pdf')
+    d.h1('Instalación', 'Installation')
+    d.p(f'{N} se publica como imagen Docker (`{img}`). La instalación paso a paso desde cero —con Docker Compose, con `docker run` desde Docker Hub o con un gestor gráfico como Arcane— está en su propia guía: **{guide}** (menú › «Instalación · PDF», o en la misma carpeta de manuales).',
+        f'{N} is published as a Docker image (`{img}`). The step-by-step installation from scratch — with Docker Compose, with `docker run` from Docker Hub or with a graphical manager such as Arcane — is in its own guide: **{guide}** (menu › «Installation · PDF», or in the same manuals folder).')
+    d.p('Las dos cosas imprescindibles: una **`SECRET_KEY`** (32 bytes en base64) y una carpeta **`/data`** persistente, ambas incluidas en tus copias. El primer administrador se crea con una orden de consola, no desde la web.',
+        'The two essentials: a **`SECRET_KEY`** (32 bytes in base64) and a persistent **`/data`** folder, both included in your backups. The first administrator is created with a console command, not from the web.')
+    if d.bck:
+        d.h2('Primeros pasos recomendados', 'Recommended first steps')
+        d.ol([('Da de alta una **cuenta de correo (IMAP)** donde lleguen los avisos de tus programas de copia.', 'Add an **e-mail account (IMAP)** where your backup programs\' notices arrive.'),
+              ('Crea un **origen** por cada NAS o equipo y fija cada cuántos días debe llegar una copia correcta.', 'Create a **source** for every NAS or machine and set how many days may pass without a successful backup.'),
+              ('Si un programa no es Synology, añade su **formato** con una plantilla (ver «Formatos propios»).', 'If a program is not Synology, add its **format** from a template (see «Custom e-mail formats»).'),
+              ('Configura el **correo** y el **resumen semanal** en Notificaciones.', 'Set up **e-mail** and the **weekly summary** in Notifications.'),
+              ('Activa la **copia automática** de BCKMon a una carpeta, NAS o nube.', 'Enable BCKMon\'s **automatic backup** to a folder, NAS or cloud.')])
+        d.h2('Exportación a PVEMon', 'Export to PVEMon')
+        d.p('Si usas también PVEMon, la pestaña Sistema › Exportación PVEMon crea un archivo cifrado con la configuración de copias para importarlo en PVEMon (y trae la que exportes desde allí). No lleva usuarios, kioscos ni alertas, y la importación solo añade lo que falta.',
+            'If you also use PVEMon, the System › PVEMon export tab creates an encrypted file with the backup configuration to import into PVEMon (and brings in what you export from there). It carries no users, kiosks or alerts, and importing only adds what is missing.')
+    else:
+        d.h2('Primeros pasos recomendados', 'Recommended first steps')
+        d.ol([('Añade tu primer **nodo** con un token de API de solo lectura (Nodos › Añadir nodo).', 'Add your first **node** with a read-only API token (Nodes › Add node).'),
+              ('Si quieres el registro de **accesos fallidos**, da el permiso Sys.Syslog al token (ver «Accesos fallidos a Proxmox»).', 'If you want the **failed logins** log, grant the Sys.Syslog permission to the token (see «Failed logins to Proxmox»).'),
+              ('Configura el **correo** y **Telegram** en Ajustes › Notificaciones y pulsa Probar.', 'Set up **e-mail** and **Telegram** in Settings › Notifications and press Test.'),
+              ('Revisa las **alertas** y sus umbrales en Ajustes › Alertas.', 'Review the **alerts** and their thresholds in Settings › Alerts.'),
+              ('Activa la **copia automática** de PVEMon a una carpeta, NAS o nube.', 'Enable PVEMon\'s **automatic backup** to a folder, NAS or cloud.')])
+
+
+def look_feel(d):
+    N = d.name
+    d.h1('Colores, tema e iconos', 'Colours, theme and icons')
+    d.p(f'{N} se adapta a tu gusto y a tu pantalla. Hay dos ajustes independientes: el **tema** (claro u oscuro) y la **paleta de color**.',
+        f'{N} adapts to your taste and your screen. There are two independent settings: the **theme** (light or dark) and the **colour palette**.')
+    d.h2('Tema: Auto, Claro u Oscuro', 'Theme: Auto, Light or Dark')
+    d.p('Está al principio del **Menú**, en una sola línea con tres botones. **Auto** sigue el modo de tu sistema (claro de día, oscuro de noche si tu equipo lo hace); **Claro** y **Oscuro** lo fijan. Se recuerda en ese navegador.',
+        'It is at the top of the **Menu**, on a single line with three buttons. **Auto** follows your system mode (light by day, dark by night if your device does so); **Light** and **Dark** fix it. It is remembered in that browser.')
+    d.h2('Paleta de color', 'Colour palette')
+    d.p('En **Personalizar › Perfil**, bajo «Color», eliges entre **cinco paletas**: **Aurora** (cian y violeta), **Lima** (verdes), **Cobre** (naranjas), **Índigo** (azul violeta) y **Grafito** (grises neutros). Un clic cambia toda la aplicación al instante, tanto en modo claro como en oscuro, y se guarda **en tu usuario**: la verás igual desde cualquier dispositivo.',
+        'In **Customise › Profile**, under «Colour», you choose between **five palettes**: **Aurora** (cyan and violet), **Lime** (greens), **Copper** (oranges), **Indigo** (violet blue) and **Graphite** (neutral greys). One click changes the whole application at once, in both light and dark mode, and it is saved **on your user**: you will see it the same from any device.')
+    if d.bck:
+        d.note('La paleta por defecto de BCKMon es **Cobre**. PVEMon arranca con **Aurora**.', 'BCKMon\'s default palette is **Copper**. PVEMon starts with **Aurora**.')
+        d.img('pal-cobre-light', 'BCKMon en Cobre, modo claro', 'BCKMon in Copper, light mode')
+        d.img('pal-indigo-dark', 'BCKMon en Índigo, modo oscuro', 'BCKMon in Indigo, dark mode')
+    else:
+        d.note('La paleta por defecto de PVEMon es **Aurora**. BCKMon arranca con **Cobre**.', 'PVEMon\'s default palette is **Aurora**. BCKMon starts with **Copper**.')
+        d.img('pal-lima-dark', 'PVEMon en Lima, modo oscuro', 'PVEMon in Lime, dark mode')
+        d.img('pal-grafito-light', 'PVEMon en Grafito, modo claro', 'PVEMon in Graphite, light mode')
+    d.h2('El logo y los iconos', 'The logo and the icons')
+    if d.bck:
+        d.p('El logo de BCKMon es una **torre de vigilancia dentro de un escudo**: la torre vigila (monitoriza) y el escudo protege tus copias. El nombre se escribe siempre «BCK**Mon**», con «Mon» resaltado.',
+            'BCKMon\'s logo is a **watchtower inside a shield**: the tower watches (monitors) and the shield protects your backups. The name is always written «BCK**Mon**», with «Mon» highlighted.')
+    else:
+        d.p('El logo de PVEMon es una **torre de vigilancia con ondas y un anillo discontinuo**: la torre vigila tus servidores y las ondas son la señal que emite cuando algo pasa. El nombre se escribe siempre «PVE**Mon**», con «Mon» resaltado.',
+            'PVEMon\'s logo is a **watchtower with waves and a dashed ring**: the tower watches your servers and the waves are the signal it sends when something happens. The name is always written «PVE**Mon**», with «Mon» highlighted.')
+    d.p('Cada paleta tiene su propio juego de iconos, y la aplicación usa el de **tu** paleta: el icono de la app instalada y de la pestaña, el icono táctil de iPhone/iPad y la **insignia** de las notificaciones push (una silueta blanca que Android pinta sobre el color de tu tema). En tamaños muy pequeños (pestaña del navegador e insignia) se usa una versión **simplificada** del dibujo, con trazos más gruesos y sin anillo, para que se siga leyendo.',
+        'Each palette has its own set of icons, and the application uses the one of **your** palette: the icon of the installed app and of the tab, the iPhone/iPad touch icon and the **badge** of push notifications (a white silhouette that Android paints over your theme colour). At very small sizes (browser tab and badge) a **simplified** version of the drawing is used, with thicker strokes and no ring, so it stays readable.')
+    d.img('logos', 'Los cinco juegos de iconos: icono de la app, favicon e insignia', 'The five icon sets: app icon, favicon and badge')
+    d.note('Si instalas la app y luego cambias de paleta, **el icono de la app ya instalada no cambia solo**: es una limitación de los sistemas. Para estrenarlo, desinstálala y vuelve a instalarla. Dentro de la aplicación, la pestaña y la cabecera sí se actualizan al momento.',
+           'If you install the app and later change palette, **the icon of the already installed app does not change by itself**: it is a limitation of the systems. To get the new one, uninstall it and install it again. Inside the application, the tab and the header do update at once.')
+
+
+def pve_authfail(d):
+    d.h1('Accesos fallidos a Proxmox', 'Failed logins to Proxmox')
+    d.p('Proxmox anota en su registro cada intento de acceso fallido a su web o a su API (contraseña mala, usuario inexistente…). PVEMon lee ese registro **cada 5 minutos** y te lo enseña de un vistazo, para que notes pronto si alguien está probando contraseñas.',
+        'Proxmox records in its log every failed login attempt to its web interface or API (wrong password, non-existent user…). PVEMon reads that log **every 5 minutes** and shows it at a glance, so you notice early if someone is trying passwords.')
+    d.ul([('**En Inicio**, el bloque de cada nodo incluye un resumen con el candado.', '**On Home**, each node block includes a summary with the padlock.'),
+          ('**En la ficha de cada nodo**, la tarjeta «Accesos fallidos a Proxmox»: fallos de las últimas **24 horas** y de los últimos **15 minutos**, las IP más activas con los usuarios que probaron, y cuándo fue el último.', '**On each node\'s sheet**, the «Failed logins to Proxmox» card: failures in the last **24 hours** and the last **15 minutes**, the most active IPs with the users they tried, and when the last one was.'),
+          ('**Alerta** «Accesos fallidos a Proxmox»: salta con **más de 4 fallos en 15 minutos** y te avisa por tus canales (por ejemplo Telegram), indicando la IP más activa. Umbral, duración y gravedad se cambian en Ajustes › Alertas.', '**Alert** «Failed logins to Proxmox»: it fires with **more than 4 failures in 15 minutes** and warns you through your channels (for example Telegram), naming the most active IP. Threshold, duration and severity are changed in Settings › Alerts.'),
+          ('La **API de solo lectura** (`/api/v1/summary`) incluye un bloque `security` con esos contadores, por si quieres llevarlos a Home Assistant.', 'The **read-only API** (`/api/v1/summary`) includes a `security` block with those counters, in case you want to take them to Home Assistant.')])
+    d.img('auth-ok', 'La tarjeta con accesos fallidos (datos de ejemplo)', 'The card with failed logins (sample data)')
+    d.h2('Darle permiso al token (una vez)', 'Giving the token permission (once)')
+    d.p('Leer el registro del nodo exige el privilegio **Sys.Syslog**, que el token de solo lectura normal no tiene. Hasta que se lo des, la tarjeta lo explica y te ofrece las órdenes ya preparadas, con el usuario y el token de ese servidor, y un botón **Copiar**:',
+        'Reading the node log requires the **Sys.Syslog** privilege, which the usual read-only token does not have. Until you grant it, the card explains this and offers the ready-made commands, with that server\'s user and token, and a **Copy** button:')
+    d.img('auth-err', 'La tarjeta cuando falta el permiso, con las órdenes para copiar', 'The card when the permission is missing, with the commands to copy')
+    d.p('Pégalas **una sola vez como root** en la consola de un nodo (en un clúster basta con uno: los permisos son comunes). Crean un rol que solo permite leer el registro y se lo dan al token de PVEMon:',
+        'Paste them **once as root** in a node\'s console (in a cluster one is enough: permissions are shared). They create a role that only allows reading the log and give it to the PVEMon token:')
+    d.parts.append('<pre style="background:#eef1f7;padding:3mm;border-radius:2mm;font:8.5pt/1.4 \'DejaVu Sans Mono\',monospace">pveum role add MonSyslog -privs "Sys.Syslog"\npveum acl modify /nodes --users \'pvemon@pve\' --roles MonSyslog\npveum acl modify /nodes --tokens \'pvemon@pve!app\' --roles MonSyslog</pre>')
+    d.p('Cambia `pvemon@pve` y `pvemon@pve!app` si tu usuario o token se llaman de otra forma (la tarjeta ya lo hace por ti). Espera unos minutos y la tarjeta dejará de mostrar el error.',
+        'Change `pvemon@pve` and `pvemon@pve!app` if your user or token are named differently (the card already does it for you). Wait a few minutes and the card will stop showing the error.')
+    d.note('El rol **no puede llamarse «PVE…»**: Proxmox reserva esos nombres. Por eso se llama `MonSyslog`.', 'The role **cannot be named «PVE…»**: Proxmox reserves those names. That is why it is called `MonSyslog`.')
+    d.note('Qué cuenta como fallo: los intentos fallidos a la web y a la API de Proxmox (`pvedaemon`). Un aviso de **sesión caducada** de la web de Proxmox también aparece como fallo. Los intentos contra **SSH** no se leen (están en el registro de sshd).', 'What counts as a failure: failed attempts against Proxmox\'s web interface and API (`pvedaemon`). An **expired session** notice from the Proxmox web UI also shows up as a failure. **SSH** attempts are not read (they are in sshd\'s log).')
 
 
 def whats_new(d):
@@ -363,7 +445,8 @@ def whats_new(d):
     d.h1('Novedades recientes', 'Recent changes')
     d.p('El historial completo está en el botón **ChangeLog** del menú.', 'The full history is under the **ChangeLog** button in the menu.')
     d.table([('Versión', 'Version'), ('Novedad', 'Change')],
-            [(('2.3.x', '2.3.x'), ('Tarjetas de Ajustes con banda de título; «Copias por mail» en su propia tarjeta; ficha de copia con carita y contador hacia la alarma; Tema primero en el menú. Cabecera con la navegación centrada; menú reordenado (Salir tras las opciones, Tema al final en una línea, enlace al manual); resumen semanal dentro de Notificaciones («Enviar resumen semanal»); alertas en una sola tarjeta; formatos de correo mejor explicados; copia de la aplicación primera en Backups; guías PDF actualizadas y la primera de BCKMon.', 'Settings cards with a title band; «Backups by mail» in its own card; backup sheet with a face and a counter towards the alarm; Theme first in the menu. Header with centred navigation; reordered menu (Log out after the options, Theme last on one line, manual link); weekly summary inside Notifications («Send weekly summary»); alerts in a single card; better-explained e-mail formats; application backup first in Backups; updated PDF guides and the first one for BCKMon.')),
+            [(('2.4.x', '2.4.x'), ('Nueva imagen «Atalaya» (torre; escudo en BCKMon) con iconos por paleta y versión simplificada para tamaños pequeños; kiosko con «Estado copias» y «Detalle de copias»' + ('' if d.bck else '; **accesos fallidos a Proxmox** con tarjeta, alerta por Telegram y órdenes para dar el permiso') + '; carita del contador más pequeña; código depurado; guía de instalación.', 'New «Atalaya» image (tower; shield in BCKMon) with icons per palette and a simplified version for small sizes; kiosk with «Backup status» and «Backup detail»' + ('' if d.bck else '; **failed logins to Proxmox** with a card, a Telegram alert and commands to grant the permission') + '; smaller counter face; cleaned-up code; installation guide.')),
+             (('2.3.x', '2.3.x'), ('Columna «Estado» con carita y contador (días, horas:minutos, minutos:segundos); tarjetas de Ajustes con banda de título; «Copias por mail» en su propia tarjeta; ficha de copia con carita y contador hacia la alarma; Tema primero en el menú. Cabecera con la navegación centrada; menú reordenado (Salir tras las opciones, Tema al final en una línea, enlace al manual); resumen semanal dentro de Notificaciones («Enviar resumen semanal»); alertas en una sola tarjeta; formatos de correo mejor explicados; copia de la aplicación primera en Backups; guías PDF actualizadas y la primera de BCKMon.', '«Status» column with face and counter (days, hours:minutes, minutes:seconds); settings cards with a title band; «Backups by mail» in its own card; backup sheet with a face and a counter towards the alarm; Theme first in the menu. Header with centred navigation; reordered menu (Log out after the options, Theme last on one line, manual link); weekly summary inside Notifications («Send weekly summary»); alerts in a single card; better-explained e-mail formats; application backup first in Backups; updated PDF guides and the first one for BCKMon.')),
              (('2.2.x', '2.2.x'), ('Copia automática de la aplicación a carpeta, NFS, SMB, SFTP, Dropbox, Google Drive y OneDrive; Ajustes reorganizados con pestañas de segundo nivel; la copia propia aparece en el panel Backups.', 'Automatic application backup to folder, NFS, SMB, SFTP, Dropbox, Google Drive and OneDrive; Settings reorganised with second-level tabs; the own backup shows in the Backups panel.')),
              (('2.0 – 2.1', '2.0 – 2.1'), ('Edición BCKMon (solo copias), cinco paletas de color y nombre propio por edición.', 'BCKMon edition (backups only), five colour palettes and a name per edition.')),
              (('1.5.x', '1.5.x'), ('Castellano e inglés; imagen Docker; guía en PDF.', 'Spanish and English; Docker image; PDF guide.')),
@@ -374,6 +457,7 @@ def build(ed, lang):
     d = Doc(ed, lang)
     common_intro(d)
     header_menu(d)
+    look_feel(d)
     if not d.bck:
         d.h1('El Panel', 'The Dashboard')
         d.p('El **Panel** es la pantalla principal: arriba, los avisos que necesitan atención; debajo, una tarjeta por nodo con anillos de CPU, memoria y disco, el estado, el tiempo encendido y la temperatura; después, las máquinas y contenedores de cada nodo. Pulsa cualquiera para abrir su detalle.',
@@ -381,6 +465,8 @@ def build(ed, lang):
         d.img('001', 'El Panel', 'The Dashboard', old=True)
         d.img('005', 'Detalle de una máquina', 'Machine detail', old=True)
     backups_panel(d)
+    if not d.bck:
+        pve_authfail(d)
     alerts_user(d)
     kiosk_custom(d)
     d.h1('Anexo para administradores', 'Administrators\' appendix')
@@ -388,8 +474,7 @@ def build(ed, lang):
     if not d.bck:
         pve_admin_nodes(d)
     settings_admin(d)
-    if d.bck:
-        install_bck(d)
+    install_pointer(d)
     security(d)
     whats_new(d)
     return d
@@ -405,7 +490,7 @@ def main():
                 name = ('BCKMon' if ed == 'bckmon' else 'PVEMon') + ('-Guia-de-usuario' if lang == 'es' else '-User-Guide') + '.pdf'
                 pg = b.new_page()
                 pg.set_content(d.render(), wait_until='load')
-                foot = f'<div style="font:8pt Inter,sans-serif;color:#667089;width:100%;padding:0 16mm;display:flex;justify-content:space-between"><span>{d.name} · {d.t("Guía de usuario", "User guide")} · v{VER}</span><span>{d.t("Página", "Page")} <span class="pageNumber"></span> {d.t("de", "of")} <span class="totalPages"></span></span></div>'
+                foot = f'<div style="font:8pt Inter,sans-serif;color:#667089;width:100%;padding:0 16mm;display:flex;justify-content:space-between"><span>{d.name} · {d.t(d.title_es, d.title_en)} · v{VER}</span><span>{d.t("Página", "Page")} <span class="pageNumber"></span> {d.t("de", "of")} <span class="totalPages"></span></span></div>'
                 pg.pdf(path=os.path.join(OUT, name), format='A4', display_header_footer=True, header_template='<div></div>', footer_template=foot,
                        margin={'top': '18mm', 'bottom': '20mm', 'left': '16mm', 'right': '16mm'}, print_background=True)
                 pg.close()

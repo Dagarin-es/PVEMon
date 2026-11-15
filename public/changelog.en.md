@@ -1,6 +1,30 @@
 # PVEMon ChangeLog
 History rebuilt from the first numbered version. Most recent first.
 
+## 2.4.1 · 15/11/2026
+Consolidation release: no new features, to leave a clean and stable base.
+- **Renewed manual** (PVEMon and BCKMon, Spanish and English): cover with the new logo, new sections on **colours, theme and icons**, **failed logins to Proxmox** (with the commands to grant the permission) and **kiosk elements**, new screenshots with sample data and up-to-date news.
+- **Installation guide from scratch** (4 PDFs): Docker Compose, Docker Hub (`docker run`) and graphical managers (Arcane, Portainer, Dockge, Synology), first sign-in, HTTPS with Nginx Proxy Manager, maintenance and common problems. New menu link: **Installation · PDF**.
+- **Code clean-up:** removed unused functions and variables on server and client, orphan CSS and a small leftover of test-only code; the compiler now warns about unused code. 0 vulnerabilities in dependencies. Data read from the Proxmox log is length-limited.
+- The console help (`cli.js`) now lists `reset-2fa`.
+- Fixed in the manual: the first administrator is created with `create-admin`, not from the web.
+
+## 2.4.0 · 15/11/2026
+- **Failed Proxmox logins (PVEMon only):** new card on each node (and a summary on Home) showing failed login attempts in the last 24 h and 15 min, the most active IP and the latest events. Read from the `pvedaemon` log every 5 min. The token needs the **Sys.Syslog** privilege on `/nodes`; if missing, the card says so. An expired-session notice from the Proxmox web UI also counts as a failure.
+- **Telegram alert:** new rule "Failed Proxmox logins" (more than 4 failures in 15 min). New metrics `auth.fail` and `auth.fail.recent`. `/api/v1/summary` now includes a `security` block.
+- If the permission is missing, the card shows the exact commands for that node (Sys.Syslog role for the token) with a **Copy** button. Kiosk element titles are larger.
+- **Kiosk:** new **"Backup status"** element (green when all is well, red listing failing backups) and **"Backup detail"**.
+- Smaller uptime-counter smiley.
+- **New "Atalaya" brand:** tower with ring and waves for PVEMon, tower inside a shield for BCKMon, in all five palettes. Simplified version for favicon and notification badge.
+
+## 2.3.4 · 12/11/2026
+- **Backups panel:** the «Alarm in» column is now called **«Status»** and shows only the face and the counter (no text). The column that said «State» (Correct / Error…) is now called **«Result»**.
+- **Counter:** the word «days» no longer follows it. It counts **days** while more than a day is left; then **hours:minutes** (HH:MM) and, in the last hour, **minutes:seconds** (MM:SS), ticking live.
+- Backup sheet: same counter, without «days» after it.
+
+## 2.3.3 · 12/11/2026
+- Backup sheet: the «Stop monitoring / Monitor» button now lines up with the last line of the card and no longer sticks out.
+
 ## 2.3.2 · 12/11/2026
 - **Clearer backup sheet:** the top card («Backup · running» and «Source») is removed, as it repeated what the state already says. The **Stop monitoring / Monitor** button moves to the main card, bottom right.
 

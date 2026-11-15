@@ -32,7 +32,7 @@ g.setAttribute('role','img');g.setAttribute('aria-label',KLAB[key]+' '+Math.roun
 /* Tema propio del panel (auto = el del dispositivo) */
 const kTheme=v=>{if(v==='light'||v==='dark')document.documentElement.setAttribute('data-theme',v);else THEME.apply()};
 const kDesc=n=>(n.children||[]).flatMap(c=>[c,...kDesc(c)]);
-const KSPEC={systems:T('Estado de los sistemas'),backups:T('Estado de los backups'),text:T('Cuadro de texto')};
+const KSPEC={systems:T('Estado de los sistemas'),backups:T('Detalle de copias'),bkstatus:T('Estado copias'),text:T('Cuadro de texto')};
 const kRun=n=>n.status==='running';
 function kNodes(tree){return tree.filter(s=>s.kind==='server'&&s.origin!=='mail').flatMap(sv=>(sv.children||[]).filter(c=>c.kind==='node'&&!c.missing).map(nd=>({nd,off:sv.server?.status==='offline'})))}
 function kBackups(tree){const out=[],seen=new Set();const walk=l=>{for(const n of l){if(!seen.has(n.id)&&n.accessible!==false&&!n.missing&&n.backup&&(n.kind==='backup'||(['vm','lxc','docker'].includes(n.kind)&&n.monitored!==false))){seen.add(n.id);out.push(n)}walk(n.children||[])}};walk(tree);return out}
@@ -45,6 +45,9 @@ if(ty==='systems'){const ns=kNodes(tree),act=ns.filter(x=>kRun(x.nd)&&!x.off).le
 sum=ns.length+(ns.length===1?T(' nodo'):T(' nodos'))+' · '+act+(act===1?T(' activo'):T(' activos'));
 rows=ns.map(({nd,off})=>{const g=kDesc(nd),c=k=>{const a=g.filter(x=>x.kind===k);return[a.filter(kRun).length,a.length]},[v,l,d]=['vm','lxc','docker'].map(c),run=kRun(nd)&&!off;
 return h('div',{class:'ks-r'+(run?'':' dn')},h('span',{class:T('led ')+(run?'on':'off')}),h('span',{class:'ks-n',title:nd.name},nd.name),h('span',{class:'ks-c'},run?T('VM {0}/{1} · LXC {2}/{3} · Docker {4}/{5}', v[0], v[1], l[0], l[1], d[0], d[1]):T('Apagado')))})}
+else if(ty==='bkstatus'){const bs=kBackups(tree),bl=bs.filter(n=>bkBad(n.backup)),bad=bl.length;led=!bs.length?'na':bad?'off':'on';e.classList.add('bks',!bs.length?'none':bad?'bad':'good');
+sum=!bs.length?T('Sin copias'):bad?T('Copias con errores'):T('Copias correctas');
+rows=bl.map(n=>{const b=n.backup;return h('div',{class:'ks-r dn'},h('span',{class:T('led ')+'off'}),h('span',{class:'ks-n',title:n.name},n.name),h('span',{class:'ks-c'},kBkTxt(b)))})}
 else{const bs=kBackups(tree),bad=bs.filter(n=>bkBad(n.backup)).length,ok=bs.filter(n=>n.backup.state==='ok').length;led=!bs.length?'na':bad?'off':'on';
 sum=bs.length+(bs.length===1?T(' backup'):T(' backups'))+' · '+ok+(ok===1?T(' correcto'):T(' correctos'))+(bad?' · '+bad+(bad===1?T(' con problema'):T(' con problemas')):'');
 rows=bs.map(n=>{const b=n.backup,bd=bkBad(b),na=b.state==='none';return h('div',{class:'ks-r'+(bd?' dn':'')},h('span',{class:T('led ')+(na?'na':bd?'off':'on')}),h('span',{class:'ks-n',title:n.name},n.name),h('span',{class:'ks-c'},kBkTxt(b)+(b.lastOkAt&&!bd?' · '+BD(b.lastOkAt):'')))})}
@@ -52,8 +55,8 @@ e.classList.add('spec');if(mini)e.classList.add('mini');
 if(live){e.classList.add('go');e.setAttribute('role','link');e.tabIndex=0;e.setAttribute('aria-label',T('Ir al panel principal'));e.addEventListener('click',()=>location.hash='#/');e.addEventListener('keydown',ev=>{if(ev.key==='Enter')location.hash='#/'})}
 e.append(h('div',{class:'kt-h'},h('span',{class:'kt-n'},KSPEC[ty]),h('span',{class:T('led ')+led,role:'img','aria-label':led==='on'?T('Todo correcto'):T('Hay problemas')})));
 if(mini)return e;
-e.style.setProperty('--r',String(1.55*Math.max(1,rows.length)+1.9));
-e.append(h('div',{class:'kt-b ks-b'},h('div',{class:'ks-s'},sum),...(rows.length?rows:[h('div',{class:'kv-s'},ty==='systems'?T('No hay nodos.'):T('No hay backups.'))])));return e}
+e.style.setProperty('--r',String(1.55*Math.max(1,rows.length)+(ty==='bkstatus'?2.8:1.9)));
+e.append(h('div',{class:'kt-b ks-b'},h('div',{class:'ks-s'},sum),...(rows.length||ty==='bkstatus'?rows:[h('div',{class:'kv-s'},ty==='systems'?T('No hay nodos.'):T('No hay backups.'))])));return e}
 /* Una ficha del lienzo: nombre, LED arriba a la derecha y los indicadores elegidos */
 function kTile(t,n,L,live,TR){const e=h('div',{class:'kt','data-id':t.id,style:`left:${t.x}%;top:${t.y}%;width:${t.w}%;height:${t.h}%`});
 if(t.type)return kSpecial(t,e,TR||[],live,t.mini);
@@ -227,11 +230,11 @@ e.classList.toggle('sel',S.includes(t.id));return e};
 const free=(w,hh)=>{for(let y=2;y<=100-hh;y+=2)for(let x=2;x<=100-w;x+=2)if(!layout.some(t=>x<t.x+t.w&&x+w>t.x&&y<t.y+t.h&&y+hh>t.y))return[x,y];const c=layout.length*3%20;return[Math.min(100-w,2+c),Math.min(100-hh,2+c)]};
 const add=ent=>{const n=ent.n,bk=n.kind==='backup',av=k2=>!bk&&!!kMetric(n,data.L,k2),ng=['cpu','mem','disk'].filter(av).length,w=bk?24:Math.min(48,Math.max(22,ng*16)),hh=bk?20:34,[x,y]=free(w,hh);
 const t={id:'t'+Date.now().toString(36)+Math.floor(Math.random()*1e3),elementId:n.id,x,y,w,h:hh,cpu:av('cpu'),mem:av('mem'),disk:av('disk')};layout.push(t);S=[t.id];redraw();save()};
-const addSpec=ty=>{const w=ty==='text'?30:44,hh=ty==='text'?16:ty==='systems'?36:40,[x,y]=free(w,hh);const t={id:'t'+Date.now().toString(36)+Math.floor(Math.random()*1e3),elementId:'',type:ty,x,y,w,h:hh,cpu:false,mem:false,disk:false,...(ty==='text'?{text:T('Texto'),fs:4,al:'left'}:{})};layout.push(t);S=[t.id];redraw();save();if(ty==='text')setTimeout(()=>{fitText(t);save();const ta=selbar.querySelector('textarea');if(ta){ta.focus();ta.select()}},50)};
+const addSpec=ty=>{const w=ty==='text'?30:44,hh=ty==='text'?16:ty==='systems'?36:ty==='bkstatus'?28:40,[x,y]=free(w,hh);const t={id:'t'+Date.now().toString(36)+Math.floor(Math.random()*1e3),elementId:'',type:ty,x,y,w,h:hh,cpu:false,mem:false,disk:false,...(ty==='text'?{text:T('Texto'),fs:4,al:'left'}:{})};layout.push(t);S=[t.id];redraw();save();if(ty==='text')setTimeout(()=>{fitText(t);save();const ta=selbar.querySelector('textarea');if(ta){ta.focus();ta.select()}},50)};
 const picker=()=>{const bk=h('div',{class:'modalbk',role:'dialog','aria-modal':'true','aria-label':T('Añadir un elemento')}),close=()=>bk.remove(),q=h('input',{'data-nolbl':'',placeholder:T('Buscar…'),'aria-label':T('Buscar'),autocomplete:'off'}),list=h('div',{class:'kpick'});
 const used=new Set(layout.map(t=>t.type||t.elementId));
 const paint=()=>{const f=q.value.trim().toLowerCase(),all=kFlat(data.tree).filter(x=>!f||(x.n.name+' '+x.path).toLowerCase().includes(f));let last=null;const rows=[];
-if(!f||/estado|resumen|sistema|backup|texto|cuadro|otro/.test(f)){rows.push(h('div',{class:'kpg mu'},T('Resúmenes y texto')));for(const ty of['systems','backups','text']){const u=ty!=='text'&&used.has(ty);rows.push(h('button',{class:'kpr',disabled:u?'':null,onclick:()=>{addSpec(ty);close()}},h('span',{class:'grow'},KSPEC[ty]),h('span',{class:'mu'},u?T('ya añadido'):ty==='text'?T('Texto libre'):T('Resumen'))))}}
+if(!f||/estado|resumen|sistema|backup|texto|cuadro|otro/.test(f)){rows.push(h('div',{class:'kpg mu'},T('Resúmenes y texto')));for(const ty of['systems','backups','bkstatus','text']){const u=ty!=='text'&&used.has(ty);rows.push(h('button',{class:'kpr',disabled:u?'':null,onclick:()=>{addSpec(ty);close()}},h('span',{class:'grow'},KSPEC[ty]),h('span',{class:'mu'},u?T('ya añadido'):ty==='text'?T('Texto libre'):T('Resumen'))))}}
 for(const x of all){if(x.path!==last){rows.push(h('div',{class:'kpg mu'},x.path||T('Copias por correo y archivos')));last=x.path}
 const u=used.has(x.n.id);rows.push(h('button',{class:'kpr',disabled:u?'':null,onclick:()=>{add(x);close()}},x.n.kind==='backup'?KI(x.n.info&&x.n.info.fileCheck?'filebk':'mailbk'):KI(x.n.kind),h('span',{class:'grow'},x.n.name),h('span',{class:'mu'},u?T('ya añadido'):KIND[x.n.kind]||'')))}
 list.replaceChildren(...(rows.length?rows:[h('div',{class:'mu'},T('No hay elementos que coincidan.'))]))};q.addEventListener('input',paint);paint();

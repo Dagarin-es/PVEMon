@@ -22,6 +22,7 @@ import { mailRoutes } from './routes/mail.js';
 import { overviewRoutes } from './routes/overview.js';
 import { kioskRoutes } from './routes/kiosks.js';
 import { diskRoutes } from './routes/disks.js';
+import { authLogRoutes } from './routes/authlog.js';
 import { apiV1Routes } from './routes/apiv1.js';
 import { startUpdateWatcher } from './update/service.js';
 import { startLanScan } from './discovery/lan.js';
@@ -142,6 +143,7 @@ await app.register(filecheckRoutes, { prefix: '/api' });
 await app.register(overviewRoutes, { prefix: '/api' });
 await app.register(kioskRoutes, { prefix: '/api' });
 if (EDITION === 'pvemon') await app.register(diskRoutes, { prefix: '/api' });
+if (EDITION === 'pvemon') await app.register(authLogRoutes, { prefix: '/api' });
 await app.register(apiV1Routes, { prefix: '/api' });
 // Marca de la edición: script, manifiesto e iconos propios (PVEMon por defecto; BCKMon con EDITION=bckmon)
 app.get('/brand.js', async (_req, reply) => reply.header('Cache-Control', 'no-cache').type('application/javascript; charset=utf-8').send(brandScript()));

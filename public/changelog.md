@@ -1,6 +1,30 @@
 # ChangeLog de PVEMon
 Historial reconstruido desde la primera versión numerada. Lo más reciente, primero.
 
+## 2.4.1 · 15/11/2026
+Versión de consolidación: sin funciones nuevas, para dejar una base limpia y estable.
+- **Manual renovado** (PVEMon y BCKMon, castellano e inglés): portada con el nuevo logo, secciones nuevas de **colores, tema e iconos**, **accesos fallidos a Proxmox** (con las órdenes para dar el permiso) y **elementos del kiosko**, capturas nuevas con los datos de ejemplo y novedades al día.
+- **Guía de instalación desde cero** (4 PDF): Docker Compose, Docker Hub (`docker run`) y gestores gráficos (Arcane, Portainer, Dockge, Synology), primer acceso, HTTPS con Nginx Proxy Manager, mantenimiento y problemas frecuentes. Enlace nuevo en el menú: **Instalación · PDF**.
+- **Depuración del código:** eliminadas funciones y variables sin uso en servidor y cliente, CSS huérfano y un pequeño resto de código de pruebas; el compilador avisa ahora de código sin uso. 0 vulnerabilidades en dependencias. Los datos que se leen del registro de Proxmox se acotan en longitud.
+- El texto de ayuda de la consola (`cli.js`) incluye `reset-2fa`.
+- Corregido en el manual: el primer administrador se crea con `create-admin`, no desde la web.
+
+## 2.4.0 · 15/11/2026
+- **Accesos fallidos a Proxmox (solo PVEMon):** nueva tarjeta en cada nodo (y un resumen en Inicio) con los intentos de acceso fallidos de las últimas 24 h, los de los últimos 15 min, la IP más activa y los últimos eventos. Se leen del registro de `pvedaemon` cada 5 min. Necesita que el token tenga el privilegio **Sys.Syslog** en `/nodes`; si falta, la tarjeta lo explica. Un aviso de sesión caducada de la web de Proxmox también cuenta como fallo.
+- **Alerta por Telegram:** nueva regla «Accesos fallidos a Proxmox» (más de 4 fallos en 15 min). Nuevas métricas `auth.fail` y `auth.fail.recent`. La API `/api/v1/summary` incluye el bloque `security`.
+- Si falta el permiso, la tarjeta muestra las órdenes exactas del nodo (rol Sys.Syslog para el token) con botón **Copiar**. Los títulos de los elementos del kiosko son más grandes.
+- **Kiosco:** nuevos elementos **«Estado copias»** (verde si todo va bien, rojo con las copias que fallan) y **«Detalle de copias»**.
+- **Carita del contador** más pequeña.
+- **Nueva identidad gráfica «Atalaya»:** torre con anillo y ondas para PVEMon y torre dentro de un escudo para BCKMon, en las cinco paletas. Versión simplificada para favicon e insignia de notificaciones.
+
+## 2.3.4 · 12/11/2026
+- **Panel Backups:** la columna «Alarma en» pasa a llamarse **«Estado»** y muestra solo la carita y el contador (sin texto). La columna que decía «Estado» (Correcta / Con error…) pasa a llamarse **«Resultado»**.
+- **Contador:** ya no lleva la palabra «días» detrás. Cuenta **días** mientras falte más de un día; después **horas:minutos** (HH:MM) y, en la última hora, **minutos:segundos** (MM:SS), avanzando en directo.
+- Ficha de la copia: mismo contador, sin «días» detrás.
+
+## 2.3.3 · 12/11/2026
+- Ficha de una copia: el botón «Dejar de monitorizar / Monitorizar» queda alineado con la última línea del cuadro y ya no sobresale.
+
 ## 2.3.2 · 12/11/2026
 - **Ficha de una copia más clara:** se quita el cuadro de arriba («Copia · en marcha» y «Origen»), que repetía lo que ya dice el estado. El botón **Dejar de monitorizar / Monitorizar** pasa al cuadro principal, abajo a la derecha.
 

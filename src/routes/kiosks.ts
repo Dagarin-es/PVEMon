@@ -11,7 +11,7 @@ const pct = z.number().min(0).max(100);
 const tile = z.object({
   id: z.string().min(1).max(40),
   elementId: z.string().max(80),
-  type: z.enum(['systems', 'backups', 'text']).optional(),
+  type: z.enum(['systems', 'backups', 'bkstatus', 'text']).optional(),
   text: z.string().max(600).optional(), fs: z.number().min(1).max(6).optional(),
   al: z.enum(['left', 'center', 'right']).optional(), nb: z.boolean().optional(), bg: z.boolean().optional(),
   x: pct, y: pct, w: z.number().min(4).max(100), h: z.number().min(4).max(100),

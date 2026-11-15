@@ -108,7 +108,7 @@ export const deliveryRoutes: FastifyPluginAsync = async (app) => {
     return c?.tokenEnc ? decrypt(c.tokenEnc) : null;
   };
 
-  app.post('/settings/telegram/test', { preHandler: requireAdmin, ...testLimit }, async (req, reply) => {
+  app.post('/settings/telegram/test', { preHandler: requireAdmin, ...testLimit }, async (_req, reply) => {
     const c = getTelegram();
     const token = tgToken();
     if (!token || !c?.chatId) return reply.code(400).send({ error: 'Guarda primero el token y el Chat ID' });
@@ -148,7 +148,7 @@ export const deliveryRoutes: FastifyPluginAsync = async (app) => {
       audit(req.user!.id, `settings.${kind}`, b.data.enabled ? 'activado' : 'desactivado');
       return { ok: true };
     });
-    app.post(`/settings/${kind}/test`, { preHandler: requireAdmin, ...testLimit }, async (req, reply) => {
+    app.post(`/settings/${kind}/test`, { preHandler: requireAdmin, ...testLimit }, async (_req, reply) => {
       const c = getHook(kind);
       if (!c?.urlEnc) return reply.code(400).send({ error: 'Guarda primero la dirección' });
       try {

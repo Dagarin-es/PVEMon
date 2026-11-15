@@ -229,8 +229,8 @@ details.det{margin:8px 0}details.det>summary{cursor:pointer;color:var(--ac);font
 pre.code{overflow:auto;font-size:12px;background:var(--bd);padding:10px;border-radius:8px;border:1px solid var(--bd2);white-space:pre-wrap;word-break:break-all;margin:8px 0}
 pre.code.log{max-height:220px;white-space:pre-wrap}
 .pk{max-height:200px;overflow:auto;font:12px ui-monospace,monospace;color:var(--mu);display:flex;flex-direction:column;gap:2px;margin-top:6px}
-.upj{border:1px solid var(--ac);border-radius:8px;padding:12px;background:color-mix(in srgb,var(--ac) 7%,transparent);box-shadow:0 0 22px -10px var(--ac)}
-.upj.done{border-color:var(--ok)}.upj.error{border-color:var(--cr)}
+
+
 button.danger{color:var(--cr);border-color:color-mix(in srgb,var(--cr) 50%,var(--bd2))}
 button.danger:hover{background:color-mix(in srgb,var(--cr) 14%,transparent);border-color:var(--cr);box-shadow:0 0 14px -4px var(--cr)}
 button:disabled{opacity:.6;cursor:default;box-shadow:none}
@@ -263,10 +263,10 @@ details.grp[open]>details.det>summary,details.sec>summary{list-style:none}detail
 .sp{height:14px}
 
 /* Progreso de actualización */
-.pbar{height:12px;border-radius:999px;background:var(--bd);overflow:hidden;margin:10px 0 6px;border:1px solid var(--bd2)}
-.pbar i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--ac),#8b5cf6);transition:width .6s ease;box-shadow:0 0 12px var(--ac)}
-.pbar.ind i{animation:pbi 1.4s ease-in-out infinite}@keyframes pbi{0%,100%{opacity:.4}50%{opacity:1}}
-.pst{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:13px;margin-bottom:6px}
+
+
+
+
 pre.code.log.big{font-weight:400;max-height:360px;min-height:160px;font-size:11.5px;white-space:pre-wrap;word-break:break-word}
 
 /* Ayuda emergente */
@@ -415,7 +415,7 @@ label.f.ck{flex-direction:row;align-items:center;gap:10px}label.f.ck input{width
 .kt.mini .led{width:.55em;height:.55em}.kt.mini .kt-h .ki{width:1em;height:1em}
 .kt.spec .kt-h{padding-bottom:1cqmin}
 .ks-b{flex-direction:column;justify-content:flex-start;gap:0;overflow:hidden;font-size:clamp(8px,min(3.6cqw,calc(80cqh / var(--r,4))),26px);line-height:1.15}
-.kt.spec .kt-h{font-size:clamp(11px,min(4cqw,8cqh),22px)}
+.kt.spec .kt-h{font-size:clamp(14px,min(6.2cqw,11cqh),34px);font-weight:800}
 .ks-s{flex:none;color:var(--mu);font-weight:700;padding:0 1cqmin .35em}
 .ks-r{flex:none;display:flex;align-items:center;gap:.5em;padding:.18em 1cqmin;border-top:1px solid var(--bd);min-height:0}
 .ks-r .led{width:.7em;height:.7em}.ks-n{font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -430,7 +430,7 @@ label.f.ck{flex-direction:row;align-items:center;gap:10px}label.f.ck input{width
 .kcanvas.edit{touch-action:none}.ksel textarea{min-width:160px;flex:1;max-width:340px;font:inherit;padding:6px 8px;border-radius:8px;border:1px solid var(--bd2);background:var(--well);color:var(--tx);resize:vertical}
 .ksel .kn2{width:4.6em}.kcust{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0}.kcust input{width:7em}
 .ke{user-select:none;-webkit-user-select:none}.ke input,.ke textarea,.ke select{user-select:text;-webkit-user-select:text}
-.kfx{position:fixed;inset:0;width:100vw;height:100vh;z-index:40;pointer-events:none}
+
 .kt.mini .kt-h{padding:0 max(16px,30cqh) 0 max(10px,14cqh)}
 
 .fact .k.tk{display:flex;align-items:center;gap:8px;color:var(--tx);font:600 16px/1.2 var(--disp);letter-spacing:0;margin-bottom:6px}
@@ -647,7 +647,7 @@ select:not(.langpick):focus-visible{outline:2px solid var(--ac);outline-offset:1
 
 /* copia de seguridad a destinos */
 .fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin:8px 0}
-.row2{display:flex;gap:8px;align-items:center;margin:8px 0}.row2>input{flex:1;min-width:0}
+
 .chkl{display:flex;gap:8px;align-items:center;margin:8px 0;cursor:pointer}
 .fbr{border:1px solid var(--bd,rgba(128,128,128,.3));border-radius:10px;padding:10px;margin:8px 0;max-height:420px;overflow:auto}
 .fbr .crumbs{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin-bottom:8px}
@@ -679,3 +679,11 @@ header>.topnav{justify-self:center}
 .tl .ki{align-self:center}
 .card>.mh{align-items:flex-start}.card>.mh>.chips{margin:0}
 .card .mh .upm{flex:none}
+.bkb{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}.bkb .bkl{flex:1 1 260px;min-width:0}.bkb .bkmon{flex:none;margin:0}
+.ud.sep{background:none;border:0;box-shadow:none;text-shadow:none;padding:5px 0 4px;color:var(--mu)}
+.bkr .bkm .upm{justify-content:center;gap:2px}.bkr .bkm .upi{width:22px;height:22px}.bkr .bkm .ud{font-size:14px;padding:3px 3px 2px}.bkr .bkm .ud.sep{padding:3px 0 2px}
+
+/* 2.4.0 · «Estado copias» del kiosko: indicador grande verde/rojo y solo las copias con error */
+.kt.spec.bks .ks-s{font-size:1.5em;line-height:1.15;padding-bottom:.45em}
+.kt.spec.bks.good .ks-s{color:var(--ok)}.kt.spec.bks.bad .ks-s{color:var(--cr)}
+.kt.spec.bks.good{box-shadow:inset 0 0 0 2px var(--ok)}.kt.spec.bks.bad{box-shadow:inset 0 0 0 2px var(--cr)}

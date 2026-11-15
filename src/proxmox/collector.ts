@@ -16,6 +16,7 @@ import { observe, serverPoint } from '../alerts/engine.js';
 import { cpuTemp } from '../update/service.js';
 import { connFor, toStatus } from './discovery.js';
 import { maybeRefreshDisks } from './disks.js';
+import { maybeRefreshAuth } from './authlog.js';
 
 const { servers, elements } = schema;
 
@@ -158,6 +159,7 @@ export async function collectServer(server: typeof servers.$inferSelect, store: 
     for (const el of els) {
       if (el.kind !== 'node' || !el.monitored || el.status === 'stopped') continue;
       maybeRefreshDisks(server, el, store, now); // discos: SMART, desgaste y ZFS (cada 30 min, en segundo plano)
+      maybeRefreshAuth(server, el, store, now); // accesos fallidos a Proxmox (cada 5 min, en segundo plano)
       try {
         const st = await client.get<{ loadavg?: string[] }>(`/nodes/${el.externalId}/status`);
         const load = Number(st.loadavg?.[0]);

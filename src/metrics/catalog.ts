@@ -45,6 +45,8 @@ export const METRICS: MetricDef[] = [
   { key: 'disks.bad',    label: 'Discos con problemas', unit: '',   appliesTo: ['node'],         source: 'pve',    widget: 'number', defaultOn: false },
   { key: 'disks.wear',   label: 'Desgaste de SSD',   unit: '%',   appliesTo: ['node'],         source: 'pve',    widget: 'gauge',  thresholds: { warn: 80, crit: 90 }, defaultOn: false },
   { key: 'disks.temp',   label: 'Temperatura de discos', unit: '°C', appliesTo: ['node'],      source: 'pve',    widget: 'gauge',  thresholds: { warn: 55, crit: 65 }, defaultOn: false },
+  { key: 'auth.fail',    label: 'Accesos fallidos (24 h)', unit: '', appliesTo: ['node'], source: 'pve', widget: 'number', defaultOn: false },
+  { key: 'auth.fail.recent', label: 'Accesos fallidos (15 min)', unit: '', appliesTo: ['node'], source: 'pve', widget: 'number', defaultOn: false },
   { key: 'temp.cpu',     label: 'Temperatura CPU',   unit: '°C',  appliesTo: ['node'],         source: 'pve',    widget: 'gauge',  thresholds: { warn: 80, crit: 90 }, defaultOn: false },
 ];
 

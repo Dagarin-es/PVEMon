@@ -16,6 +16,8 @@ import { metricByKey } from '../metrics/catalog.js';
 import type { Point } from '../metrics/store.js';
 import { fullestByNode } from '../backups/collector.js';
 import { describeDisks } from '../proxmox/disk-data.js';
+import { EDITION } from '../edition.js';
+import { describeAuth } from '../proxmox/authlog.js';
 import { activeMaintenance, inMaintenance } from './maintenance.js';
 import { dispatch, type AlertNote } from './notify.js';
 
@@ -63,6 +65,7 @@ export function describeValue(rule: { metricKey: string }, v: number, elementId?
     return s ? `El almacén de copias «${s.storage}» está al ${v.toLocaleString('es-ES', { maximumFractionDigits: 1 })} % (quedan ${gb(free)} GB de ${gb(s.total)} GB)` : `Almacén de copias al ${v} %`;
   }
   if (rule.metricKey.startsWith('disks.')) return describeDisks(rule.metricKey, v, elementId);
+  if (rule.metricKey === 'auth.fail.recent') return describeAuth(v, elementId);
   if (rule.metricKey === 'health') return 'El contenedor está en mal estado (healthcheck)';
   const def = metricByKey(rule.metricKey);
   const n = v.toLocaleString('es-ES', { maximumFractionDigits: 1 });
@@ -91,6 +94,7 @@ export function seedDefaultRules(): void {
       { name: 'Disco con fallo (SMART o ZFS)', metricKey: 'disks.bad', operator: '>' as const, threshold: 0, forSeconds: 60, severity: 'critical' as const },
       { name: 'Desgaste alto del SSD', metricKey: 'disks.wear', operator: '>' as const, threshold: 90, forSeconds: 60, severity: 'warning' as const },
       { name: 'Disco muy caliente', metricKey: 'disks.temp', operator: '>' as const, threshold: 65, forSeconds: 600, severity: 'warning' as const },
+      ...(EDITION === 'pvemon' ? [{ name: 'Accesos fallidos a Proxmox', metricKey: 'auth.fail.recent', operator: '>' as const, threshold: 4, forSeconds: 0, severity: 'warning' as const }] : []),
     ];
     for (const r of extra) if (!db.select({ id: alertRules.id }).from(alertRules).where(eq(alertRules.metricKey, r.metricKey)).get()) db.insert(alertRules).values(r).run();
   }
@@ -112,6 +116,7 @@ export function seedDefaultRules(): void {
     { name: 'Disco con fallo (SMART o ZFS)', metricKey: 'disks.bad', operator: '>', threshold: 0, forSeconds: 60, severity: 'critical' },
     { name: 'Desgaste alto del SSD', metricKey: 'disks.wear', operator: '>', threshold: 90, forSeconds: 60, severity: 'warning' },
     { name: 'Disco muy caliente', metricKey: 'disks.temp', operator: '>', threshold: 65, forSeconds: 600, severity: 'warning' },
+    ...(EDITION === 'pvemon' ? [{ name: 'Accesos fallidos a Proxmox', metricKey: 'auth.fail.recent', operator: '>' as const, threshold: 4, forSeconds: 0, severity: 'warning' as const }] : []),
   ]).run();
 }
 

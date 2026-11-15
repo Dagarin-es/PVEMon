@@ -121,7 +121,4 @@ export const imapFetcher: Fetcher = {
   },
 };
 
-let current: Fetcher = imapFetcher;
-export const getFetcher = (): Fetcher => current;
-/** Para pruebas */
-export const setFetcher = (f: Fetcher): void => { current = f; };
+export const getFetcher = (): Fetcher => imapFetcher;
