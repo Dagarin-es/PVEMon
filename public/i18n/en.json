@@ -1184,5 +1184,8 @@
   "Accesos fallidos a Proxmox": "Failed logins to Proxmox",
   "Un aviso de sesión caducada de la web de Proxmox también cuenta como fallo.": "An expired-session notice from the Proxmox web interface also counts as a failure.",
   "Pega esto una vez en la consola de este nodo (como root). Crea un rol que solo permite leer el registro y se lo da al token de PVEMon. Después espera 5 minutos.": "Paste this once in this node's console (as root). It creates a role that only allows reading the log and gives it to the PVEMon token. Then wait 5 minutes.",
-  "Instalación": "Installation"
+  "Instalación": "Installation",
+  "💾 Sin copias": "💾 No backups",
+  " sin copia": " without backup",
+  "● SIN COPIAS": "● NO BACKUPS"
 }

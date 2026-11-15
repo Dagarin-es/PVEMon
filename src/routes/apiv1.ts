@@ -168,7 +168,7 @@ export const apiV1Routes: FastifyPluginAsync = async (app) => {
       const upd = s.nodes.map((n) => n.updates?.pending ?? 0);
       const out: Record<string, unknown> = {
         at: new Date().toISOString(), version: VERSION,
-        ok: !s.alerts.length && !s.nodes.some((n) => !n.online) && !bks.some((b) => b.problem),
+        ok: !s.alerts.length && !s.nodes.some((n) => !n.online) && !bks.some((b) => b.problem || b.state === 'none'),
         nodes: { total: s.nodes.length, online: s.nodes.filter((n) => n.online).length, offline: s.nodes.filter((n) => !n.online).length, offlineNames: names(s.nodes.filter((n) => !n.online)) },
         guests: { total: s.guests.length, running: s.guests.filter((g) => g.running).length, stopped: s.guests.filter((g) => !g.running).length, stoppedNames: names(s.guests.filter((g) => !g.running)) },
         backups: {

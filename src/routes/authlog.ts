@@ -10,8 +10,8 @@ function permScript(tokenId: string): string {
   const user = tokenId.split('!')[0];
   return [
     'pveum role add MonSyslog -privs "Sys.Syslog" || pveum role modify MonSyslog -privs "Sys.Syslog"',
-    `pveum acl modify /nodes --users '${user}' --roles MonSyslog`,
-    `pveum acl modify /nodes --tokens '${tokenId}' --roles MonSyslog`,
+    `pveum acl modify /nodes --users '${user}' --roles PVEAuditor,MonSyslog`,
+    `pveum acl modify /nodes --tokens '${tokenId}' --roles PVEAuditor,MonSyslog`,
   ].join('\n');
 }
 

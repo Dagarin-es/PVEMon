@@ -97,6 +97,7 @@ export async function checkServerBackups(serverId: string, store: MetricsStore):
     // 1) Copia más reciente por VMID, en cada almacenamiento de copias
     const last = new Map<string, { at: number; size: number; storage: string }>();
     const done = new Set<string>();
+    const readErr = new Map<string, string>(); // almacén → motivo del fallo al leer su contenido
     for (const r of res) {
       if (r.type !== 'storage' || !r.storage || !r.node) continue;
       if (!r.content?.split(',').includes('backup') || r.status === 'unknown') continue;
@@ -109,7 +110,7 @@ export async function checkServerBackups(serverId: string, store: MetricsStore):
           const id = String(v.vmid), cur = last.get(id);
           if (!cur || v.ctime > cur.at) last.set(id, { at: v.ctime, size: v.size ?? 0, storage: r.storage });
         }
-      } catch { /* un almacenamiento apagado no debe tirar la comprobación */ }
+      } catch (e) { readErr.set(r.storage, ((e as Error).message || 'error').slice(0, 120)); /* un almacenamiento apagado no debe tirar la comprobación */ }
     }
 
     // 1b) Espacio de los almacenes de copias
@@ -162,7 +163,13 @@ export async function checkServerBackups(serverId: string, store: MetricsStore):
         const a = att.get(g.externalId) ?? null;
         // Si la copia no aparece en el almacenamiento pero el último intento fue bien, se usa su hora
         const lastOkAt = Math.max(l?.at ?? 0, a?.ok ? a.at : 0) || null;
-        const { state, message } = decide({ lastOkAt, lastAttempt: a, excluded: excluded.has(g.externalId), maxHours: server.backupMaxHours, now });
+        let { state, message } = decide({ lastOkAt, lastAttempt: a, excluded: excluded.has(g.externalId), maxHours: server.backupMaxHours, now });
+        // Si no se pudo leer algún almacén y no hay otra pista, se avisa en vez de decir en silencio que no hay copias
+        if (state === 'none' && readErr.size && !l && !a) {
+          const [st, why] = [...readErr][0]!;
+          state = 'error';
+          message = `No se pudo leer el contenido del almacén «${st}»: ${why}`;
+        }
         const row = {
           elementId: g.id, serverId, state, lastOkAt, lastOkSize: l?.size || osz.get(g.externalId)?.size || null, lastOkStorage: l?.storage ?? null,
           lastAttemptAt: a?.at ?? null, lastAttemptOk: a?.ok ?? null, message, checkedAt: now,

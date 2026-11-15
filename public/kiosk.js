@@ -45,8 +45,8 @@ if(ty==='systems'){const ns=kNodes(tree),act=ns.filter(x=>kRun(x.nd)&&!x.off).le
 sum=ns.length+(ns.length===1?T(' nodo'):T(' nodos'))+' · '+act+(act===1?T(' activo'):T(' activos'));
 rows=ns.map(({nd,off})=>{const g=kDesc(nd),c=k=>{const a=g.filter(x=>x.kind===k);return[a.filter(kRun).length,a.length]},[v,l,d]=['vm','lxc','docker'].map(c),run=kRun(nd)&&!off;
 return h('div',{class:'ks-r'+(run?'':' dn')},h('span',{class:T('led ')+(run?'on':'off')}),h('span',{class:'ks-n',title:nd.name},nd.name),h('span',{class:'ks-c'},run?T('VM {0}/{1} · LXC {2}/{3} · Docker {4}/{5}', v[0], v[1], l[0], l[1], d[0], d[1]):T('Apagado')))})}
-else if(ty==='bkstatus'){const bs=kBackups(tree),bl=bs.filter(n=>bkBad(n.backup)),bad=bl.length;led=!bs.length?'na':bad?'off':'on';e.classList.add('bks',!bs.length?'none':bad?'bad':'good');
-sum=!bs.length?T('Sin copias'):bad?T('Copias con errores'):T('Copias correctas');
+else if(ty==='bkstatus'){const bs=kBackups(tree),bl=bs.filter(n=>bkBad(n.backup)),bad=bl.length;const nok=bs.filter(n=>n.backup.state==='ok').length;led=!nok&&!bad?'na':bad?'off':'on';e.classList.add('bks',!nok&&!bad?'none':bad?'bad':'good');
+sum=!nok&&!bad?T('Sin copias'):bad?T('Copias con errores'):T('Copias correctas');
 rows=bl.map(n=>{const b=n.backup;return h('div',{class:'ks-r dn'},h('span',{class:T('led ')+'off'}),h('span',{class:'ks-n',title:n.name},n.name),h('span',{class:'ks-c'},kBkTxt(b)))})}
 else{const bs=kBackups(tree),bad=bs.filter(n=>bkBad(n.backup)).length,ok=bs.filter(n=>n.backup.state==='ok').length;led=!bs.length?'na':bad?'off':'on';
 sum=bs.length+(bs.length===1?T(' backup'):T(' backups'))+' · '+ok+(ok===1?T(' correcto'):T(' correctos'))+(bad?' · '+bad+(bad===1?T(' con problema'):T(' con problemas')):'');

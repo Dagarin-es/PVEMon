@@ -10,7 +10,7 @@ from playwright.sync_api import sync_playwright
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, '..', '..', 'public', 'manuals')
-VER = '2.4.1'
+VER = '2.4.3'
 DATE = {'es': '15 de noviembre de 2026', 'en': '15 November 2026'}
 
 
@@ -431,9 +431,9 @@ def pve_authfail(d):
     d.p('Leer el registro del nodo exige el privilegio **Sys.Syslog**, que el token de solo lectura normal no tiene. Hasta que se lo des, la tarjeta lo explica y te ofrece las órdenes ya preparadas, con el usuario y el token de ese servidor, y un botón **Copiar**:',
         'Reading the node log requires the **Sys.Syslog** privilege, which the usual read-only token does not have. Until you grant it, the card explains this and offers the ready-made commands, with that server\'s user and token, and a **Copy** button:')
     d.img('auth-err', 'La tarjeta cuando falta el permiso, con las órdenes para copiar', 'The card when the permission is missing, with the commands to copy')
-    d.p('Pégalas **una sola vez como root** en la consola de un nodo (en un clúster basta con uno: los permisos son comunes). Crean un rol que solo permite leer el registro y se lo dan al token de PVEMon:',
+    d.p('Pégalas **una sola vez como root** en la consola de un nodo (en un clúster basta con uno: los permisos son comunes). Crean un rol que permite leer el registro y se lo dan al token de PVEMon **junto con PVEAuditor** (en Proxmox, un permiso en una ruta más concreta como `/nodes` sustituye al heredado de `/`, así que hay que repetir PVEAuditor para no perder la lectura):',
         'Paste them **once as root** in a node\'s console (in a cluster one is enough: permissions are shared). They create a role that only allows reading the log and give it to the PVEMon token:')
-    d.parts.append('<pre style="background:#eef1f7;padding:3mm;border-radius:2mm;font:8.5pt/1.4 \'DejaVu Sans Mono\',monospace">pveum role add MonSyslog -privs "Sys.Syslog"\npveum acl modify /nodes --users \'pvemon@pve\' --roles MonSyslog\npveum acl modify /nodes --tokens \'pvemon@pve!app\' --roles MonSyslog</pre>')
+    d.parts.append('<pre style="background:#eef1f7;padding:3mm;border-radius:2mm;font:8.5pt/1.4 \'DejaVu Sans Mono\',monospace">pveum role add MonSyslog -privs "Sys.Syslog"\npveum acl modify /nodes --users \'pvemon@pve\' --roles PVEAuditor,MonSyslog\npveum acl modify /nodes --tokens \'pvemon@pve!app\' --roles PVEAuditor,MonSyslog</pre>')
     d.p('Cambia `pvemon@pve` y `pvemon@pve!app` si tu usuario o token se llaman de otra forma (la tarjeta ya lo hace por ti). Espera unos minutos y la tarjeta dejará de mostrar el error.',
         'Change `pvemon@pve` and `pvemon@pve!app` if your user or token are named differently (the card already does it for you). Wait a few minutes and the card will stop showing the error.')
     d.note('El rol **no puede llamarse «PVE…»**: Proxmox reserva esos nombres. Por eso se llama `MonSyslog`.', 'The role **cannot be named «PVE…»**: Proxmox reserves those names. That is why it is called `MonSyslog`.')

@@ -1,6 +1,13 @@
 # ChangeLog de PVEMon
 Historial reconstruido desde la primera versión numerada. Lo más reciente, primero.
 
+## 2.4.3 · 15/11/2026
+- **Corregido:** el Panel (resumen del servidor), el panel de copias por correo, el elemento «Estado copias» del kiosko y el resumen `/api/v1/summary` daban las copias por buenas cuando **no había ninguna copia correcta** (por ejemplo «Copias: 0 correctas» en verde). Ahora, sin ninguna copia correcta se muestra «Sin copias» en aviso, las máquinas sin copia se cuentan aparte y el resumen de la API deja de decir `ok`.
+
+## 2.4.2 · 15/11/2026
+- **Corregido:** si Proxmox no deja leer el contenido de un almacén de copias (permiso o conexión), las copias de las VM/LXC aparecían como «sin copias» **sin ningún aviso**. Ahora se muestra el error con el motivo.
+- Las órdenes para dar el permiso Sys.Syslog dan al token **PVEAuditor + MonSyslog** en `/nodes`: en Proxmox, un permiso en una ruta más concreta sustituye al heredado de `/`, y con solo `MonSyslog` el token perdía la lectura (Sys.Audit) en los nodos. Manuales y guías actualizados.
+
 ## 2.4.1 · 15/11/2026
 Versión de consolidación: sin funciones nuevas, para dejar una base limpia y estable.
 - **Manual renovado** (PVEMon y BCKMon, castellano e inglés): portada con el nuevo logo, secciones nuevas de **colores, tema e iconos**, **accesos fallidos a Proxmox** (con las órdenes para dar el permiso) y **elementos del kiosko**, capturas nuevas con los datos de ejemplo y novedades al día.

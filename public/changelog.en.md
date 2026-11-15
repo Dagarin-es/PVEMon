@@ -1,6 +1,13 @@
 # PVEMon ChangeLog
 History rebuilt from the first numbered version. Most recent first.
 
+## 2.4.3 · 15/11/2026
+- **Fixed:** the Panel (server summary), the e-mail backups panel, the kiosk «Backup status» element and `/api/v1/summary` reported backups as fine when there was **no successful backup at all** (for example a green «Backups: 0 OK»). Now, with no successful backup, «No backups» is shown as a warning, machines without a backup are counted separately and the API summary no longer says `ok`.
+
+## 2.4.2 · 15/11/2026
+- **Fixed:** if Proxmox does not allow reading the contents of a backup storage (permission or connection), the VM/LXC backups showed as "no backups" **with no warning at all**. The error is now shown with its reason.
+- The commands that grant the Sys.Syslog permission now give the token **PVEAuditor + MonSyslog** on `/nodes`: in Proxmox a permission on a more specific path replaces the one inherited from `/`, and with only `MonSyslog` the token lost read access (Sys.Audit) on the nodes. Manuals and guides updated.
+
 ## 2.4.1 · 15/11/2026
 Consolidation release: no new features, to leave a clean and stable base.
 - **Renewed manual** (PVEMon and BCKMon, Spanish and English): cover with the new logo, new sections on **colours, theme and icons**, **failed logins to Proxmox** (with the commands to grant the permission) and **kiosk elements**, new screenshots with sample data and up-to-date news.
