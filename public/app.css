@@ -687,3 +687,6 @@ header>.topnav{justify-self:center}
 .kt.spec.bks .ks-s{font-size:1.5em;line-height:1.15;padding-bottom:.45em}
 .kt.spec.bks.good .ks-s{color:var(--ok)}.kt.spec.bks.bad .ks-s{color:var(--cr)}
 .kt.spec.bks.good{box-shadow:inset 0 0 0 2px var(--ok)}.kt.spec.bks.bad{box-shadow:inset 0 0 0 2px var(--cr)}
+/* móvil: los botones de navegación van a la derecha, junto al avatar, y no se pisan con el título; el aviso de alertas baja a una segunda línea */
+@media(max-width:600px){header{grid-template-columns:auto minmax(0,1fr) auto;row-gap:6px}header .hl{min-width:max-content}header>.topnav{justify-self:end;gap:6px}header .navb{padding:8px 10px}header .hrr{display:contents}header .hrr .pill{order:10;grid-column:1/-1;justify-content:center;text-align:center}}
+@media(max-width:430px){header .navb{padding:7px 8px}header>.topnav{gap:5px}}

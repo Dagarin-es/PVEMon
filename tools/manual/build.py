@@ -10,7 +10,7 @@ from playwright.sync_api import sync_playwright
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, '..', '..', 'public', 'manuals')
-VER = '2.4.3'
+VER = '2.4.4'
 DATE = {'es': '15 de noviembre de 2026', 'en': '15 November 2026'}
 
 

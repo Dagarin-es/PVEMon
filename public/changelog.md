@@ -1,6 +1,9 @@
 # ChangeLog de PVEMon
 Historial reconstruido desde la primera versión numerada. Lo más reciente, primero.
 
+## 2.4.4 · 16/11/2026
+- **Móvil:** la cabecera ya no pisa el título con los botones de navegación (Estado, Backups, Kiosko): ahora van a la derecha, junto al avatar, y el aviso de alertas baja a una segunda línea.
+
 ## 2.4.3 · 15/11/2026
 - **Corregido:** el Panel (resumen del servidor), el panel de copias por correo, el elemento «Estado copias» del kiosko y el resumen `/api/v1/summary` daban las copias por buenas cuando **no había ninguna copia correcta** (por ejemplo «Copias: 0 correctas» en verde). Ahora, sin ninguna copia correcta se muestra «Sin copias» en aviso, las máquinas sin copia se cuentan aparte y el resumen de la API deja de decir `ok`.
 

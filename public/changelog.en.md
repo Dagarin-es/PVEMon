@@ -1,6 +1,9 @@
 # PVEMon ChangeLog
 History rebuilt from the first numbered version. Most recent first.
 
+## 2.4.4 · 16/11/2026
+- **Mobile:** the header no longer overlaps the title with the navigation buttons (Status, Backups, Kiosk): they now sit on the right next to the avatar, and the alerts notice drops to a second line.
+
 ## 2.4.3 · 15/11/2026
 - **Fixed:** the Panel (server summary), the e-mail backups panel, the kiosk «Backup status» element and `/api/v1/summary` reported backups as fine when there was **no successful backup at all** (for example a green «Backups: 0 OK»). Now, with no successful backup, «No backups» is shown as a warning, machines without a backup are counted separately and the API summary no longer says `ok`.
 
